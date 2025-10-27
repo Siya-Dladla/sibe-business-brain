@@ -1,8 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { Video, Mic, MicOff, Users, Calendar, Play, StopCircle } from "lucide-react";
 import { useState } from "react";
+import MobileMenu from "@/components/MobileMenu";
 
 const Meeting = () => {
   const [isMeetingActive, setIsMeetingActive] = useState(false);
@@ -26,20 +26,9 @@ const Meeting = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="glass-card border-b border-white/10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-2xl font-bold glow-text">SIBE SI</Link>
-            <div className="flex gap-6">
-              <Link to="/dashboard" className="text-secondary hover:text-primary transition">Dashboard</Link>
-              <Link to="/employees" className="text-secondary hover:text-primary transition">AI Employees</Link>
-              <Link to="/meeting" className="text-foreground hover:text-primary transition">Meetings</Link>
-              <Link to="/reports" className="text-secondary hover:text-primary transition">Reports</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <div className="p-6">
+        <MobileMenu />
+      </div>
 
       <div className="container mx-auto px-6 py-12">
         {/* Header */}
