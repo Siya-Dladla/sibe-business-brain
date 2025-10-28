@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* SIBE SI Design System - Black/Silver/White Theme */
+    /* SIBE SI Design System - Strict Black/Silver/White Theme */
     --background: 0 0% 0%; /* Pure black */
     --foreground: 0 0% 100%; /* Pure white */
 
@@ -18,37 +18,48 @@ All colors MUST be HSL.
     --popover: 0 0% 8%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 195 100% 50%; /* Electric blue - default accent */
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 75%; /* Silver - primary accent */
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 0 0% 75%; /* Silver */
+    --secondary: 0 0% 85%; /* Light silver */
     --secondary-foreground: 0 0% 0%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%; /* Light silver for muted text */
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%; /* Silver text */
 
-    --accent: 195 100% 50%; /* Electric blue accent */
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 90%; /* Bright silver accent */
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 0% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%; /* Silver border with transparency */
-    --input: 0 0% 15%;
-    --ring: 195 100% 50%;
+    --border: 0 0% 20%; /* Dark silver border */
+    --input: 0 0% 10%;
+    --ring: 0 0% 75%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
+
+    /* Sidebar colors */
+    --sidebar-background: 0 0% 3%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 0 0% 75%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 0 0% 75%;
 
     /* Custom SIBE colors */
-    --glass-bg: 0 0% 100% / 0.05; /* Glassmorphism background */
-    --glass-border: 0 0% 100% / 0.1;
     --silver: 0 0% 75%;
     --silver-light: 0 0% 85%;
+    --silver-dark: 0 0% 50%;
     
-    /* Gradient definitions */
-    --gradient-primary: linear-gradient(135deg, hsl(195 100% 50%), hsl(220 100% 60%));
-    --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-    --glow-primary: 0 0 40px hsl(195 100% 50% / 0.3);
+    /* Professional effects */
+    --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    --gradient-subtle: linear-gradient(180deg, rgba(255,255,255,0.03), transparent);
+    --shadow-subtle: 0 2px 8px rgba(0,0,0,0.5);
+    --shadow-strong: 0 8px 32px rgba(0,0,0,0.8);
+    --glow-silver: 0 0 20px rgba(255,255,255,0.15);
   }
 }
 
@@ -64,31 +75,42 @@ All colors MUST be HSL.
 
   /* Glassmorphism utilities */
   .glass-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: var(--shadow-subtle);
   }
 
   .glass-button {
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-button:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: hsl(var(--primary));
-    box-shadow: 0 0 30px hsl(var(--primary) / 0.3);
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.3);
+    box-shadow: var(--glow-silver);
+    transform: translateY(-1px);
   }
 
-  /* Glow effects */
+  /* Professional effects */
   .glow-text {
-    text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+    text-shadow: 0 0 30px rgba(255,255,255,0.3);
   }
 
   .glow-border {
-    box-shadow: 0 0 30px hsl(var(--primary) / 0.3), inset 0 0 20px hsl(var(--primary) / 0.1);
+    box-shadow: 0 0 20px rgba(255,255,255,0.1), inset 0 0 10px rgba(255,255,255,0.05);
+  }
+
+  .hover-lift {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-strong);
   }
 
   /* Animations */

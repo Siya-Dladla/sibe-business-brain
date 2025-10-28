@@ -19,34 +19,40 @@ const MobileMenu = () => {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button className="glass-button p-3 rounded-lg">
-          <Menu className="w-6 h-6" />
+        <button className="glass-button p-3 rounded-lg hover-lift">
+          <Menu className="w-6 h-6 text-primary" />
         </button>
       </SheetTrigger>
-      <SheetContent side="left" className="bg-background border-white/10 p-0 w-[280px]">
+      <SheetContent side="left" className="bg-background border-primary/20 p-0 w-[300px] backdrop-blur-xl">
         <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-white/10">
-            <h2 className="text-2xl font-bold">Menu</h2>
+          <div className="p-8 border-b border-primary/20">
+            <h2 className="text-3xl font-extralight tracking-wider mb-1">SIBE</h2>
+            <p className="text-xs text-primary font-light">Synthetic Intelligence</p>
           </div>
           
-          <nav className="flex-1 py-4">
+          <nav className="flex-1 py-6">
             {menuItems.map((item, index) => (
               <Link
                 key={index}
                 to={item.path}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition ${
-                  location.pathname === item.path ? "bg-white/10" : ""
+                className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group ${
+                  location.pathname === item.path ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"
                 }`}
               >
-                <item.icon className="w-5 h-5" />
-                <span className="text-lg">{item.label}</span>
+                <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${
+                  location.pathname === item.path ? "text-primary" : "text-muted-foreground"
+                }`} />
+                <span className={`text-base font-light ${
+                  location.pathname === item.path ? "text-primary" : "text-foreground"
+                }`}>{item.label}</span>
               </Link>
             ))}
           </nav>
 
-          <div className="p-6 border-t border-white/10">
-            <p className="text-sm text-muted-foreground">© 2025</p>
+          <div className="p-8 border-t border-primary/20">
+            <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
+            <p className="text-xs text-primary/50 mt-1">v6.0 Professional</p>
           </div>
         </div>
       </SheetContent>

@@ -12,40 +12,53 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Mobile Menu */}
-      <div className="p-6">
+    <div className="min-h-screen bg-background flex flex-col grid-bg">
+      {/* Header */}
+      <div className="p-6 flex items-center justify-between border-b border-border/50">
         <MobileMenu />
+        <div className="text-xs text-muted-foreground">SIBE v6.0</div>
       </div>
 
       {/* Logo Section */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <div className="mb-12">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+        <div className="mb-16 animate-float">
           <div className="relative">
-            <div className="w-64 h-64 rounded-full border-2 border-white flex items-center justify-center">
+            <div className="w-72 h-72 rounded-full border border-primary/30 flex items-center justify-center bg-gradient-card backdrop-blur-sm shadow-2xl hover-lift">
               <div className="text-center">
-                <h1 className="text-6xl font-light mb-2">Sibe</h1>
+                <h1 className="text-7xl font-extralight tracking-wider mb-2 glow-text">Sibe</h1>
+                <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent"></div>
               </div>
             </div>
-            <div className="absolute -top-4 -right-8 text-3xl font-light">SI</div>
+            <div className="absolute -top-6 -right-12 text-4xl font-extralight text-primary tracking-widest">SI</div>
+            <div className="absolute inset-0 rounded-full border border-primary/10 animate-pulse-glow"></div>
           </div>
         </div>
 
-        <h2 className="text-xl text-secondary text-center mb-16">
-          Professional Business Intelligence Platform
+        <h2 className="text-2xl text-primary text-center mb-4 font-light tracking-wide">
+          Synthetic Intelligence Business Engine
         </h2>
+        <p className="text-sm text-muted-foreground text-center mb-20 max-w-md">
+          Professional Business Intelligence Platform
+        </p>
 
         {/* Menu Grid */}
-        <div className="w-full max-w-2xl grid grid-cols-2 gap-4">
+        <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-3 gap-6">
           {menuItems.map((item, index) => (
             <Link key={index} to={item.path}>
-              <div className="glass-card p-8 flex flex-col items-center justify-center gap-4 hover:glow-border transition-all duration-300 min-h-[160px]">
-                <item.icon className="w-12 h-12" />
-                <span className="text-lg font-medium">{item.label}</span>
+              <div className="glass-card p-10 flex flex-col items-center justify-center gap-5 hover:glow-border hover-lift transition-all duration-300 min-h-[180px] group">
+                <item.icon className="w-14 h-14 text-primary transition-transform duration-300 group-hover:scale-110" />
+                <span className="text-lg font-light tracking-wide">{item.label}</span>
               </div>
             </Link>
           ))}
         </div>
+      </div>
+
+      {/* Footer */}
+      <div className="p-6 border-t border-border/50 text-center">
+        <p className="text-xs text-muted-foreground">
+          © 2025 SGD Business Analysis & Projects • Powered by Lovable Cloud
+        </p>
       </div>
     </div>
   );
