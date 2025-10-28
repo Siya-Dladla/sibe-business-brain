@@ -1,11 +1,27 @@
 import { useState } from "react";
-import { Menu, X, Home, BarChart3, TrendingUp, Users, Calendar, Settings } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Menu, X, Home, BarChart3, TrendingUp, Users, Calendar, Settings, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const MobileMenu = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut, user } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been successfully signed out."
+    });
+    navigate("/auth");
+    setOpen(false);
+  };
 
   const menuItems = [
     { icon: Home, label: "Home", path: "/" },
@@ -50,9 +66,21 @@ const MobileMenu = () => {
             ))}
           </nav>
 
-          <div className="p-8 border-t border-primary/20">
-            <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
-            <p className="text-xs text-primary/50 mt-1">v6.0 Professional</p>
+          <div className="p-8 border-t border-primary/20 space-y-4">
+            {user && (
+              <Button
+                onClick={handleSignOut}
+                variant="outline"
+                className="w-full glass-button justify-start text-primary border-primary/30 hover:bg-primary/10"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            )}
+            <div>
+              <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
+              <p className="text-xs text-primary/50 mt-1">v6.0 Professional</p>
+            </div>
           </div>
         </div>
       </SheetContent>

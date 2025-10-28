@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { BarChart3, Users, Calendar, TrendingUp, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 
 const Index = () => {
@@ -55,10 +56,15 @@ const Index = () => {
       </div>
 
       {/* Footer */}
-      <div className="p-6 border-t border-border/50 text-center">
+      <div className="p-6 border-t border-border/50 flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
-          © 2025 SGD Business Analysis & Projects • Powered by Lovable Cloud
+          © 2025 SGD Business Analysis & Projects
         </p>
+        <Link to="/auth">
+          <Button variant="outline" className="glass-button text-primary border-primary/30 hover:bg-primary/10">
+            Sign In
+          </Button>
+        </Link>
       </div>
     </div>
   );
