@@ -14,6 +14,121 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_insights: {
+        Row: {
+          business_plan_id: string | null
+          content: string
+          created_at: string
+          id: string
+          insight_type: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          business_plan_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          insight_type: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          business_plan_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          insight_type?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_business_plan_id_fkey"
+            columns: ["business_plan_id"]
+            isOneToOne: false
+            referencedRelation: "business_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_metrics: {
+        Row: {
+          business_plan_id: string | null
+          change_percentage: number | null
+          created_at: string
+          id: string
+          metric_name: string
+          metric_type: string
+          period: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          business_plan_id?: string | null
+          change_percentage?: number | null
+          created_at?: string
+          id?: string
+          metric_name: string
+          metric_type: string
+          period: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          business_plan_id?: string | null
+          change_percentage?: number | null
+          created_at?: string
+          id?: string
+          metric_name?: string
+          metric_type?: string
+          period?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_metrics_business_plan_id_fkey"
+            columns: ["business_plan_id"]
+            isOneToOne: false
+            referencedRelation: "business_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_plans: {
+        Row: {
+          content: string | null
+          created_at: string
+          description: string | null
+          file_url: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

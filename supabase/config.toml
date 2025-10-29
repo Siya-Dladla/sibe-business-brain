@@ -1,1 +1,7 @@
 project_id = "eqngtubtiqvifltwjcwj"
+
+[functions.analyze-business-plan]
+verify_jwt = true
+
+[functions.generate-insights]
+verify_jwt = true
