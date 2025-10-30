@@ -168,6 +168,93 @@ export type Database = {
         }
         Relationships: []
       }
+      forecasts: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          description: string | null
+          forecast_type: string
+          id: string
+          predictions: Json | null
+          status: string
+          time_horizon: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          forecast_type: string
+          id?: string
+          predictions?: Json | null
+          status?: string
+          time_horizon?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          description?: string | null
+          forecast_type?: string
+          id?: string
+          predictions?: Json | null
+          status?: string
+          time_horizon?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      meetings: {
+        Row: {
+          ai_recommendations: string | null
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          meeting_date: string
+          participants: string[] | null
+          status: string
+          summary: string | null
+          title: string
+          transcript: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_recommendations?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          meeting_date?: string
+          participants?: string[] | null
+          status?: string
+          summary?: string | null
+          title: string
+          transcript?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_recommendations?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          meeting_date?: string
+          participants?: string[] | null
+          status?: string
+          summary?: string | null
+          title?: string
+          transcript?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -192,6 +279,51 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          content: string | null
+          created_at: string
+          data: Json | null
+          id: string
+          period_end: string | null
+          period_start: string | null
+          report_type: string
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          report_type: string
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          report_type?: string
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
