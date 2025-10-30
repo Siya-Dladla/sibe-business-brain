@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_employees: {
+        Row: {
+          created_at: string
+          department: string
+          expertise: string[] | null
+          id: string
+          name: string
+          personality: string | null
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          expertise?: string[] | null
+          id?: string
+          name: string
+          personality?: string | null
+          role: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          expertise?: string[] | null
+          id?: string
+          name?: string
+          personality?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_insights: {
         Row: {
           business_plan_id: string | null

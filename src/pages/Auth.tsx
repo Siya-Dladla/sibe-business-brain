@@ -119,15 +119,24 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-6">
       <Card className="glass-card w-full max-w-md hover-lift border-primary/20">
-        <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-20 h-20 rounded-full border border-primary/30 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-            <Sparkles className="w-10 h-10 text-primary" />
+        <CardHeader className="space-y-6 text-center">
+          <div className="mx-auto animate-float">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full border border-primary/30 flex items-center justify-center bg-gradient-card backdrop-blur-sm shadow-2xl">
+                <div className="text-center">
+                  <h1 className="text-3xl font-extralight tracking-wider glow-text">Sibe</h1>
+                  <div className="h-px w-16 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+                </div>
+              </div>
+              <div className="absolute -top-3 -right-5 text-xl font-extralight text-primary tracking-widest">SI</div>
+              <div className="absolute inset-0 rounded-full border border-primary/10 animate-pulse-glow"></div>
+            </div>
           </div>
           <div>
-            <CardTitle className="text-4xl font-extralight tracking-wider mb-2">
-              SIBE SI
+            <CardTitle className="text-2xl font-extralight tracking-wide text-primary mb-2">
+              Synthetic Intelligence Business Engine
             </CardTitle>
-            <CardDescription className="text-primary font-light">
+            <CardDescription className="text-muted-foreground font-light">
               {isLogin ? "Access Your Business Intelligence" : "Create Your Account"}
             </CardDescription>
           </div>
