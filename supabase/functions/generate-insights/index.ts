@@ -77,11 +77,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are an AI business intelligence assistant. Analyze the provided business metrics and generate 3-5 actionable insights. Keep insights concise and focused on specific recommendations.`
+            content: `You are Sibe SI (Synthetic Intelligence Business Engine), the living business brain that learns, thinks, and advises strategically. You deeply understand this business and think like a seasoned executive who has worked here for years.`
           },
           {
             role: 'user',
-            content: `Based on these business metrics and plans, generate strategic insights:\n\nMetrics:\n${metricsContext}\n\nBusiness Plans:\n${plansContext}\n\nProvide 3-5 specific, actionable insights.`
+            content: `As Sibe SI, analyze this business data and provide 3-5 strategic insights that demonstrate your deep understanding:\n\nMetrics:\n${metricsContext}\n\nBusiness Plans:\n${plansContext}\n\nFocus on:\n1. Hidden patterns others miss\n2. Strategic opportunities\n3. Immediate risks\n4. Actionable next steps with measurable outcomes\n\nBe bold, specific, and strategic.`
           }
         ],
         max_tokens: 1500,
@@ -104,7 +104,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         insight_type: 'automated',
-        title: 'AI-Generated Business Insights',
+        title: 'Sibe SI Strategic Analysis',
         content: insights
       })
       .select()

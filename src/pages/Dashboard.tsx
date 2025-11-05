@@ -5,7 +5,9 @@ import MobileMenu from "@/components/MobileMenu";
 import DocumentUpload from "@/components/DocumentUpload";
 import MetricsGrid from "@/components/MetricsGrid";
 import AIInsights from "@/components/AIInsights";
+import SibeChat from "@/components/SibeChat";
 import { useToast } from "@/hooks/use-toast";
+import { Brain, Sparkles } from "lucide-react";
 
 const Dashboard = () => {
   const [metrics, setMetrics] = useState<any[]>([]);
@@ -66,36 +68,55 @@ const Dashboard = () => {
 
       <div className="container mx-auto px-6 py-8">
         <div className="mb-10">
-          <h1 className="text-5xl font-extralight mb-3 tracking-wide">Analytics</h1>
-          <p className="text-primary text-lg font-light">Real-time business intelligence and insights</p>
+          <div className="flex items-center gap-4 mb-3">
+            <Brain className="w-10 h-10 text-primary animate-pulse" />
+            <div>
+              <h1 className="text-5xl font-extralight tracking-wide">Business Intelligence</h1>
+              <p className="text-primary text-lg font-light flex items-center gap-2 mt-1">
+                <Sparkles className="w-4 h-4" />
+                Your synthetic business brain is learning
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Document Upload Section */}
+        {/* Chat with Sibe SI */}
         <div className="mb-8">
+          <SibeChat />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Document Upload Section */}
           <DocumentUpload onUploadSuccess={fetchData} />
+          
+          {/* AI Insights */}
+          <AIInsights insights={insights} onInsightGenerated={fetchData} />
         </div>
 
         {/* KPI Cards */}
         <div className="mb-8">
+          <h2 className="text-2xl font-extralight mb-4 tracking-wide">Live Performance Metrics</h2>
           <MetricsGrid metrics={metrics} />
         </div>
 
-        {/* AI Insights */}
-        <div className="mb-8">
-          <AIInsights insights={insights} onInsightGenerated={fetchData} />
-        </div>
-
-        {/* Charts Placeholder */}
+        {/* Strategic Overview */}
         <Card className="glass-card hover-lift border-primary/20">
           <CardHeader>
-            <CardTitle className="text-xl font-light">Analytics Charts</CardTitle>
+            <CardTitle className="text-xl font-light flex items-center gap-2">
+              <Brain className="w-5 h-5 text-primary" />
+              Strategic Intelligence Dashboard
+            </CardTitle>
             <CardDescription className="text-muted-foreground font-light">
-              Visual representation of your business performance
+              Sibe SI continuously monitors your business and provides real-time strategic recommendations
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-64 flex items-center justify-center border border-primary/10 rounded bg-black/20 backdrop-blur-sm">
-              <p className="text-muted-foreground font-light">Charts will appear here once you upload business data</p>
+              <div className="text-center">
+                <Sparkles className="w-12 h-12 mx-auto mb-3 text-primary opacity-50" />
+                <p className="text-muted-foreground font-light">Advanced analytics visualizations coming soon</p>
+                <p className="text-xs text-muted-foreground/60 mt-2">Sibe SI is processing your business data</p>
+              </div>
             </div>
           </CardContent>
         </Card>

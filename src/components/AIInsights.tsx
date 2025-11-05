@@ -48,11 +48,14 @@ const AIInsights = ({ insights, onInsightGenerated }: AIInsightsProps) => {
   };
 
   return (
-    <Card className="glass-card p-6">
+    <Card className="glass-card p-6 h-full">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Lightbulb className="w-6 h-6 text-primary" />
-          <h3 className="text-xl font-extralight">AI Insights</h3>
+          <div>
+            <h3 className="text-xl font-extralight">Strategic Insights</h3>
+            <p className="text-xs text-muted-foreground font-light">AI-powered business intelligence</p>
+          </div>
         </div>
         <Button
           onClick={generateInsights}
@@ -92,7 +95,8 @@ const AIInsights = ({ insights, onInsightGenerated }: AIInsightsProps) => {
         ) : (
           <div className="text-center py-8 text-muted-foreground font-light">
             <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p>No insights yet. Upload a business plan or click Generate to get started.</p>
+            <p>Sibe SI is ready to learn your business.</p>
+            <p className="text-xs mt-2">Upload data to generate strategic insights.</p>
           </div>
         )}
       </div>

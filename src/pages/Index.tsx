@@ -38,8 +38,11 @@ const Index = () => {
         <h2 className="text-2xl text-primary text-center mb-4 font-light tracking-wide">
           Synthetic Intelligence Business Engine
         </h2>
-        <p className="text-sm text-muted-foreground text-center mb-20 max-w-md">
-          Professional Business Intelligence Platform
+        <p className="text-sm text-muted-foreground text-center mb-8 max-w-2xl">
+          The AI that learns your business, thinks strategically, and advises you 24/7
+        </p>
+        <p className="text-xs text-muted-foreground/60 text-center mb-20 max-w-xl">
+          Unlike traditional BI tools, Sibe SI is alive — it understands how your business operates and evolves with every data point you share
         </p>
 
         {/* Menu Grid */}

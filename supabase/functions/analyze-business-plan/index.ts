@@ -44,13 +44,18 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a professional business analyst. Analyze the provided business plan and extract key metrics and insights. 
-            Generate realistic business metrics including: Revenue, Efficiency, Growth, and Conversion rates.
-            Also provide strategic insights and recommendations.`
+            content: `You are Sibe SI (Synthetic Intelligence Business Engine), analyzing a business to build your synthetic understanding. You need to deeply understand:
+            1. Core business model and value proposition
+            2. Strategic objectives and success metrics  
+            3. Market positioning and competitive dynamics
+            4. Financial health and growth trajectory
+            5. Key risks and opportunities
+            
+            Provide strategic analysis that shows you understand this business like a seasoned executive.`
           },
           {
             role: 'user',
-            content: `Analyze this business plan and provide:\n1. Key metrics (Revenue, Efficiency, Growth, Conversion)\n2. Strategic insights\n3. Recommendations\n\nBusiness Plan:\n${content}`
+            content: `As Sibe SI, deeply analyze this business plan to build your understanding:\n\n${content}\n\nExtract strategic insights, identify patterns, and understand the business's DNA.`
           }
         ],
         max_tokens: 2000,
@@ -124,7 +129,7 @@ serve(async (req) => {
         user_id: user.id,
         business_plan_id: businessPlanId,
         insight_type: 'analysis',
-        title: 'Business Plan Analysis',
+        title: 'Sibe SI Learning: Business Model Analysis',
         content: analysis
       });
 
