@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { DollarSign, Zap, TrendingUp, Target, ArrowUp, ArrowDown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { DollarSign, Zap, TrendingUp, Target, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 
 interface Metric {
   metric_type: string;
@@ -64,31 +65,51 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
     );
   }
 
+  const getInsightBadge = (change: number) => {
+    if (change > 15) return { text: "Exceptional", color: "bg-green-500/20 text-green-400" };
+    if (change > 5) return { text: "Strong", color: "bg-blue-500/20 text-blue-400" };
+    if (change > -5) return { text: "Stable", color: "bg-gray-500/20 text-gray-400" };
+    return { text: "Needs Attention", color: "bg-red-500/20 text-red-400" };
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {metrics.map((metric) => (
-        <Card key={metric.metric_type} className="glass-card p-6 hover-lift">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-primary">{getIcon(metric.metric_type)}</div>
-            {metric.change_percentage >= 0 ? (
-              <ArrowUp className="w-4 h-4 text-green-400" />
-            ) : (
-              <ArrowDown className="w-4 h-4 text-red-400" />
-            )}
-          </div>
-          <h3 className="text-muted-foreground font-light text-sm mb-2">
-            {metric.metric_name}
-          </h3>
-          <p className="text-3xl font-extralight mb-1">
-            {formatValue(metric.metric_type, metric.value)}
-          </p>
-          <p className={`text-sm font-light ${
-            metric.change_percentage >= 0 ? 'text-green-400' : 'text-red-400'
-          }`}>
-            {metric.change_percentage >= 0 ? '+' : ''}{metric.change_percentage.toFixed(1)}%
-          </p>
-        </Card>
-      ))}
+      {metrics.map((metric) => {
+        const badge = getInsightBadge(metric.change_percentage);
+        return (
+          <Card key={metric.metric_type} className="glass-card p-6 hover-lift relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-primary">{getIcon(metric.metric_type)}</div>
+                <div className="flex items-center gap-2">
+                  {metric.change_percentage >= 0 ? (
+                    <ArrowUp className="w-4 h-4 text-green-400" />
+                  ) : (
+                    <ArrowDown className="w-4 h-4 text-red-400" />
+                  )}
+                </div>
+              </div>
+              <h3 className="text-muted-foreground font-light text-sm mb-2">
+                {metric.metric_name}
+              </h3>
+              <p className="text-3xl font-extralight mb-2">
+                {formatValue(metric.metric_type, metric.value)}
+              </p>
+              <div className="flex items-center justify-between">
+                <p className={`text-sm font-light ${
+                  metric.change_percentage >= 0 ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {metric.change_percentage >= 0 ? '+' : ''}{metric.change_percentage.toFixed(1)}%
+                </p>
+                <Badge className={`${badge.color} border-0 text-xs`}>
+                  {badge.text}
+                </Badge>
+              </div>
+            </div>
+          </Card>
+        );
+      })}
     </div>
   );
 };

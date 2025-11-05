@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import MobileMenu from "@/components/MobileMenu";
@@ -6,14 +6,18 @@ import DocumentUpload from "@/components/DocumentUpload";
 import MetricsGrid from "@/components/MetricsGrid";
 import AIInsights from "@/components/AIInsights";
 import SibeChat from "@/components/SibeChat";
+import BusinessDNA from "@/components/BusinessDNA";
+import QuickActions from "@/components/QuickActions";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Sparkles } from "lucide-react";
 
 const Dashboard = () => {
   const [metrics, setMetrics] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
+  const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const chatRef = useRef<any>(null);
 
   const fetchData = async () => {
     try {
@@ -41,8 +45,18 @@ const Dashboard = () => {
 
       if (insightsError) throw insightsError;
 
+      // Fetch plans
+      const { data: plansData, error: plansError } = await supabase
+        .from('business_plans')
+        .select('id, title, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (plansError) throw plansError;
+
       setMetrics(metricsData || []);
       setInsights(insightsData || []);
+      setPlans(plansData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -52,6 +66,12 @@ const Dashboard = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleQuickAction = (question: string) => {
+    if (chatRef.current) {
+      chatRef.current.sendMessage(question);
     }
   };
 
@@ -80,9 +100,23 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Business DNA Analysis */}
+        <div className="mb-8">
+          <BusinessDNA 
+            metricsCount={metrics.length}
+            insightsCount={insights.length}
+            plansCount={plans.length}
+          />
+        </div>
+
         {/* Chat with Sibe SI */}
         <div className="mb-8">
-          <SibeChat />
+          <SibeChat ref={chatRef} />
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <QuickActions onAction={handleQuickAction} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">

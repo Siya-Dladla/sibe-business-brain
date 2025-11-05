@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ interface Message {
   timestamp: Date;
 }
 
-const SibeChat = () => {
+const SibeChat = forwardRef((props, ref) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -79,6 +79,13 @@ const SibeChat = () => {
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    sendMessage: (message: string) => {
+      setInput(message);
+      setTimeout(() => handleSend(), 100);
+    }
+  }));
+
   return (
     <Card className="glass-card p-6 flex flex-col h-[600px]">
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-primary/20">
@@ -141,6 +148,6 @@ const SibeChat = () => {
       </div>
     </Card>
   );
-};
+});
 
 export default SibeChat;
