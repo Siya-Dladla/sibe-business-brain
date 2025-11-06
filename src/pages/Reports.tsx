@@ -115,6 +115,16 @@ const Reports = () => {
 
   useEffect(() => {
     fetchReports();
+
+    // Set up realtime subscription
+    const channel = supabase
+      .channel('reports-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, fetchReports)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Get default dates (last 30 days)

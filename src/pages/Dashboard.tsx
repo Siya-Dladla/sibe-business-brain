@@ -77,6 +77,28 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchData();
+
+    // Set up realtime subscriptions
+    const metricsChannel = supabase
+      .channel('dashboard-metrics')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'business_metrics' }, fetchData)
+      .subscribe();
+
+    const insightsChannel = supabase
+      .channel('dashboard-insights')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_insights' }, fetchData)
+      .subscribe();
+
+    const plansChannel = supabase
+      .channel('dashboard-plans')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'business_plans' }, fetchData)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(metricsChannel);
+      supabase.removeChannel(insightsChannel);
+      supabase.removeChannel(plansChannel);
+    };
   }, []);
 
   return (

@@ -114,6 +114,16 @@ const Forecasting = () => {
 
   useEffect(() => {
     fetchForecasts();
+
+    // Set up realtime subscription
+    const channel = supabase
+      .channel('forecasts-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'forecasts' }, fetchForecasts)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (

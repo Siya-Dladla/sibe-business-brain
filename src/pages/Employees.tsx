@@ -70,6 +70,16 @@ const Employees = () => {
 
   useEffect(() => {
     fetchEmployees();
+
+    // Set up realtime subscription
+    const channel = supabase
+      .channel('employees-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_employees' }, fetchEmployees)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
