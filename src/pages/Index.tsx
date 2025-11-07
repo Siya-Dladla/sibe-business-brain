@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BarChart3, Users, Calendar, TrendingUp, Briefcase, Settings } from "lucide-react";
+import { BarChart3, Users, Calendar, TrendingUp, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 
@@ -9,7 +9,6 @@ const Index = () => {
     { icon: Users, label: "Team", path: "/employees" },
     { icon: Calendar, label: "Meetings", path: "/meeting" },
     { icon: TrendingUp, label: "Strategy", path: "/forecasting" },
-    { icon: Briefcase, label: "Investors", path: "/investors" },
     { icon: Settings, label: "Settings", path: "/settings" }
   ];
 

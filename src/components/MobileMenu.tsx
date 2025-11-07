@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, Home, BarChart3, TrendingUp, Users, Calendar, Briefcase, Settings, LogOut } from "lucide-react";
+import { Menu, X, Home, BarChart3, TrendingUp, Users, Calendar, Settings, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,6 @@ const MobileMenu = () => {
     { icon: TrendingUp, label: "Forecasting", path: "/forecasting" },
     { icon: Users, label: "Team", path: "/employees" },
     { icon: Calendar, label: "Meetings", path: "/meeting" },
-    { icon: Briefcase, label: "Investors", path: "/investors" },
     { icon: Settings, label: "Settings", path: "/settings" }
   ];
 
