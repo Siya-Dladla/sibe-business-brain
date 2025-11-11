@@ -60,6 +60,16 @@ All colors MUST be HSL.
     --shadow-subtle: 0 2px 8px rgba(0,0,0,0.5);
     --shadow-strong: 0 8px 32px rgba(0,0,0,0.8);
     --glow-silver: 0 0 20px rgba(255,255,255,0.15);
+    
+    /* Holographic effect */
+    --holographic-gradient: linear-gradient(
+      135deg,
+      hsl(180, 100%, 50%) 0%,
+      hsl(240, 100%, 60%) 25%,
+      hsl(300, 100%, 50%) 50%,
+      hsl(0, 100%, 50%) 75%,
+      hsl(60, 100%, 50%) 100%
+    );
   }
 }
 
@@ -143,5 +153,53 @@ All colors MUST be HSL.
       linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size: 50px 50px;
+  }
+
+  /* Holographic effect */
+  @keyframes holographic-rotate {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .holographic-card {
+    position: relative;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 255, 255, 0.1) 0%,
+      rgba(128, 0, 255, 0.1) 25%,
+      rgba(255, 0, 255, 0.1) 50%,
+      rgba(255, 0, 0, 0.1) 75%,
+      rgba(255, 255, 0, 0.1) 100%
+    );
+    background-size: 200% 200%;
+    animation: holographic-rotate 3s ease infinite;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .holographic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: var(--holographic-gradient);
+    background-size: 200% 200%;
+    animation: holographic-rotate 3s ease infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 }

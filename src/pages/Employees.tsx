@@ -1,12 +1,43 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Trash2, Sparkles, Brain } from "lucide-react";
+import { Users, Trash2, Sparkles, Brain, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import CreateEmployeeDialog from "@/components/CreateEmployeeDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+const TEMPLATE_EMPLOYEES = [
+  {
+    name: "AI Business Analyst",
+    department: "Strategy",
+    role: "Business Analyst",
+    personality: "Analytical and data-driven professional specializing in market trends, competitive analysis, and strategic insights.",
+    expertise: ["Market Research", "Data Analysis", "Strategic Planning", "KPI Tracking", "Business Intelligence"]
+  },
+  {
+    name: "AI Software Engineer",
+    department: "Engineering",
+    role: "Software Engineer",
+    personality: "Expert coder with deep knowledge of modern frameworks, architecture patterns, and best practices in software development.",
+    expertise: ["Full Stack Development", "System Design", "Code Review", "DevOps", "Technical Documentation"]
+  },
+  {
+    name: "AI Accountant",
+    department: "Finance",
+    role: "Senior Accountant",
+    personality: "Detail-oriented financial expert specializing in bookkeeping, tax compliance, and financial reporting.",
+    expertise: ["Financial Reporting", "Tax Compliance", "Budgeting", "Audit Preparation", "Cash Flow Management"]
+  },
+  {
+    name: "AI Business Intelligence Analyst",
+    department: "Analytics",
+    role: "BI Analyst",
+    personality: "Data storyteller who transforms complex datasets into actionable insights and compelling visualizations.",
+    expertise: ["Data Visualization", "SQL", "Dashboard Creation", "Predictive Analytics", "Report Automation"]
+  }
+];
 
 interface AIEmployee {
   id: string;
@@ -68,6 +99,39 @@ const Employees = () => {
     }
   };
 
+  const addTemplateEmployee = async (template: typeof TEMPLATE_EMPLOYEES[0]) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { error } = await supabase
+        .from("ai_employees")
+        .insert({
+          name: template.name,
+          department: template.department,
+          role: template.role,
+          personality: template.personality,
+          expertise: template.expertise,
+          user_id: user.id
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `${template.name} added to your team!`
+      });
+      
+      fetchEmployees();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
   useEffect(() => {
     fetchEmployees();
 
@@ -96,6 +160,39 @@ const Employees = () => {
             <p className="text-primary text-lg font-light">Manage your AI employees and synthetic workforce</p>
           </div>
           <CreateEmployeeDialog onEmployeeCreated={fetchEmployees} />
+        </div>
+
+        {/* Template AI Employees Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-extralight mb-6 tracking-wide">Ready-Made AI Employees</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {TEMPLATE_EMPLOYEES.map((template, idx) => (
+              <Card key={idx} className="holographic-card p-6 cursor-pointer group hover-lift" onClick={() => addTemplateEmployee(template)}>
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 flex items-center justify-center animate-pulse-glow">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-light tracking-wide mb-1">{template.name}</h3>
+                    <Badge variant="outline" className="border-primary/30 text-primary font-light mb-3">
+                      {template.department}
+                    </Badge>
+                    <p className="text-sm text-muted-foreground font-light line-clamp-3 mb-4">
+                      {template.personality}
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add to Team
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        <div className="border-t border-border/30 pt-8 mb-6">
+          <h2 className="text-3xl font-extralight mb-6 tracking-wide">Your AI Team</h2>
         </div>
 
         {loading ? (
