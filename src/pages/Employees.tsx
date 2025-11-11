@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Trash2, Sparkles, Brain, Plus } from "lucide-react";
+import { Users, Trash2, Sparkles, Brain, Plus, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import CreateEmployeeDialog from "@/components/CreateEmployeeDialog";
+import EmployeeInteractionDialog from "@/components/EmployeeInteractionDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -53,6 +54,7 @@ interface AIEmployee {
 const Employees = () => {
   const [employees, setEmployees] = useState<AIEmployee[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEmployee, setSelectedEmployee] = useState<AIEmployee | null>(null);
   const { toast } = useToast();
 
   const fetchEmployees = async () => {
@@ -268,11 +270,27 @@ const Employees = () => {
                       )}
                     </div>
                   )}
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedEmployee(employee)}
+                    className="w-full mt-4 border-primary/30 hover:bg-primary/10"
+                  >
+                    <MessageSquare className="w-3 h-3 mr-1" />
+                    Chat with {employee.name.split(' ')[0]}
+                  </Button>
                 </div>
               </Card>
             ))}
           </div>
         )}
+
+        <EmployeeInteractionDialog
+          employee={selectedEmployee}
+          open={!!selectedEmployee}
+          onOpenChange={(open) => !open && setSelectedEmployee(null)}
+        />
       </div>
     </div>
   );

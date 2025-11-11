@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar, MessageSquare, Sparkles, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar, MessageSquare, Sparkles, Trash2, Users } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -21,13 +22,22 @@ interface Meeting {
   status: string;
 }
 
+interface AIEmployee {
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+}
+
 const Meeting = () => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [aiEmployees, setAiEmployees] = useState<AIEmployee[]>([]);
   const [loading, setLoading] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [formData, setFormData] = useState({ title: "", agenda: "" });
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const { toast } = useToast();
 
   const fetchMeetings = async () => {
@@ -51,6 +61,25 @@ const Meeting = () => {
     }
   };
 
+  const fetchAIEmployees = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("ai_employees")
+        .select("id, name, role, department")
+        .eq("status", "active")
+        .order("name");
+
+      if (error) throw error;
+      setAiEmployees(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
   const createMeeting = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsCreating(true);
@@ -63,7 +92,7 @@ const Meeting = () => {
         body: {
           meetingTitle: formData.title,
           agenda: formData.agenda,
-          participantIds: []
+          participantIds: selectedEmployees
         }
       });
 
@@ -75,6 +104,7 @@ const Meeting = () => {
       });
 
       setFormData({ title: "", agenda: "" });
+      setSelectedEmployees([]);
       setOpen(false);
       fetchMeetings();
     } catch (error: any) {
@@ -114,6 +144,7 @@ const Meeting = () => {
 
   useEffect(() => {
     fetchMeetings();
+    fetchAIEmployees();
 
     // Set up realtime subscription
     const channel = supabase
@@ -125,6 +156,14 @@ const Meeting = () => {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const toggleEmployee = (employeeId: string) => {
+    setSelectedEmployees(prev => 
+      prev.includes(employeeId) 
+        ? prev.filter(id => id !== employeeId)
+        : [...prev, employeeId]
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background grid-bg">
@@ -181,6 +220,36 @@ const Meeting = () => {
                     className="bg-input border-primary/20 focus:border-primary font-light min-h-[100px]"
                     required
                   />
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-sm font-light flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    Select AI Employees (Optional)
+                  </Label>
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto p-2 border border-primary/20 rounded-md">
+                    {aiEmployees.length === 0 ? (
+                      <p className="text-xs text-muted-foreground font-light text-center py-4">
+                        No AI employees available. Create some in the Employees tab first.
+                      </p>
+                    ) : (
+                      aiEmployees.map((employee) => (
+                        <div key={employee.id} className="flex items-center space-x-2 p-2 hover:bg-primary/5 rounded">
+                          <Checkbox
+                            id={employee.id}
+                            checked={selectedEmployees.includes(employee.id)}
+                            onCheckedChange={() => toggleEmployee(employee.id)}
+                          />
+                          <label
+                            htmlFor={employee.id}
+                            className="text-sm font-light cursor-pointer flex-1"
+                          >
+                            {employee.name} - {employee.role}
+                          </label>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
 
                 <Button
