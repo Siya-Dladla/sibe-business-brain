@@ -8,6 +8,7 @@ import AIInsights from "@/components/AIInsights";
 import SibeChat from "@/components/SibeChat";
 import BusinessDNA from "@/components/BusinessDNA";
 import QuickActions from "@/components/QuickActions";
+import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Sparkles } from "lucide-react";
 
@@ -129,6 +130,11 @@ const Dashboard = () => {
             insightsCount={insights.length}
             plansCount={plans.length}
           />
+        </div>
+
+        {/* Website Analyzer */}
+        <div className="mb-8">
+          <WebsiteAnalyzer onAnalysisComplete={fetchData} />
         </div>
 
         {/* Chat with Sibe SI */}
