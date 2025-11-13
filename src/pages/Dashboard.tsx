@@ -1,16 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import MobileMenu from "@/components/MobileMenu";
 import DocumentUpload from "@/components/DocumentUpload";
 import MetricsGrid from "@/components/MetricsGrid";
 import AIInsights from "@/components/AIInsights";
 import SibeChat from "@/components/SibeChat";
-import BusinessDNA from "@/components/BusinessDNA";
 import QuickActions from "@/components/QuickActions";
 import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Sparkles } from "lucide-react";
+import { Brain, Database, Lightbulb } from "lucide-react";
 
 const Dashboard = () => {
   const [metrics, setMetrics] = useState<any[]>([]);
@@ -106,82 +106,89 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background grid-bg">
       <div className="p-6 flex items-center justify-between border-b border-border/50">
         <MobileMenu />
-        <div className="text-xs text-muted-foreground">Analytics Dashboard</div>
+        <div className="text-xs text-muted-foreground">Business Intelligence Platform</div>
       </div>
 
       <div className="container mx-auto px-6 py-8">
-        <div className="mb-10">
+        <div className="mb-8">
           <div className="flex items-center gap-4 mb-3">
             <Brain className="w-10 h-10 text-primary animate-pulse" />
             <div>
-              <h1 className="text-5xl font-extralight tracking-wide">Business Intelligence</h1>
-              <p className="text-primary text-lg font-light flex items-center gap-2 mt-1">
-                <Sparkles className="w-4 h-4" />
-                Your synthetic business brain is learning
+              <h1 className="text-4xl font-extralight tracking-wide">Sibe SI</h1>
+              <p className="text-muted-foreground font-light text-sm mt-1">
+                Your Synthetic Intelligence Business Partner
               </p>
             </div>
           </div>
         </div>
 
-        {/* Business DNA Analysis */}
-        <div className="mb-8">
-          <BusinessDNA 
-            metricsCount={metrics.length}
-            insightsCount={insights.length}
-            plansCount={plans.length}
-          />
-        </div>
+        <Tabs defaultValue="insights" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="insights" className="flex items-center gap-2">
+              <Brain className="w-4 h-4" />
+              Data Insights
+            </TabsTrigger>
+            <TabsTrigger value="collection" className="flex items-center gap-2">
+              <Database className="w-4 h-4" />
+              Data Collection
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Website Analyzer */}
-        <div className="mb-8">
-          <WebsiteAnalyzer onAnalysisComplete={fetchData} />
-        </div>
+          <TabsContent value="insights" className="space-y-6">
+            {/* Quick Actions */}
+            <QuickActions onAction={handleQuickAction} />
 
-        {/* Chat with Sibe SI */}
-        <div className="mb-8">
-          <SibeChat ref={chatRef} />
-        </div>
+            {/* Metrics Grid */}
+            <MetricsGrid metrics={metrics} />
 
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <QuickActions onAction={handleQuickAction} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Document Upload Section */}
-          <DocumentUpload onUploadSuccess={fetchData} />
-          
-          {/* AI Insights */}
-          <AIInsights insights={insights} onInsightGenerated={fetchData} />
-        </div>
-
-        {/* KPI Cards */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-extralight mb-4 tracking-wide">Live Performance Metrics</h2>
-          <MetricsGrid metrics={metrics} />
-        </div>
-
-        {/* Strategic Overview */}
-        <Card className="glass-card hover-lift border-primary/20">
-          <CardHeader>
-            <CardTitle className="text-xl font-light flex items-center gap-2">
-              <Brain className="w-5 h-5 text-primary" />
-              Strategic Intelligence Dashboard
-            </CardTitle>
-            <CardDescription className="text-muted-foreground font-light">
-              Sibe SI continuously monitors your business and provides real-time strategic recommendations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64 flex items-center justify-center border border-primary/10 rounded bg-black/20 backdrop-blur-sm">
-              <div className="text-center">
-                <Sparkles className="w-12 h-12 mx-auto mb-3 text-primary opacity-50" />
-                <p className="text-muted-foreground font-light">Advanced analytics visualizations coming soon</p>
-                <p className="text-xs text-muted-foreground/60 mt-2">Sibe SI is processing your business data</p>
+            {/* Business Brain - Chat and Insights */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <AIInsights insights={insights} onInsightGenerated={fetchData} />
+              </div>
+              
+              <div>
+                <SibeChat ref={chatRef} />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
+
+          <TabsContent value="collection" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <WebsiteAnalyzer onAnalysisComplete={fetchData} />
+              <DocumentUpload onUploadSuccess={fetchData} />
+            </div>
+
+            {plans.length > 0 && (
+              <Card className="glass-card p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Lightbulb className="w-6 h-6 text-primary" />
+                  <div>
+                    <h3 className="text-xl font-extralight">Collected Data</h3>
+                    <p className="text-xs text-muted-foreground font-light">
+                      Your uploaded business plans and analyzed websites
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {plans.map((plan) => (
+                    <div
+                      key={plan.id}
+                      className="p-3 bg-background/50 border border-primary/20 rounded-lg flex justify-between items-center"
+                    >
+                      <div>
+                        <p className="text-sm font-light">{plan.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(plan.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
