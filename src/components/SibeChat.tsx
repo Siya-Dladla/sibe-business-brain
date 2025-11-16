@@ -87,17 +87,15 @@ const SibeChat = forwardRef((props, ref) => {
   }));
 
   return (
-    <Card className="glass-card p-6 flex flex-col h-[600px] border-primary/30">
+    <Card className="glass-card p-6 flex flex-col h-[600px]">
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-primary/20">
         <div className="relative">
           <Brain className="w-8 h-8 text-primary animate-pulse" />
           <div className="absolute inset-0 rounded-full border border-primary/30 animate-pulse-glow"></div>
         </div>
         <div>
-          <h3 className="text-2xl font-extralight tracking-wide bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Ask Sibe SI
-          </h3>
-          <p className="text-sm text-muted-foreground font-light">Your AI Business Intelligence Partner</p>
+          <h3 className="text-xl font-extralight">Sibe SI</h3>
+          <p className="text-xs text-muted-foreground font-light">Your Synthetic Intelligence Partner</p>
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import MobileMenu from "@/components/MobileMenu";
 import DocumentUpload from "@/components/DocumentUpload";
 import MetricsGrid from "@/components/MetricsGrid";
+import AIInsights from "@/components/AIInsights";
 import SibeChat from "@/components/SibeChat";
 import QuickActions from "@/components/QuickActions";
 import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
@@ -140,9 +141,15 @@ const Dashboard = () => {
             {/* Metrics Grid */}
             <MetricsGrid metrics={metrics} />
 
-            {/* Ask Sibe SI - Enhanced Chat */}
-            <div className="w-full">
-              <SibeChat ref={chatRef} />
+            {/* Business Brain - Chat and Insights */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <AIInsights insights={insights} onInsightGenerated={fetchData} />
+              </div>
+              
+              <div>
+                <SibeChat ref={chatRef} />
+              </div>
             </div>
           </TabsContent>
 

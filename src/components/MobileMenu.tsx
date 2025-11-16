@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Brain, Database, Layers, Users, FileText, Settings, LogOut } from "lucide-react";
+import { Menu, X, Home, BarChart3, TrendingUp, Users, Calendar, Settings, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -24,11 +24,11 @@ const MobileMenu = () => {
   };
 
   const menuItems = [
-    { icon: Brain, label: "Data Insights", path: "/dashboard" },
-    { icon: Database, label: "Data Collection", path: "/dashboard" },
-    { icon: Layers, label: "Canvas", path: "/canvas" },
-    { icon: Users, label: "AI Employees", path: "/employees" },
-    { icon: FileText, label: "Reports", path: "/reports" },
+    { icon: Home, label: "Home", path: "/" },
+    { icon: BarChart3, label: "Analytics", path: "/dashboard" },
+    { icon: TrendingUp, label: "Forecasting", path: "/forecasting" },
+    { icon: Users, label: "Team", path: "/employees" },
+    { icon: Calendar, label: "Meetings", path: "/meeting" },
     { icon: Settings, label: "Settings", path: "/settings" }
   ];
 

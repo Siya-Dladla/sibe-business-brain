@@ -3,8 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check } from "lucide-react";
+import { Settings as SettingsIcon, User, LogOut, Save } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -16,12 +15,6 @@ const Settings = () => {
   const [profile, setProfile] = useState({
     email: "",
     full_name: ""
-  });
-  const [aiEngine, setAiEngine] = useState("lovable-ai");
-  const [apiKeys, setApiKeys] = useState({
-    openai: "",
-    anthropic: "",
-    gemini: ""
   });
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -134,39 +127,44 @@ const Settings = () => {
 
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
               </div>
             ) : (
               <form onSubmit={saveProfile} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name</Label>
-                  <Input
-                    id="full_name"
-                    value={profile.full_name}
-                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                    className="glass-button h-12"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-sm font-light">Email Address</Label>
                   <Input
                     id="email"
                     type="email"
                     value={profile.email}
                     disabled
-                    className="glass-button h-12 opacity-60"
+                    className="bg-input/50 border-primary/20 font-light"
+                  />
+                  <p className="text-xs text-muted-foreground font-light">
+                    Email cannot be changed
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="full_name" className="text-sm font-light">Full Name</Label>
+                  <Input
+                    id="full_name"
+                    type="text"
+                    value={profile.full_name}
+                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                    placeholder="Enter your full name"
+                    className="bg-input border-primary/20 focus:border-primary font-light"
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  className="bg-primary hover:bg-primary/80 h-11 px-8"
+                  className="glass-button text-primary border-primary/30 hover:bg-primary/10 h-11 px-8"
                   disabled={saving}
                 >
                   {saving ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
                       Saving...
                     </div>
                   ) : (
@@ -178,140 +176,6 @@ const Settings = () => {
                 </Button>
               </form>
             )}
-          </Card>
-
-          {/* AI Engine Configuration */}
-          <Card className="glass-card p-8 border-primary/20">
-            <div className="flex items-center gap-3 mb-6">
-              <Cpu className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide">AI Engine</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="ai-engine">Select AI Provider</Label>
-                <Select value={aiEngine} onValueChange={setAiEngine}>
-                  <SelectTrigger className="glass-button h-12">
-                    <SelectValue placeholder="Select AI provider" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lovable-ai">Lovable AI (Recommended)</SelectItem>
-                    <SelectItem value="openai">OpenAI</SelectItem>
-                    <SelectItem value="anthropic">Anthropic Claude</SelectItem>
-                    <SelectItem value="gemini">Google Gemini</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {aiEngine !== "lovable-ai" && (
-                <div className="space-y-4 pt-4 border-t border-border/30">
-                  <p className="text-sm text-muted-foreground">
-                    Enter your API key for {aiEngine === "openai" ? "OpenAI" : aiEngine === "anthropic" ? "Anthropic" : "Google Gemini"}
-                  </p>
-                  <div className="space-y-2">
-                    <Label htmlFor={`${aiEngine}-key`}>API Key</Label>
-                    <Input
-                      id={`${aiEngine}-key`}
-                      type="password"
-                      value={apiKeys[aiEngine as keyof typeof apiKeys]}
-                      onChange={(e) => setApiKeys({ ...apiKeys, [aiEngine]: e.target.value })}
-                      placeholder="sk-..."
-                      className="glass-button h-12 font-mono"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <Button
-                onClick={() => {
-                  toast({
-                    title: "Settings Saved",
-                    description: "Your AI engine preferences have been updated"
-                  });
-                }}
-                className="w-full bg-primary hover:bg-primary/80 h-11"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Save AI Settings
-              </Button>
-            </div>
-          </Card>
-
-          {/* Subscription & Billing */}
-          <Card className="glass-card p-8 border-primary/20">
-            <div className="flex items-center gap-3 mb-6">
-              <CreditCard className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide">Subscription</h2>
-            </div>
-
-            <div className="space-y-6">
-              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/30">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-light text-primary">Professional Plan</h3>
-                    <p className="text-sm text-muted-foreground">Current subscription</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-light">$49</p>
-                    <p className="text-xs text-muted-foreground">per month</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-accent" />
-                    <span>Unlimited AI Employees</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-accent" />
-                    <span>Advanced Analytics & Insights</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-accent" />
-                    <span>Priority Support</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-accent" />
-                    <span>Canvas Project Management</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground font-light">
-                  Choose your payment method
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    onClick={() => {
-                      toast({
-                        title: "Stripe Integration",
-                        description: "Redirecting to Stripe checkout..."
-                      });
-                    }}
-                    className="h-12 bg-[#635bff] hover:bg-[#635bff]/80 text-white"
-                  >
-                    Pay with Stripe
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      toast({
-                        title: "PayPal Integration",
-                        description: "Redirecting to PayPal..."
-                      });
-                    }}
-                    className="h-12 bg-[#0070ba] hover:bg-[#0070ba]/80 text-white"
-                  >
-                    Pay with PayPal
-                  </Button>
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full glass-button border-destructive/30 text-destructive hover:bg-destructive/10"
-                >
-                  Cancel Subscription
-                </Button>
-              </div>
-            </div>
           </Card>
 
           {/* Platform Information */}
@@ -329,7 +193,7 @@ const Settings = () => {
               
               <div className="flex justify-between py-3 border-b border-border/30">
                 <span className="text-muted-foreground font-light">AI Engine</span>
-                <span className="text-primary font-light capitalize">{aiEngine.replace('-', ' ')}</span>
+                <span className="text-primary font-light">OpenAI GPT-4</span>
               </div>
               
               <div className="flex justify-between py-3 border-b border-border/30">
@@ -339,7 +203,7 @@ const Settings = () => {
 
               <div className="flex justify-between py-3">
                 <span className="text-muted-foreground font-light">Status</span>
-                <span className="text-accent font-light">● Active</span>
+                <span className="text-green-400 font-light">● Active</span>
               </div>
             </div>
           </Card>
@@ -364,6 +228,41 @@ const Settings = () => {
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
+            </div>
+          </Card>
+
+          {/* Feature Overview */}
+          <Card className="glass-card p-8 border-primary/20">
+            <h2 className="text-2xl font-extralight tracking-wide mb-6">Enabled Features</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                <h3 className="font-light text-primary mb-1">Business Plan Analysis</h3>
+                <p className="text-xs text-muted-foreground font-light">
+                  AI-powered document analysis and insights
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                <h3 className="font-light text-primary mb-1">AI Employees</h3>
+                <p className="text-xs text-muted-foreground font-light">
+                  Create synthetic workforce members
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                <h3 className="font-light text-primary mb-1">AI Meetings</h3>
+                <p className="text-xs text-muted-foreground font-light">
+                  Strategic conference with AI team
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                <h3 className="font-light text-primary mb-1">Forecasting & Reports</h3>
+                <p className="text-xs text-muted-foreground font-light">
+                  Predictive analytics and business reports
+                </p>
+              </div>
             </div>
           </Card>
         </div>
