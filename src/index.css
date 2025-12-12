@@ -8,68 +8,65 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* SIBE SI Design System - Professional with Accent Colors */
+    /* SIBE SI Design System - Clean Monochrome */
     --background: 0 0% 0%; /* Pure black */
     --foreground: 0 0% 100%; /* Pure white */
 
-    --card: 0 0% 5%; /* Very dark gray for cards */
+    --card: 0 0% 6%; /* Very dark gray for cards */
     --card-foreground: 0 0% 100%;
 
     --popover: 0 0% 8%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 217 91% 60%; /* Professional blue */
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 100%; /* White as primary */
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 271 81% 56%; /* Purple accent */
+    --secondary: 0 0% 15%; /* Dark gray */
     --secondary-foreground: 0 0% 100%;
 
     --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 60%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 142 76% 36%; /* Green accent */
+    --accent: 0 0% 20%; /* Medium gray accent */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%;
+    --border: 0 0% 18%;
     --input: 0 0% 10%;
-    --ring: 217 91% 60%;
+    --ring: 0 0% 50%;
 
     --radius: 0.5rem;
 
     /* Sidebar colors */
-    --sidebar-background: 0 0% 3%;
-    --sidebar-foreground: 0 0% 90%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 10%;
-    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 85%;
     --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-ring: 0 0% 50%;
 
-    /* Custom SIBE colors */
-    --blue: 217 91% 60%;
-    --blue-light: 217 91% 70%;
-    --purple: 271 81% 56%;
-    --green: 142 76% 36%;
+    /* Monochrome palette */
+    --gray-light: 0 0% 70%;
+    --gray-medium: 0 0% 40%;
+    --gray-dark: 0 0% 20%;
     
     /* Professional effects */
-    --gradient-card: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.05));
-    --gradient-subtle: linear-gradient(180deg, rgba(59, 130, 246, 0.05), transparent);
-    --shadow-subtle: 0 2px 8px rgba(0,0,0,0.5);
-    --shadow-strong: 0 8px 32px rgba(59, 130, 246, 0.2);
-    --glow-primary: 0 0 20px rgba(59, 130, 246, 0.3);
+    --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+    --gradient-subtle: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+    --shadow-subtle: 0 2px 8px rgba(0,0,0,0.6);
+    --shadow-strong: 0 8px 32px rgba(255, 255, 255, 0.05);
+    --glow-primary: 0 0 20px rgba(255, 255, 255, 0.1);
     
-    /* Holographic effect */
-    --holographic-gradient: linear-gradient(
+    /* Subtle shimmer effect */
+    --shimmer-gradient: linear-gradient(
       135deg,
-      hsl(180, 100%, 50%) 0%,
-      hsl(240, 100%, 60%) 25%,
-      hsl(300, 100%, 50%) 50%,
-      hsl(0, 100%, 50%) 75%,
-      hsl(60, 100%, 50%) 100%
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.1) 100%
     );
   }
 }
