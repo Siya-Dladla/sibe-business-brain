@@ -2,26 +2,37 @@ import { Link } from "react-router-dom";
 import { BarChart3, Users, Calendar, TrendingUp, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
-
 const Index = () => {
-  const menuItems = [
-    { icon: BarChart3, label: "Analytics", path: "/dashboard" },
-    { icon: Users, label: "Team", path: "/employees" },
-    { icon: Calendar, label: "Meetings", path: "/meeting" },
-    { icon: TrendingUp, label: "Strategy", path: "/forecasting" },
-    { icon: Settings, label: "Settings", path: "/settings" }
-  ];
-
-  return (
-    <div className="min-h-screen bg-background flex flex-col grid-bg">
+  const menuItems = [{
+    icon: BarChart3,
+    label: "Analytics",
+    path: "/dashboard"
+  }, {
+    icon: Users,
+    label: "Team",
+    path: "/employees"
+  }, {
+    icon: Calendar,
+    label: "Meetings",
+    path: "/meeting"
+  }, {
+    icon: TrendingUp,
+    label: "Strategy",
+    path: "/forecasting"
+  }, {
+    icon: Settings,
+    label: "Settings",
+    path: "/settings"
+  }];
+  return <div className="min-h-screen bg-background flex flex-col grid-bg">
       {/* Header */}
-      <div className="p-6 flex items-center justify-between border-b border-border/50">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
         <MobileMenu />
-        <div className="text-xs text-muted-foreground">SIBE v6.0</div>
+        <div className="text-xs text-muted-foreground">SIBE </div>
       </div>
 
       {/* Logo Section */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-primary-foreground">
         <div className="mb-16 animate-float">
           <div className="relative">
             <div className="w-72 h-72 rounded-full border border-primary/30 flex items-center justify-center bg-gradient-card backdrop-blur-sm shadow-2xl hover-lift">
@@ -47,19 +58,17 @@ const Index = () => {
 
         {/* Menu Grid */}
         <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-3 gap-6">
-          {menuItems.map((item, index) => (
-            <Link key={index} to={item.path}>
+          {menuItems.map((item, index) => <Link key={index} to={item.path}>
               <div className="glass-card p-10 flex flex-col items-center justify-center gap-5 hover:glow-border hover-lift transition-all duration-300 min-h-[180px] group">
                 <item.icon className="w-14 h-14 text-primary transition-transform duration-300 group-hover:scale-110" />
                 <span className="text-lg font-light tracking-wide">{item.label}</span>
               </div>
-            </Link>
-          ))}
+            </Link>)}
         </div>
       </div>
 
       {/* Footer */}
-      <div className="p-6 border-t border-border/50 flex items-center justify-between">
+      <div className="p-6 border-t border-border/50 flex items-center justify-between bg-primary-foreground">
         <p className="text-xs text-muted-foreground">
           © 2025 SGD Business Analysis & Projects
         </p>
@@ -69,8 +78,6 @@ const Index = () => {
           </Button>
         </Link>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
