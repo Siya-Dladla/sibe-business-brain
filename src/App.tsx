@@ -25,7 +25,7 @@ const App = () => <QueryClientProvider client={queryClient}>
           <Route path="/auth" element={<Auth />} className="bg-primary-foreground" />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
-          <Route path="/canvas" element={<ProtectedRoute><Canvas /></ProtectedRoute>} />
+          <Route path="/canvas" element={<ProtectedRoute><Canvas /></ProtectedRoute>} className="bg-primary-foreground" />
           <Route path="/meeting" element={<ProtectedRoute><Meeting /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/forecasting" element={<ProtectedRoute><Forecasting /></ProtectedRoute>} />
