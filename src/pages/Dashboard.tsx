@@ -101,7 +101,7 @@ const Dashboard = () => {
   return <div className="min-h-screen bg-background grid-bg">
       <div className="p-6 flex items-center justify-between border-b border-border/50">
         <MobileMenu />
-        <div className="text-xs text-muted-foreground">Business Intelligence Platform</div>
+        
       </div>
 
       <div className="container mx-auto px-6 py-8">
