@@ -204,14 +204,14 @@ const Settings = () => {
           </Card>
 
           {/* Subscription & Billing */}
-          <Card className="glass-card p-8 border-primary/20">
+          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
             <div className="flex items-center gap-3 mb-6">
               <CreditCard className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide">Subscription</h2>
             </div>
 
             <div className="space-y-6">
-              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/30">
+              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/30 bg-primary-foreground">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-xl font-light text-primary">Professional Plan</h3>
@@ -243,9 +243,7 @@ const Settings = () => {
               </div>
 
               <div className="space-y-3">
-                <p className="text-sm text-muted-foreground font-light">
-                  Choose your payment method
-                </p>
+                
                 <div className="grid grid-cols-2 gap-3">
                   <Button onClick={() => {
                   toast({
@@ -265,7 +263,7 @@ const Settings = () => {
           </Card>
 
           {/* Platform Information */}
-          <Card className="glass-card p-8 border-primary/20">
+          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
             <div className="flex items-center gap-3 mb-6">
               <SettingsIcon className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide">Platform Information</h2>
@@ -295,7 +293,7 @@ const Settings = () => {
           </Card>
 
           {/* Account Actions */}
-          <Card className="glass-card p-8 border-primary/20">
+          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
             <div className="flex items-center gap-3 mb-6">
               <LogOut className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide">Account Actions</h2>
