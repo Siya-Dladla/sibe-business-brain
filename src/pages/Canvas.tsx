@@ -141,7 +141,7 @@ const Canvas = () => {
                 <div className="mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
                   {new Date(project.created_at).toLocaleDateString()}
                 </div>
-              </Card>) : <Card className="glass-card p-12 col-span-full text-center">
+              </Card>) : <Card className="glass-card p-12 col-span-full text-center bg-primary-foreground">
               <Layers className="w-16 h-16 mx-auto mb-4 text-primary/30" />
               <h3 className="text-xl font-light mb-2">No Projects Yet</h3>
               <p className="text-muted-foreground mb-4">
