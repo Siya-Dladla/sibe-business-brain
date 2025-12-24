@@ -10,50 +10,50 @@ import QuickActions from "@/components/QuickActions";
 import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Database, Lightbulb } from "lucide-react";
-
 const Dashboard = () => {
   const [metrics, setMetrics] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const chatRef = useRef<any>(null);
-
   const fetchData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Fetch metrics
-      const { data: metricsData, error: metricsError } = await supabase
-        .from('business_metrics')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('period', 'current')
-        .order('created_at', { ascending: false })
-        .limit(4);
-
+      const {
+        data: metricsData,
+        error: metricsError
+      } = await supabase.from('business_metrics').select('*').eq('user_id', user.id).eq('period', 'current').order('created_at', {
+        ascending: false
+      }).limit(4);
       if (metricsError) throw metricsError;
 
       // Fetch insights
-      const { data: insightsData, error: insightsError } = await supabase
-        .from('ai_insights')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
+      const {
+        data: insightsData,
+        error: insightsError
+      } = await supabase.from('ai_insights').select('*').eq('user_id', user.id).order('created_at', {
+        ascending: false
+      }).limit(5);
       if (insightsError) throw insightsError;
 
       // Fetch plans
-      const { data: plansData, error: plansError } = await supabase
-        .from('business_plans')
-        .select('id, title, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
+      const {
+        data: plansData,
+        error: plansError
+      } = await supabase.from('business_plans').select('id, title, created_at').eq('user_id', user.id).order('created_at', {
+        ascending: false
+      });
       if (plansError) throw plansError;
-
       setMetrics(metricsData || []);
       setInsights(insightsData || []);
       setPlans(plansData || []);
@@ -62,53 +62,49 @@ const Dashboard = () => {
       toast({
         title: "Error",
         description: "Failed to load dashboard data",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
-
   const handleQuickAction = (question: string) => {
     if (chatRef.current) {
       chatRef.current.sendMessage(question);
     }
   };
-
   useEffect(() => {
     fetchData();
 
     // Set up realtime subscriptions
-    const metricsChannel = supabase
-      .channel('dashboard-metrics')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'business_metrics' }, fetchData)
-      .subscribe();
-
-    const insightsChannel = supabase
-      .channel('dashboard-insights')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_insights' }, fetchData)
-      .subscribe();
-
-    const plansChannel = supabase
-      .channel('dashboard-plans')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'business_plans' }, fetchData)
-      .subscribe();
-
+    const metricsChannel = supabase.channel('dashboard-metrics').on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'business_metrics'
+    }, fetchData).subscribe();
+    const insightsChannel = supabase.channel('dashboard-insights').on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'ai_insights'
+    }, fetchData).subscribe();
+    const plansChannel = supabase.channel('dashboard-plans').on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'business_plans'
+    }, fetchData).subscribe();
     return () => {
       supabase.removeChannel(metricsChannel);
       supabase.removeChannel(insightsChannel);
       supabase.removeChannel(plansChannel);
     };
   }, []);
-
-  return (
-    <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50">
+  return <div className="min-h-screen bg-background grid-bg">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
         <MobileMenu />
-        <div className="text-xs text-muted-foreground">Business Intelligence Platform</div>
+        
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-3">
             <Brain className="w-10 h-10 text-primary animate-pulse" />
@@ -152,8 +148,7 @@ const Dashboard = () => {
               <DocumentUpload onUploadSuccess={fetchData} />
             </div>
 
-            {plans.length > 0 && (
-              <Card className="glass-card p-6">
+            {plans.length > 0 && <Card className="glass-card p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <Lightbulb className="w-6 h-6 text-primary" />
                   <div>
@@ -164,27 +159,19 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  {plans.map((plan) => (
-                    <div
-                      key={plan.id}
-                      className="p-3 bg-background/50 border border-primary/20 rounded-lg flex justify-between items-center"
-                    >
+                  {plans.map(plan => <div key={plan.id} className="p-3 bg-background/50 border border-primary/20 rounded-lg flex justify-between items-center">
                       <div>
                         <p className="text-sm font-light">{plan.title}</p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(plan.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
-              </Card>
-            )}
+              </Card>}
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
