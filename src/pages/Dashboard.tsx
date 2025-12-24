@@ -99,12 +99,12 @@ const Dashboard = () => {
     };
   }, []);
   return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
         <MobileMenu />
         
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-3">
             <Brain className="w-10 h-10 text-primary animate-pulse" />
