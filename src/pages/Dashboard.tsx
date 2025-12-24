@@ -111,7 +111,7 @@ const Dashboard = () => {
             <div>
               <h1 className="font-extralight tracking-wide text-6xl">Sibe </h1>
               <p className="text-muted-foreground font-light text-sm mt-1">
-                Your Synthetic Intelligence Business Partner
+                Your Synthetic Intelligence Business Engine   
               </p>
             </div>
           </div>
