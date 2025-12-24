@@ -287,7 +287,7 @@ const Settings = () => {
 
               <div className="flex justify-between py-3">
                 <span className="text-muted-foreground font-light">Status</span>
-                <span className="text-accent font-light">● Active</span>
+                <span className="font-light text-[#61e60f]">● Active</span>
               </div>
             </div>
           </Card>

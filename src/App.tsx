@@ -30,7 +30,7 @@ const App = () => <QueryClientProvider client={queryClient}>
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/forecasting" element={<ProtectedRoute><Forecasting /></ProtectedRoute>} />
           
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} className="bg-primary-foreground" />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
