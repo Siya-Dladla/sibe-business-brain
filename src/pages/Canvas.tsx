@@ -7,6 +7,7 @@ import { Layers, Plus, CheckCircle2, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
 interface Project {
   id: string;
   title: string;
@@ -17,33 +18,26 @@ interface Project {
   participants?: string[];
   created_at: string;
 }
+
 const Canvas = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewProject, setShowNewProject] = useState(false);
-  const [newProject, setNewProject] = useState({
-    title: "",
-    description: ""
-  });
-  const {
-    toast
-  } = useToast();
+  const [newProject, setNewProject] = useState({ title: "", description: "" });
+  const { toast } = useToast();
+
   const fetchProjects = async () => {
     try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       // For now, we'll use meetings as projects placeholder
-      const {
-        data,
-        error
-      } = await supabase.from('meetings').select('*').eq('user_id', user.id).order('created_at', {
-        ascending: false
-      });
+      const { data, error } = await supabase
+        .from('meetings')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
       if (error) throw error;
       setProjects(data || []);
     } catch (error) {
@@ -51,15 +45,17 @@ const Canvas = () => {
       toast({
         title: "Error",
         description: "Failed to load projects",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchProjects();
   }, []);
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -70,13 +66,15 @@ const Canvas = () => {
         return <Clock className="w-5 h-5 text-muted-foreground" />;
     }
   };
-  return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
+
+  return (
+    <div className="min-h-screen bg-background grid-bg">
+      <div className="p-6 flex items-center justify-between border-b border-border/50">
         <MobileMenu />
         <div className="text-xs text-muted-foreground">Project Management</div>
       </div>
 
-      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
+      <div className="container mx-auto px-6 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Layers className="w-10 h-10 text-primary animate-pulse" />
@@ -87,44 +85,65 @@ const Canvas = () => {
               </p>
             </div>
           </div>
-          <Button onClick={() => setShowNewProject(!showNewProject)} className="bg-primary-foreground">
+          <Button
+            onClick={() => setShowNewProject(!showNewProject)}
+            className="bg-primary hover:bg-primary/80"
+          >
             <Plus className="w-4 h-4 mr-2" />
             New Project
           </Button>
         </div>
 
-        {showNewProject && <Card className="glass-card p-6 mb-6">
+        {showNewProject && (
+          <Card className="glass-card p-6 mb-6">
             <h3 className="text-xl font-light mb-4">Create New Project</h3>
             <div className="space-y-4">
-              <Input placeholder="Project Title" value={newProject.title} onChange={e => setNewProject({
-            ...newProject,
-            title: e.target.value
-          })} className="bg-background/50 border-primary/20" />
-              <Textarea placeholder="Project Description" value={newProject.description} onChange={e => setNewProject({
-            ...newProject,
-            description: e.target.value
-          })} className="bg-background/50 border-primary/20" rows={4} />
+              <Input
+                placeholder="Project Title"
+                value={newProject.title}
+                onChange={(e) => setNewProject({ ...newProject, title: e.target.value })}
+                className="bg-background/50 border-primary/20"
+              />
+              <Textarea
+                placeholder="Project Description"
+                value={newProject.description}
+                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                className="bg-background/50 border-primary/20"
+                rows={4}
+              />
               <div className="flex gap-2">
-                <Button onClick={() => {
-              toast({
-                title: "Coming Soon",
-                description: "Project creation will be available soon"
-              });
-              setShowNewProject(false);
-            }} className="bg-primary hover:bg-primary/80">
+                <Button
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "Project creation will be available soon",
+                    });
+                    setShowNewProject(false);
+                  }}
+                  className="bg-primary hover:bg-primary/80"
+                >
                   Create Project
                 </Button>
-                <Button onClick={() => setShowNewProject(false)} variant="outline" className="border-primary/30">
+                <Button
+                  onClick={() => setShowNewProject(false)}
+                  variant="outline"
+                  className="border-primary/30"
+                >
                   Cancel
                 </Button>
               </div>
             </div>
-          </Card>}
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading ? <Card className="glass-card p-6 bg-primary-foreground">
+          {loading ? (
+            <Card className="glass-card p-6">
               <p className="text-muted-foreground">Loading projects...</p>
-            </Card> : projects.length > 0 ? projects.map(project => <Card key={project.id} className="glass-card p-6 hover-lift cursor-pointer">
+            </Card>
+          ) : projects.length > 0 ? (
+            projects.map((project) => (
+              <Card key={project.id} className="glass-card p-6 hover-lift cursor-pointer">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-lg font-light mb-1">{project.title}</h3>
@@ -141,19 +160,28 @@ const Canvas = () => {
                 <div className="mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
                   {new Date(project.created_at).toLocaleDateString()}
                 </div>
-              </Card>) : <Card className="glass-card p-12 col-span-full text-center bg-primary-foreground">
+              </Card>
+            ))
+          ) : (
+            <Card className="glass-card p-12 col-span-full text-center">
               <Layers className="w-16 h-16 mx-auto mb-4 text-primary/30" />
               <h3 className="text-xl font-light mb-2">No Projects Yet</h3>
               <p className="text-muted-foreground mb-4">
                 Start organizing your AI employee activities by creating your first project
               </p>
-              <Button onClick={() => setShowNewProject(true)} className="bg-primary-foreground">
+              <Button
+                onClick={() => setShowNewProject(true)}
+                className="bg-primary hover:bg-primary/80"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Create First Project
               </Button>
-            </Card>}
+            </Card>
+          )}
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Canvas;

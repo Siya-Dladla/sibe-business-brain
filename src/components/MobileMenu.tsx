@@ -5,17 +5,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+
 const MobileMenu = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const {
-    signOut,
-    user
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
+  const { signOut, user } = useAuth();
+  const { toast } = useToast();
+
   const handleSignOut = async () => {
     await signOut();
     toast({
@@ -25,34 +22,20 @@ const MobileMenu = () => {
     navigate("/auth");
     setOpen(false);
   };
-  const menuItems = [{
-    icon: Brain,
-    label: "Data Insights",
-    path: "/dashboard"
-  }, {
-    icon: Database,
-    label: "Data Collection",
-    path: "/dashboard"
-  }, {
-    icon: Layers,
-    label: "Canvas",
-    path: "/canvas"
-  }, {
-    icon: Users,
-    label: "AI Employees",
-    path: "/employees"
-  }, {
-    icon: FileText,
-    label: "Reports",
-    path: "/reports"
-  }, {
-    icon: Settings,
-    label: "Settings",
-    path: "/settings"
-  }];
-  return <Sheet open={open} onOpenChange={setOpen}>
+
+  const menuItems = [
+    { icon: Brain, label: "Data Insights", path: "/dashboard" },
+    { icon: Database, label: "Data Collection", path: "/dashboard" },
+    { icon: Layers, label: "Canvas", path: "/canvas" },
+    { icon: Users, label: "AI Employees", path: "/employees" },
+    { icon: FileText, label: "Reports", path: "/reports" },
+    { icon: Settings, label: "Settings", path: "/settings" }
+  ];
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button className="glass-button p-3 rounded-lg hover-lift bg-primary-foreground">
+        <button className="glass-button p-3 rounded-lg hover-lift">
           <Menu className="w-6 h-6 text-primary" />
         </button>
       </SheetTrigger>
@@ -64,17 +47,36 @@ const MobileMenu = () => {
           </div>
           
           <nav className="flex-1 py-6">
-            {menuItems.map((item, index) => <Link key={index} to={item.path} onClick={() => setOpen(false)} className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group ${location.pathname === item.path ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}>
-                <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${location.pathname === item.path ? "text-primary" : "text-muted-foreground"}`} />
-                <span className={`text-base font-light ${location.pathname === item.path ? "text-primary" : "text-foreground"}`}>{item.label}</span>
-              </Link>)}
+            {menuItems.map((item, index) => (
+              <Link
+                key={index}
+                to={item.path}
+                onClick={() => setOpen(false)}
+                className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group ${
+                  location.pathname === item.path ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"
+                }`}
+              >
+                <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${
+                  location.pathname === item.path ? "text-primary" : "text-muted-foreground"
+                }`} />
+                <span className={`text-base font-light ${
+                  location.pathname === item.path ? "text-primary" : "text-foreground"
+                }`}>{item.label}</span>
+              </Link>
+            ))}
           </nav>
 
           <div className="p-8 border-t border-primary/20 space-y-4">
-            {user && <Button onClick={handleSignOut} variant="outline" className="w-full glass-button justify-start text-primary border-primary/30 hover:bg-primary/10">
+            {user && (
+              <Button
+                onClick={handleSignOut}
+                variant="outline"
+                className="w-full glass-button justify-start text-primary border-primary/30 hover:bg-primary/10"
+              >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
-              </Button>}
+              </Button>
+            )}
             <div>
               <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
               <p className="text-xs text-primary/50 mt-1">v6.0 Professional</p>
@@ -82,6 +84,8 @@ const MobileMenu = () => {
           </div>
         </div>
       </SheetContent>
-    </Sheet>;
+    </Sheet>
+  );
 };
+
 export default MobileMenu;

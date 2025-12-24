@@ -9,6 +9,7 @@ import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+
 const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -22,27 +23,27 @@ const Settings = () => {
     anthropic: "",
     gemini: ""
   });
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
+
   useEffect(() => {
     fetchProfile();
   }, []);
+
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
+      
       if (user) {
-        const {
-          data,
-          error
-        } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
         if (error && error.code !== 'PGRST116') throw error;
+
         setProfile({
           email: user.email || "",
           full_name: data?.full_name || ""
@@ -58,25 +59,26 @@ const Settings = () => {
       setLoading(false);
     }
   };
+
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+
     try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      const {
-        error
-      } = await supabase.from("profiles").upsert({
-        id: user.id,
-        email: profile.email,
-        full_name: profile.full_name,
-        updated_at: new Date().toISOString()
-      });
+
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          email: profile.email,
+          full_name: profile.full_name,
+          updated_at: new Date().toISOString()
+        });
+
       if (error) throw error;
+
       toast({
         title: "Success",
         description: "Profile updated successfully"
@@ -91,6 +93,7 @@ const Settings = () => {
       setSaving(false);
     }
   };
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -107,13 +110,15 @@ const Settings = () => {
       });
     }
   };
-  return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
+
+  return (
+    <div className="min-h-screen bg-background grid-bg">
+      <div className="p-6 flex items-center justify-between border-b border-border/50">
         <MobileMenu />
         <div className="text-xs text-muted-foreground">System Settings</div>
       </div>
 
-      <div className="container mx-auto px-6 py-8 max-w-4xl bg-primary-foreground">
+      <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide">Settings</h1>
           <p className="text-primary text-lg font-light">Configure your SIBE SI platform</p>
@@ -121,42 +126,62 @@ const Settings = () => {
 
         <div className="space-y-6">
           {/* Profile Settings */}
-          <Card className="glass-card p-8 border-primary bg-primary-foreground">
+          <Card className="glass-card p-8 border-primary/20">
             <div className="flex items-center gap-3 mb-6">
               <User className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide">Profile Settings</h2>
             </div>
 
-            {loading ? <div className="flex items-center justify-center py-12">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
                 <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-              </div> : <form onSubmit={saveProfile} className="space-y-6">
+              </div>
+            ) : (
+              <form onSubmit={saveProfile} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="full_name">Full Name</Label>
-                  <Input id="full_name" value={profile.full_name} onChange={e => setProfile({
-                ...profile,
-                full_name: e.target.value
-              })} className="glass-button h-12" />
+                  <Input
+                    id="full_name"
+                    value={profile.full_name}
+                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                    className="glass-button h-12"
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={profile.email} disabled className="glass-button h-12 opacity-60" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profile.email}
+                    disabled
+                    className="glass-button h-12 opacity-60"
+                  />
                 </div>
 
-                <Button type="submit" disabled={saving} className="h-11 px-8 bg-primary-foreground">
-                  {saving ? <div className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  className="bg-primary hover:bg-primary/80 h-11 px-8"
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin"></div>
                       Saving...
-                    </div> : <>
+                    </div>
+                  ) : (
+                    <>
                       <Save className="w-4 h-4 mr-2" />
                       Save Changes
-                    </>}
+                    </>
+                  )}
                 </Button>
-              </form>}
+              </form>
+            )}
           </Card>
 
           {/* AI Engine Configuration */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          <Card className="glass-card p-8 border-primary/20">
             <div className="flex items-center gap-3 mb-6">
               <Cpu className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide">AI Engine</h2>
@@ -178,25 +203,34 @@ const Settings = () => {
                 </Select>
               </div>
 
-              {aiEngine !== "lovable-ai" && <div className="space-y-4 pt-4 border-t border-border/30">
+              {aiEngine !== "lovable-ai" && (
+                <div className="space-y-4 pt-4 border-t border-border/30">
                   <p className="text-sm text-muted-foreground">
                     Enter your API key for {aiEngine === "openai" ? "OpenAI" : aiEngine === "anthropic" ? "Anthropic" : "Google Gemini"}
                   </p>
                   <div className="space-y-2">
                     <Label htmlFor={`${aiEngine}-key`}>API Key</Label>
-                    <Input id={`${aiEngine}-key`} type="password" value={apiKeys[aiEngine as keyof typeof apiKeys]} onChange={e => setApiKeys({
-                  ...apiKeys,
-                  [aiEngine]: e.target.value
-                })} placeholder="sk-..." className="glass-button h-12 font-mono" />
+                    <Input
+                      id={`${aiEngine}-key`}
+                      type="password"
+                      value={apiKeys[aiEngine as keyof typeof apiKeys]}
+                      onChange={(e) => setApiKeys({ ...apiKeys, [aiEngine]: e.target.value })}
+                      placeholder="sk-..."
+                      className="glass-button h-12 font-mono"
+                    />
                   </div>
-                </div>}
+                </div>
+              )}
 
-              <Button onClick={() => {
-              toast({
-                title: "Settings Saved",
-                description: "Your AI engine preferences have been updated"
-              });
-            }} className="w-full h-11 bg-primary-foreground">
+              <Button
+                onClick={() => {
+                  toast({
+                    title: "Settings Saved",
+                    description: "Your AI engine preferences have been updated"
+                  });
+                }}
+                className="w-full bg-primary hover:bg-primary/80 h-11"
+              >
                 <Save className="w-4 h-4 mr-2" />
                 Save AI Settings
               </Button>
@@ -204,21 +238,21 @@ const Settings = () => {
           </Card>
 
           {/* Subscription & Billing */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          <Card className="glass-card p-8 border-primary/20">
             <div className="flex items-center gap-3 mb-6">
               <CreditCard className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide">Subscription</h2>
             </div>
 
             <div className="space-y-6">
-              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/30 bg-primary-foreground">
+              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/30">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-xl font-light text-primary">Professional Plan</h3>
                     <p className="text-sm text-muted-foreground">Current subscription</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-light">$99</p>
+                    <p className="text-2xl font-light">$49</p>
                     <p className="text-xs text-muted-foreground">per month</p>
                   </div>
                 </div>
@@ -247,15 +281,33 @@ const Settings = () => {
                   Choose your payment method
                 </p>
                 <div className="grid grid-cols-2 gap-3">
-                  <Button onClick={() => {
-                  toast({
-                    title: "Stripe Integration",
-                    description: "Redirecting to Stripe checkout..."
-                  });
-                }} className="h-12 text-white bg-primary-foreground">SUBSCRIBE</Button>
-                  
+                  <Button
+                    onClick={() => {
+                      toast({
+                        title: "Stripe Integration",
+                        description: "Redirecting to Stripe checkout..."
+                      });
+                    }}
+                    className="h-12 bg-[#635bff] hover:bg-[#635bff]/80 text-white"
+                  >
+                    Pay with Stripe
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      toast({
+                        title: "PayPal Integration",
+                        description: "Redirecting to PayPal..."
+                      });
+                    }}
+                    className="h-12 bg-[#0070ba] hover:bg-[#0070ba]/80 text-white"
+                  >
+                    Pay with PayPal
+                  </Button>
                 </div>
-                <Button variant="outline" className="w-full glass-button border-destructive/30 text-destructive hover:bg-destructive/10">
+                <Button
+                  variant="outline"
+                  className="w-full glass-button border-destructive/30 text-destructive hover:bg-destructive/10"
+                >
                   Cancel Subscription
                 </Button>
               </div>
@@ -263,7 +315,7 @@ const Settings = () => {
           </Card>
 
           {/* Platform Information */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          <Card className="glass-card p-8 border-primary/20">
             <div className="flex items-center gap-3 mb-6">
               <SettingsIcon className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide">Platform Information</h2>
@@ -293,7 +345,7 @@ const Settings = () => {
           </Card>
 
           {/* Account Actions */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          <Card className="glass-card p-8 border-primary/20">
             <div className="flex items-center gap-3 mb-6">
               <LogOut className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide">Account Actions</h2>
@@ -304,7 +356,11 @@ const Settings = () => {
                 Sign out from your SIBE SI account. You can sign back in at any time.
               </p>
 
-              <Button onClick={handleSignOut} variant="outline" className="glass-button border-destructive/30 text-destructive hover:bg-destructive/10 h-11 px-8">
+              <Button
+                onClick={handleSignOut}
+                variant="outline"
+                className="glass-button border-destructive/30 text-destructive hover:bg-destructive/10 h-11 px-8"
+              >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
@@ -312,6 +368,8 @@ const Settings = () => {
           </Card>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Settings;
