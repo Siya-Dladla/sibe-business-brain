@@ -121,7 +121,7 @@ const Auth = () => {
             <div className="relative text-secondary-foreground">
               <div className="w-32 h-32 rounded-full border border-primary/30 flex items-center justify-center bg-gradient-card backdrop-blur-sm shadow-2xl">
                 <div className="text-center">
-                  <h1 className="text-3xl font-extralight tracking-wider glow-text bg-primary-foreground text-primary">Sibe</h1>
+                  <h1 className="text-3xl font-extralight tracking-wider glow-text text-primary bg-primary-foreground">Sibe</h1>
                   <div className="h-px w-16 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent"></div>
                 </div>
               </div>
