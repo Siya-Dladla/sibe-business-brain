@@ -40,9 +40,7 @@ const QuickActions = ({
               <action.icon className={`w-5 h-5 ${action.color} flex-shrink-0 mt-0.5`} />
               <div>
                 <p className="text-sm font-light mb-1">{action.label}</p>
-                <p className="text-xs text-muted-foreground/60 font-light line-clamp-2">
-                  {action.question}
-                </p>
+                
               </div>
             </div>
           </Button>)}
