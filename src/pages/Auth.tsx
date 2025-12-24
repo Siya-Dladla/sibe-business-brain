@@ -118,10 +118,10 @@ const Auth = () => {
       <Card className="glass-card w-full max-w-md hover-lift border-primary/20">
         <CardHeader className="space-y-6 text-center bg-primary-foreground">
           <div className="mx-auto animate-float">
-            <div className="relative">
+            <div className="relative text-secondary-foreground">
               <div className="w-32 h-32 rounded-full border border-primary/30 flex items-center justify-center bg-gradient-card backdrop-blur-sm shadow-2xl">
                 <div className="text-center">
-                  <h1 className="text-3xl font-extralight tracking-wider glow-text">Sibe</h1>
+                  <h1 className="text-3xl font-extralight tracking-wider glow-text bg-primary-foreground text-primary">Sibe</h1>
                   <div className="h-px w-16 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent"></div>
                 </div>
               </div>
@@ -139,7 +139,7 @@ const Auth = () => {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="bg-primary-foreground">
           <form onSubmit={isLogin ? handleSignIn : handleSignUp} className="space-y-4">
             {!isLogin && <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-sm font-light">
