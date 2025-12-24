@@ -8,11 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Lock, Mail, User, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-
 const emailSchema = z.string().trim().email("Invalid email address");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
 const nameSchema = z.string().trim().min(2, "Name must be at least 2 characters").max(100);
-
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
@@ -20,26 +18,33 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({
+      data: {
+        session
+      }
+    }) => {
       if (session) {
         navigate("/dashboard");
       }
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: {
+        subscription
+      }
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === "SIGNED_IN") {
         navigate("/dashboard");
       }
     });
-
     return () => subscription.unsubscribe();
   }, [navigate]);
-
   const validateInputs = () => {
     try {
       emailSchema.parse(email);
@@ -59,15 +64,14 @@ const Auth = () => {
       return false;
     }
   };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateInputs()) return;
-
     setLoading(true);
     const redirectUrl = `${window.location.origin}/dashboard`;
-
-    const { error } = await supabase.auth.signUp({
+    const {
+      error
+    } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -77,9 +81,7 @@ const Auth = () => {
         }
       }
     });
-
     setLoading(false);
-
     if (error) {
       toast({
         variant: "destructive",
@@ -93,20 +95,17 @@ const Auth = () => {
       });
     }
   };
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateInputs()) return;
-
     setLoading(true);
-
-    const { error } = await supabase.auth.signInWithPassword({
+    const {
+      error
+    } = await supabase.auth.signInWithPassword({
       email,
       password
     });
-
     setLoading(false);
-
     if (error) {
       toast({
         variant: "destructive",
@@ -115,11 +114,9 @@ const Auth = () => {
       });
     }
   };
-
-  return (
-    <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-6">
-      <Card className="glass-card w-full max-w-md hover-lift border-primary/20">
-        <CardHeader className="space-y-6 text-center">
+  return <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-6">
+      <Card className="glass-card w-full max-w-md hover-lift border-primary/20 bg-primary-foreground">
+        <CardHeader className="space-y-6 text-center bg-primary-foreground">
           <div className="mx-auto animate-float">
             <div className="relative">
               <div className="w-32 h-32 rounded-full border border-primary/30 flex items-center justify-center bg-gradient-card backdrop-blur-sm shadow-2xl">
@@ -142,43 +139,25 @@ const Auth = () => {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="bg-primary-foreground">
           <form onSubmit={isLogin ? handleSignIn : handleSignUp} className="space-y-4">
-            {!isLogin && (
-              <div className="space-y-2">
+            {!isLogin && <div className="space-y-2">
                 <Label htmlFor="fullName" className="text-sm font-light">
                   Full Name
                 </Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-5 w-5 text-primary/50" />
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Enter your name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 bg-input border-primary/20 focus:border-primary h-11 font-light"
-                    required={!isLogin}
-                  />
+                  <Input id="fullName" type="text" placeholder="Enter your name" value={fullName} onChange={e => setFullName(e.target.value)} className="pl-10 bg-input border-primary/20 focus:border-primary h-11 font-light" required={!isLogin} />
                 </div>
-              </div>
-            )}
+              </div>}
 
-            <div className="space-y-2">
+            <div className="space-y-2 bg-primary-foreground">
               <Label htmlFor="email" className="text-sm font-light">
                 Email
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-5 w-5 text-primary/50" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-input border-primary/20 focus:border-primary h-11 font-light"
-                  required
-                />
+                <Input id="email" type="email" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} className="pl-10 bg-input border-primary/20 focus:border-primary h-11 font-light" required />
               </div>
             </div>
 
@@ -188,44 +167,25 @@ const Auth = () => {
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-5 w-5 text-primary/50" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={isLogin ? "Enter your password" : "Minimum 6 characters"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 bg-input border-primary/20 focus:border-primary h-11 font-light"
-                  required
-                />
+                <Input id="password" type="password" placeholder={isLogin ? "Enter your password" : "Minimum 6 characters"} value={password} onChange={e => setPassword(e.target.value)} className="pl-10 bg-input border-primary/20 focus:border-primary h-11 font-light" required />
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full h-12 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary font-light mt-6"
-              disabled={loading}
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
+            <Button type="submit" className="w-full h-12 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary font-light mt-6" disabled={loading}>
+              {loading ? <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
                   Processing...
-                </div>
-              ) : (
-                <>{isLogin ? "Sign In" : "Create Account"}</>
-              )}
+                </div> : <>{isLogin ? "Sign In" : "Create Account"}</>}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setEmail("");
-                setPassword("");
-                setFullName("");
-              }}
-              className="text-sm text-primary hover:text-primary/80 transition-colors font-light"
-            >
+            <button onClick={() => {
+            setIsLogin(!isLogin);
+            setEmail("");
+            setPassword("");
+            setFullName("");
+          }} className="text-sm text-primary hover:text-primary/80 transition-colors font-light">
               {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
             </button>
           </div>
@@ -237,8 +197,6 @@ const Auth = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default Auth;
