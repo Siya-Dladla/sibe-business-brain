@@ -9,7 +9,6 @@ import { FileText, Sparkles, Trash2, Download } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
 interface Report {
   id: string;
   report_type: string;
@@ -21,7 +20,6 @@ interface Report {
   status: string;
   created_at: string;
 }
-
 const Reports = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,16 +31,18 @@ const Reports = () => {
     periodStart: "",
     periodEnd: ""
   });
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("reports")
-        .select("*")
-        .order("created_at", { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from("reports").select("*").order("created_at", {
+        ascending: false
+      });
       if (error) throw error;
       setReports(data || []);
     } catch (error: any) {
@@ -55,27 +55,32 @@ const Reports = () => {
       setLoading(false);
     }
   };
-
   const generateReport = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
-
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: {
+          session
+        }
+      } = await supabase.auth.getSession();
       if (!session) throw new Error("Not authenticated");
-
-      const { data, error } = await supabase.functions.invoke("generate-report", {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke("generate-report", {
         body: formData
       });
-
       if (error) throw error;
-
       toast({
         title: "Success",
         description: "Report generated successfully"
       });
-
-      setFormData({ reportType: "", periodStart: "", periodEnd: "" });
+      setFormData({
+        reportType: "",
+        periodStart: "",
+        periodEnd: ""
+      });
       setOpen(false);
       fetchReports();
     } catch (error: any) {
@@ -88,21 +93,16 @@ const Reports = () => {
       setIsGenerating(false);
     }
   };
-
   const deleteReport = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from("reports")
-        .delete()
-        .eq("id", id);
-
+      const {
+        error
+      } = await supabase.from("reports").delete().eq("id", id);
       if (error) throw error;
-
       toast({
         title: "Success",
         description: "Report deleted successfully"
       });
-
       fetchReports();
     } catch (error: any) {
       toast({
@@ -112,16 +112,15 @@ const Reports = () => {
       });
     }
   };
-
   useEffect(() => {
     fetchReports();
 
     // Set up realtime subscription
-    const channel = supabase
-      .channel('reports-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, fetchReports)
-      .subscribe();
-
+    const channel = supabase.channel('reports-changes').on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'reports'
+    }, fetchReports).subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
@@ -137,7 +136,6 @@ const Reports = () => {
       end: end.toISOString().split('T')[0]
     };
   };
-
   useEffect(() => {
     const dates = getDefaultDates();
     setFormData(prev => ({
@@ -146,15 +144,13 @@ const Reports = () => {
       periodEnd: dates.end
     }));
   }, []);
-
-  return (
-    <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50">
+  return <div className="min-h-screen bg-background grid-bg">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
         <MobileMenu />
         <div className="text-xs text-muted-foreground">Reports & Insights</div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
         <div className="mb-10 flex items-center justify-between">
           <div>
             <h1 className="text-5xl font-extralight mb-3 tracking-wide">Reports & Insights</h1>
@@ -182,11 +178,10 @@ const Reports = () => {
               <form onSubmit={generateReport} className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="reportType" className="text-sm font-light">Report Type</Label>
-                  <Select
-                    value={formData.reportType}
-                    onValueChange={(value) => setFormData({ ...formData, reportType: value })}
-                    required
-                  >
+                  <Select value={formData.reportType} onValueChange={value => setFormData({
+                  ...formData,
+                  reportType: value
+                })} required>
                     <SelectTrigger className="bg-input border-primary/20 focus:border-primary font-light">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
@@ -203,138 +198,93 @@ const Reports = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="periodStart" className="text-sm font-light">Start Date</Label>
-                    <Input
-                      id="periodStart"
-                      type="date"
-                      value={formData.periodStart}
-                      onChange={(e) => setFormData({ ...formData, periodStart: e.target.value })}
-                      className="bg-input border-primary/20 focus:border-primary font-light"
-                      required
-                    />
+                    <Input id="periodStart" type="date" value={formData.periodStart} onChange={e => setFormData({
+                    ...formData,
+                    periodStart: e.target.value
+                  })} className="bg-input border-primary/20 focus:border-primary font-light" required />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="periodEnd" className="text-sm font-light">End Date</Label>
-                    <Input
-                      id="periodEnd"
-                      type="date"
-                      value={formData.periodEnd}
-                      onChange={(e) => setFormData({ ...formData, periodEnd: e.target.value })}
-                      className="bg-input border-primary/20 focus:border-primary font-light"
-                      required
-                    />
+                    <Input id="periodEnd" type="date" value={formData.periodEnd} onChange={e => setFormData({
+                    ...formData,
+                    periodEnd: e.target.value
+                  })} className="bg-input border-primary/20 focus:border-primary font-light" required />
                   </div>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full glass-button text-primary border-primary/30 hover:bg-primary/20 h-11"
-                  disabled={isGenerating}
-                >
-                  {isGenerating ? (
-                    <div className="flex items-center gap-2">
+                <Button type="submit" className="w-full glass-button text-primary border-primary/30 hover:bg-primary/20 h-11" disabled={isGenerating}>
+                  {isGenerating ? <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
                       Generating...
-                    </div>
-                  ) : (
-                    <>Generate Report</>
-                  )}
+                    </div> : <>Generate Report</>}
                 </Button>
               </form>
             </DialogContent>
           </Dialog>
         </div>
 
-        {loading ? (
-          <Card className="glass-card p-16 flex flex-col items-center justify-center min-h-[400px] border-primary/20">
+        {loading ? <Card className="glass-card p-16 flex flex-col items-center justify-center min-h-[400px] border-primary/20">
             <div className="w-12 h-12 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
             <p className="text-muted-foreground font-light">Loading reports...</p>
-          </Card>
-        ) : reports.length === 0 ? (
-          <Card className="glass-card p-16 flex flex-col items-center justify-center min-h-[500px] hover-lift border-primary/20">
+          </Card> : reports.length === 0 ? <Card className="glass-card p-16 flex flex-col items-center justify-center min-h-[500px] hover-lift border-primary/20 bg-primary-foreground">
             <FileText className="w-20 h-20 text-primary mb-8 opacity-50 animate-pulse-glow" />
             <h2 className="text-3xl font-extralight mb-4 text-primary">No Reports Yet</h2>
             <p className="text-muted-foreground text-center max-w-lg font-light leading-relaxed mb-8">
               Generate your first AI-powered business report. SIBE analyzes all your data to create
               comprehensive insights and strategic recommendations.
             </p>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {reports.map((report) => (
-              <Card
-                key={report.id}
-                className="glass-card p-6 hover-lift border-primary/20 group cursor-pointer"
-                onClick={() => setSelectedReport(report)}
-              >
+          </Card> : <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {reports.map(report => <Card key={report.id} className="glass-card p-6 hover-lift border-primary/20 group cursor-pointer" onClick={() => setSelectedReport(report)}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-light tracking-wide mb-2">{report.title}</h3>
                     <p className="text-xs text-muted-foreground font-light">
-                      {report.period_start && report.period_end && (
-                        `${new Date(report.period_start).toLocaleDateString()} - ${new Date(report.period_end).toLocaleDateString()}`
-                      )}
+                      {report.period_start && report.period_end && `${new Date(report.period_start).toLocaleDateString()} - ${new Date(report.period_end).toLocaleDateString()}`}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteReport(report.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive"
-                  >
+                  <Button variant="ghost" size="icon" onClick={e => {
+              e.stopPropagation();
+              deleteReport(report.id);
+            }} className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
 
-                {report.summary && (
-                  <p className="text-sm text-muted-foreground font-light line-clamp-3">
+                {report.summary && <p className="text-sm text-muted-foreground font-light line-clamp-3">
                     {report.summary}
-                  </p>
-                )}
+                  </p>}
 
                 <div className="mt-4">
                   <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary font-light">
                     {report.report_type}
                   </span>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+              </Card>)}
+          </div>}
 
         {/* Report Details Dialog */}
-        {selectedReport && (
-          <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
+        {selectedReport && <Dialog open={!!selectedReport} onOpenChange={() => setSelectedReport(null)}>
             <DialogContent className="glass-card border-primary/20 max-w-4xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-extralight tracking-wide">
                   {selectedReport.title}
                 </DialogTitle>
                 <DialogDescription className="text-muted-foreground font-light">
-                  {selectedReport.period_start && selectedReport.period_end && (
-                    `${new Date(selectedReport.period_start).toLocaleDateString()} - ${new Date(selectedReport.period_end).toLocaleDateString()}`
-                  )}
+                  {selectedReport.period_start && selectedReport.period_end && `${new Date(selectedReport.period_start).toLocaleDateString()} - ${new Date(selectedReport.period_end).toLocaleDateString()}`}
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-6 mt-4">
-                {selectedReport.content && (
-                  <div className="prose prose-invert max-w-none">
+                {selectedReport.content && <div className="prose prose-invert max-w-none">
                     <div className="text-sm text-muted-foreground font-light whitespace-pre-wrap leading-relaxed">
                       {selectedReport.content}
                     </div>
-                  </div>
-                )}
+                  </div>}
               </div>
             </DialogContent>
-          </Dialog>
-        )}
+          </Dialog>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Reports;
