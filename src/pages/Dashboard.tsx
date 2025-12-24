@@ -110,9 +110,7 @@ const Dashboard = () => {
             <Brain className="w-10 h-10 text-primary animate-pulse" />
             <div>
               <h1 className="text-4xl font-extralight tracking-wide">Sibe SI</h1>
-              <p className="text-muted-foreground font-light text-sm mt-1">
-                Your Synthetic Intelligence Business Partner
-              </p>
+              
             </div>
           </div>
         </div>
