@@ -5,23 +5,24 @@ import { Input } from "@/components/ui/input";
 import { Globe, Loader2, Sparkles, TrendingUp, Target, Lightbulb } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
 interface WebsiteAnalyzerProps {
   onAnalysisComplete?: () => void;
 }
-
-const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
+const WebsiteAnalyzer = ({
+  onAnalysisComplete
+}: WebsiteAnalyzerProps) => {
   const [url, setUrl] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const analyzeWebsite = async () => {
     if (!url.trim()) {
       toast({
         title: "URL Required",
         description: "Please enter a valid website URL",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -33,27 +34,27 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
       toast({
         title: "Invalid URL",
         description: "Please enter a valid website URL",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsAnalyzing(true);
-
     try {
       const finalUrl = url.startsWith('http') ? url : `https://${url}`;
-      
-      const { data, error } = await supabase.functions.invoke("analyze-website", {
-        body: { websiteUrl: finalUrl }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke("analyze-website", {
+        body: {
+          websiteUrl: finalUrl
+        }
       });
-
       if (error) throw error;
-
       if (data.success) {
         setAnalysis(data.analysis);
         toast({
           title: "Analysis Complete!",
-          description: "Your website has been analyzed by Sibe SI",
+          description: "Your website has been analyzed by Sibe SI"
         });
         onAnalysisComplete?.();
       } else {
@@ -64,21 +65,18 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
       toast({
         title: "Analysis Failed",
         description: error.message || "Failed to analyze website",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsAnalyzing(false);
     }
   };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       analyzeWebsite();
     }
   };
-
-  return (
-    <Card className="glass-card p-6">
+  return <Card className="glass-card p-6 bg-primary-foreground">
       <div className="flex items-center gap-3 mb-6">
         <Globe className="w-6 h-6 text-primary" />
         <div>
@@ -90,37 +88,21 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
       </div>
 
       <div className="space-y-4">
-        {!analysis ? (
-          <>
+        {!analysis ? <>
             <div className="flex gap-2">
-              <Input
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Enter your website URL (e.g., myshop.com)"
-                className="bg-background/50 border-primary/20 focus:border-primary font-light"
-                disabled={isAnalyzing}
-              />
-              <Button
-                onClick={analyzeWebsite}
-                disabled={isAnalyzing}
-                className="bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary font-light"
-              >
-                {isAnalyzing ? (
-                  <>
+              <Input value={url} onChange={e => setUrl(e.target.value)} onKeyPress={handleKeyPress} placeholder="Enter your website URL (e.g., myshop.com)" className="bg-background/50 border-primary/20 focus:border-primary font-light" disabled={isAnalyzing} />
+              <Button onClick={analyzeWebsite} disabled={isAnalyzing} className="border border-primary/30 text-primary font-light bg-primary-foreground">
+                {isAnalyzing ? <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Analyzing...
-                  </>
-                ) : (
-                  <>
+                  </> : <>
                     <Sparkles className="w-4 h-4 mr-2" />
                     Analyze
-                  </>
-                )}
+                  </>}
               </Button>
             </div>
 
-            <div className="p-4 bg-primary/5 border border-primary/10 rounded-lg">
+            <div className="p-4 border border-primary/10 rounded-lg bg-primary-foreground">
               <p className="text-sm text-muted-foreground font-light">
                 <strong className="text-primary">What Sibe SI will analyze:</strong>
               </p>
@@ -139,21 +121,14 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
                 </li>
               </ul>
             </div>
-          </>
-        ) : (
-          <div className="space-y-4">
+          </> : <div className="space-y-4">
             <div className="p-4 bg-background/50 border border-primary/20 rounded-lg">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-primary font-light">Analysis Complete</h4>
-                <Button
-                  onClick={() => {
-                    setAnalysis(null);
-                    setUrl("");
-                  }}
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs"
-                >
+                <Button onClick={() => {
+              setAnalysis(null);
+              setUrl("");
+            }} variant="ghost" size="sm" className="text-xs">
                   Analyze Another
                 </Button>
               </div>
@@ -171,19 +146,15 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
                   </div>
                 </div>
 
-                {analysis.recommendations && analysis.recommendations.length > 0 && (
-                  <div>
+                {analysis.recommendations && analysis.recommendations.length > 0 && <div>
                     <p className="text-xs text-muted-foreground mb-2">Top Recommendations:</p>
                     <ul className="space-y-2">
-                      {analysis.recommendations.slice(0, 5).map((rec: string, idx: number) => (
-                        <li key={idx} className="text-xs text-muted-foreground font-light flex gap-2">
+                      {analysis.recommendations.slice(0, 5).map((rec: string, idx: number) => <li key={idx} className="text-xs text-muted-foreground font-light flex gap-2">
                           <Sparkles className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
                           <span>{rec}</span>
-                        </li>
-                      ))}
+                        </li>)}
                     </ul>
-                  </div>
-                )}
+                  </div>}
 
                 <div className="pt-3 border-t border-border/30">
                   <p className="text-xs text-primary font-light">
@@ -195,11 +166,8 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
-    </Card>
-  );
+    </Card>;
 };
-
 export default WebsiteAnalyzer;
