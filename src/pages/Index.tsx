@@ -59,7 +59,7 @@ const Index = () => {
         {/* Menu Grid */}
         <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-3 gap-6">
           {menuItems.map((item, index) => <Link key={index} to={item.path}>
-              <div className="glass-card p-10 flex flex-col items-center justify-center gap-5 hover:glow-border hover-lift transition-all duration-300 min-h-[180px] group">
+              <div className="glass-card p-10 flex flex-col items-center justify-center gap-5 hover:glow-border hover-lift transition-all duration-300 min-h-[180px] group bg-primary-foreground">
                 <item.icon className="w-14 h-14 text-primary transition-transform duration-300 group-hover:scale-110" />
                 <span className="text-lg font-light tracking-wide">{item.label}</span>
               </div>
