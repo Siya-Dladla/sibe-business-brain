@@ -125,12 +125,12 @@ const Forecasting = () => {
     };
   }, []);
   return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
         <MobileMenu />
         <div className="text-xs text-muted-foreground">Strategy & Forecasting</div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
         <div className="mb-10 flex items-center justify-between">
           <div>
             <h1 className="text-5xl font-extralight mb-3 tracking-wide">Strategy & Forecasting</h1>
