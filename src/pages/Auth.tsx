@@ -114,7 +114,7 @@ const Auth = () => {
       });
     }
   };
-  return <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-6">
+  return <div className="min-h-screen bg-background grid-bg flex items-center justify-center p-6 gap-0">
       <Card className="glass-card w-full max-w-md hover-lift border-primary/20 bg-primary-foreground">
         <CardHeader className="space-y-6 text-center bg-primary-foreground">
           <div className="mx-auto animate-float">
@@ -133,9 +133,7 @@ const Auth = () => {
             <CardTitle className="text-2xl font-extralight tracking-wide text-primary mb-2">
               Synthetic Intelligence Business Engine
             </CardTitle>
-            <CardDescription className="text-muted-foreground font-light">
-              {isLogin ? "Access Your Business Intelligence" : "Create Your Account"}
-            </CardDescription>
+            
           </div>
         </CardHeader>
 
