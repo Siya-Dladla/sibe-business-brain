@@ -93,7 +93,7 @@ const Canvas = () => {
           </Button>
         </div>
 
-        {showNewProject && <Card className="glass-card p-6 mb-6">
+        {showNewProject && <Card className="glass-card p-6 mb-6 bg-primary-foreground">
             <h3 className="text-xl font-light mb-4">Create New Project</h3>
             <div className="space-y-4">
               <Input placeholder="Project Title" value={newProject.title} onChange={e => setNewProject({
@@ -111,7 +111,7 @@ const Canvas = () => {
                 description: "Project creation will be available soon"
               });
               setShowNewProject(false);
-            }} className="bg-primary hover:bg-primary/80">
+            }} className="bg-primary-foreground">
                   Create Project
                 </Button>
                 <Button onClick={() => setShowNewProject(false)} variant="outline" className="border-primary/30">
