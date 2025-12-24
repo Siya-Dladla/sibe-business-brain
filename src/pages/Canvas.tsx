@@ -93,7 +93,7 @@ const Canvas = () => {
           </Button>
         </div>
 
-        {showNewProject && <Card className="glass-card p-6 mb-6">
+        {showNewProject && <Card className="glass-card p-6 mb-6 bg-primary-foreground">
             <h3 className="text-xl font-light mb-4">Create New Project</h3>
             <div className="space-y-4">
               <Input placeholder="Project Title" value={newProject.title} onChange={e => setNewProject({
@@ -111,7 +111,7 @@ const Canvas = () => {
                 description: "Project creation will be available soon"
               });
               setShowNewProject(false);
-            }} className="bg-primary hover:bg-primary/80">
+            }} className="bg-primary-foreground">
                   Create Project
                 </Button>
                 <Button onClick={() => setShowNewProject(false)} variant="outline" className="border-primary/30">
@@ -141,7 +141,7 @@ const Canvas = () => {
                 <div className="mt-4 pt-4 border-t border-border/50 text-xs text-muted-foreground">
                   {new Date(project.created_at).toLocaleDateString()}
                 </div>
-              </Card>) : <Card className="glass-card p-12 col-span-full text-center">
+              </Card>) : <Card className="glass-card p-12 col-span-full text-center bg-primary-foreground">
               <Layers className="w-16 h-16 mx-auto mb-4 text-primary/30" />
               <h3 className="text-xl font-light mb-2">No Projects Yet</h3>
               <p className="text-muted-foreground mb-4">
