@@ -147,7 +147,7 @@ const Canvas = () => {
               <p className="text-muted-foreground mb-4">
                 Start organizing your AI employee activities by creating your first project
               </p>
-              <Button onClick={() => setShowNewProject(true)} className="bg-primary hover:bg-primary/80">
+              <Button onClick={() => setShowNewProject(true)} className="bg-primary-foreground">
                 <Plus className="w-4 h-4 mr-2" />
                 Create First Project
               </Button>
