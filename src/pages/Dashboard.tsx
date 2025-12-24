@@ -99,12 +99,12 @@ const Dashboard = () => {
     };
   }, []);
   return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
+      <div className="p-6 flex items-center justify-between border-b border-border/50">
         <MobileMenu />
         
       </div>
 
-      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
+      <div className="container mx-auto px-6 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-3">
             <Brain className="w-10 h-10 text-primary animate-pulse" />
@@ -117,7 +117,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="insights" className="space-y-6">
+        <Tabs defaultValue="insights" className="space-y-6 bg-primary-foreground">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="insights" className="flex items-center gap-2">
               <Brain className="w-4 h-4" />
