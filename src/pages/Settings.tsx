@@ -108,12 +108,12 @@ const Settings = () => {
     }
   };
   return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
         <MobileMenu />
         <div className="text-xs text-muted-foreground">System Settings</div>
       </div>
 
-      <div className="container mx-auto px-6 py-8 max-w-4xl">
+      <div className="container mx-auto px-6 py-8 max-w-4xl bg-primary-foreground">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide">Settings</h1>
           <p className="text-primary text-lg font-light">Configure your SIBE SI platform</p>
@@ -252,7 +252,7 @@ const Settings = () => {
                     title: "Stripe Integration",
                     description: "Redirecting to Stripe checkout..."
                   });
-                }} className="h-12 text-white bg-primary">SUBSCRIBE</Button>
+                }} className="h-12 text-white bg-primary-foreground">SUBSCRIBE</Button>
                   
                 </div>
                 <Button variant="outline" className="w-full glass-button border-destructive/30 text-destructive hover:bg-destructive/10">
