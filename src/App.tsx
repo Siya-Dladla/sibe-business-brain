@@ -22,15 +22,15 @@ const App = () => <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} className="bg-primary-foreground" />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
-          <Route path="/canvas" element={<ProtectedRoute><Canvas /></ProtectedRoute>} className="bg-primary-foreground" />
+          <Route path="/canvas" element={<ProtectedRoute><Canvas /></ProtectedRoute>} />
           <Route path="/meeting" element={<ProtectedRoute><Meeting /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/forecasting" element={<ProtectedRoute><Forecasting /></ProtectedRoute>} />
           
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} className="bg-primary-foreground" />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
