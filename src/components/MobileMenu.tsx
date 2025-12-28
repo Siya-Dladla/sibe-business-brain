@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Brain, Database, Layers, Users, FileText, Settings, LogOut } from "lucide-react";
+import { Menu, Database, Layers, Users, FileText, Settings, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -26,13 +26,9 @@ const MobileMenu = () => {
     setOpen(false);
   };
   const menuItems = [{
-    icon: Brain,
-    label: "Data Insights",
-    path: "/dashboard?tab=insights"
-  }, {
     icon: Database,
-    label: "Data Collection",
-    path: "/dashboard?tab=collection"
+    label: "Data",
+    path: "/dashboard"
   }, {
     icon: Layers,
     label: "Canvas",
@@ -65,8 +61,8 @@ const MobileMenu = () => {
           
           <nav className="flex-1 py-6">
             {menuItems.map((item, index) => {
-              const isActive = location.pathname + location.search === item.path || 
-                (location.pathname === "/dashboard" && !location.search && item.path === "/dashboard?tab=insights");
+              const isActive = location.pathname === item.path || 
+                (item.path === "/dashboard" && location.pathname === "/dashboard");
               return (
                 <Link key={index} to={item.path} onClick={() => setOpen(false)} className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group ${isActive ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}>
                   <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
