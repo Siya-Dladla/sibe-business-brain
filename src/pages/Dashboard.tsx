@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,8 @@ import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Database, Lightbulb } from "lucide-react";
 const Dashboard = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "insights";
   const [metrics, setMetrics] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
@@ -19,6 +22,10 @@ const Dashboard = () => {
     toast
   } = useToast();
   const chatRef = useRef<any>(null);
+  
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value });
+  };
   const fetchData = async () => {
     try {
       const {
@@ -115,7 +122,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="insights" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="insights" className="flex items-center gap-2">
               <Brain className="w-4 h-4" />

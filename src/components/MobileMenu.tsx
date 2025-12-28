@@ -28,11 +28,11 @@ const MobileMenu = () => {
   const menuItems = [{
     icon: Brain,
     label: "Data Insights",
-    path: "/dashboard"
+    path: "/dashboard?tab=insights"
   }, {
     icon: Database,
     label: "Data Collection",
-    path: "/dashboard"
+    path: "/dashboard?tab=collection"
   }, {
     icon: Layers,
     label: "Canvas",
@@ -64,10 +64,16 @@ const MobileMenu = () => {
           </div>
           
           <nav className="flex-1 py-6">
-            {menuItems.map((item, index) => <Link key={index} to={item.path} onClick={() => setOpen(false)} className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group ${location.pathname === item.path ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}>
-                <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${location.pathname === item.path ? "text-primary" : "text-muted-foreground"}`} />
-                <span className={`text-base font-light ${location.pathname === item.path ? "text-primary" : "text-foreground"}`}>{item.label}</span>
-              </Link>)}
+            {menuItems.map((item, index) => {
+              const isActive = location.pathname + location.search === item.path || 
+                (location.pathname === "/dashboard" && !location.search && item.path === "/dashboard?tab=insights");
+              return (
+                <Link key={index} to={item.path} onClick={() => setOpen(false)} className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group ${isActive ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}>
+                  <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={`text-base font-light ${isActive ? "text-primary" : "text-foreground"}`}>{item.label}</span>
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="p-8 border-t border-primary/20 space-y-4">
