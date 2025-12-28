@@ -43,17 +43,17 @@ const MetricsGrid = ({
     return value.toFixed(0);
   };
   if (!metrics || metrics.length === 0) {
-    return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {['revenue', 'efficiency', 'growth', 'conversion'].map(type => <Card key={type} className="glass-card p-6 hover-lift">
-            <div className="flex items-center justify-between mb-4">
+    return <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        {['revenue', 'efficiency', 'growth', 'conversion'].map(type => <Card key={type} className="glass-card p-4 md:p-6 hover-lift">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
               <div className="text-primary">{getIcon(type)}</div>
-              <ArrowUp className="w-4 h-4 text-green-400" />
+              <ArrowUp className="w-3 h-3 md:w-4 md:h-4 text-green-400" />
             </div>
-            <h3 className="text-muted-foreground font-light text-sm mb-2 capitalize">
+            <h3 className="text-muted-foreground font-light text-xs md:text-sm mb-1 md:mb-2 capitalize">
               {type}
             </h3>
-            <p className="text-3xl font-extralight mb-1">--</p>
-            <p className="text-sm text-muted-foreground font-light">No data</p>
+            <p className="text-xl md:text-3xl font-extralight mb-1">--</p>
+            <p className="text-xs md:text-sm text-muted-foreground font-light">No data</p>
           </Card>)}
       </div>;
   }
@@ -75,29 +75,29 @@ const MetricsGrid = ({
       color: "bg-red-500/20 text-red-400"
     };
   };
-  return <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+  return <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
       {metrics.map(metric => {
       const badge = getInsightBadge(metric.change_percentage);
-      return <Card key={metric.metric_type} className="glass-card p-6 hover-lift relative overflow-hidden group bg-primary-foreground">
+      return <Card key={metric.metric_type} className="glass-card p-4 md:p-6 hover-lift relative overflow-hidden group bg-primary-foreground">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div className="text-primary">{getIcon(metric.metric_type)}</div>
-                <div className="flex items-center gap-2">
-                  {metric.change_percentage >= 0 ? <ArrowUp className="w-4 h-4 text-green-400" /> : <ArrowDown className="w-4 h-4 text-red-400" />}
+                <div className="flex items-center gap-1 md:gap-2">
+                  {metric.change_percentage >= 0 ? <ArrowUp className="w-3 h-3 md:w-4 md:h-4 text-green-400" /> : <ArrowDown className="w-3 h-3 md:w-4 md:h-4 text-red-400" />}
                 </div>
               </div>
-              <h3 className="text-muted-foreground font-light text-sm mb-2">
+              <h3 className="text-muted-foreground font-light text-xs md:text-sm mb-1 md:mb-2">
                 {metric.metric_name}
               </h3>
-              <p className="text-3xl font-extralight mb-2">
+              <p className="text-xl md:text-3xl font-extralight mb-1 md:mb-2">
                 {formatValue(metric.metric_type, metric.value)}
               </p>
-              <div className="flex items-center justify-between">
-                <p className={`text-sm font-light ${metric.change_percentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-1 md:gap-0">
+                <p className={`text-xs md:text-sm font-light ${metric.change_percentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                   {metric.change_percentage >= 0 ? '+' : ''}{metric.change_percentage.toFixed(1)}%
                 </p>
-                <Badge className={`${badge.color} border-0 text-xs`}>
+                <Badge className={`${badge.color} border-0 text-[10px] md:text-xs w-fit`}>
                   {badge.text}
                 </Badge>
               </div>

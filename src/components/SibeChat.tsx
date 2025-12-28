@@ -79,31 +79,31 @@ const SibeChat = forwardRef((props, ref) => {
       setTimeout(() => handleSend(), 100);
     }
   }));
-  return <Card className="glass-card p-6 flex flex-col h-[600px] border-primary/30 bg-primary-foreground">
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-primary/20">
+  return <Card className="glass-card p-4 md:p-6 flex flex-col h-[450px] md:h-[600px] border-primary/30 bg-primary-foreground">
+      <div className="flex items-center gap-3 mb-4 md:mb-6 pb-3 md:pb-4 border-b border-primary/20">
         <div className="relative">
-          <Brain className="w-8 h-8 text-primary animate-pulse" />
+          <Brain className="w-6 h-6 md:w-8 md:h-8 text-primary animate-pulse" />
           <div className="absolute inset-0 rounded-full border border-primary/30 animate-pulse-glow"></div>
         </div>
         <div>
-          <h3 className="text-2xl font-extralight tracking-wide bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h3 className="text-xl md:text-2xl font-extralight tracking-wide bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Ask Sibe SI
           </h3>
-          <p className="text-sm text-muted-foreground font-light">Your AI Business Intelligence Partner</p>
+          <p className="text-xs md:text-sm text-muted-foreground font-light">Your AI Business Intelligence Partner</p>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
+      <div className="flex-1 overflow-y-auto space-y-3 md:space-y-4 mb-4 pr-2">
         {messages.map((message, index) => <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] p-4 rounded-lg ${message.role === "user" ? "bg-primary/10 border border-primary/30 text-foreground" : "bg-background/50 border border-primary/20 text-foreground"}`}>
-              <p className="text-sm font-light whitespace-pre-wrap">{message.content}</p>
-              <p className="text-xs text-muted-foreground/60 mt-2">
+            <div className={`max-w-[85%] md:max-w-[80%] p-3 md:p-4 rounded-lg ${message.role === "user" ? "bg-primary/10 border border-primary/30 text-foreground" : "bg-background/50 border border-primary/20 text-foreground"}`}>
+              <p className="text-xs md:text-sm font-light whitespace-pre-wrap">{message.content}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground/60 mt-2">
                 {message.timestamp.toLocaleTimeString()}
               </p>
             </div>
           </div>)}
         {isLoading && <div className="flex justify-start">
-            <div className="max-w-[80%] p-4 rounded-lg bg-background/50 border border-primary/20">
+            <div className="max-w-[80%] p-3 md:p-4 rounded-lg bg-background/50 border border-primary/20">
               <Loader2 className="w-4 h-4 animate-spin text-primary" />
             </div>
           </div>}
@@ -111,8 +111,8 @@ const SibeChat = forwardRef((props, ref) => {
       </div>
 
       <div className="flex gap-2">
-        <Input value={input} onChange={e => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="Ask Sibe SI anything about your business..." className="glass-card border-primary/30 font-light" disabled={isLoading} />
-        <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="border border-primary/30 text-primary bg-primary-foreground">
+        <Input value={input} onChange={e => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="Ask anything about your business..." className="glass-card border-primary/30 font-light text-sm" disabled={isLoading} />
+        <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="border border-primary/30 text-primary bg-primary-foreground px-3 md:px-4">
           <Send className="w-4 h-4" />
         </Button>
       </div>

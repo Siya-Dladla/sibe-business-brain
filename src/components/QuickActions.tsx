@@ -28,19 +28,18 @@ const QuickActions = ({
     question: "What patterns do you see in my business that I might be missing?",
     color: "text-purple-400"
   }];
-  return <Card className="glass-card p-6 bg-primary-foreground">
+  return <Card className="glass-card p-4 md:p-6 bg-primary-foreground">
       <div className="flex items-center gap-3 mb-4">
         <Sparkles className="w-5 h-5 text-primary" />
-        <h3 className="text-lg font-extralight">Ask Sibe SI</h3>
+        <h3 className="text-base md:text-lg font-extralight">Ask Sibe SI</h3>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {actions.map(action => <Button key={action.label} onClick={() => onAction(action.question)} variant="outline" className="h-auto p-4 justify-start text-left hover:bg-primary/5 border-primary/20">
-            <div className="flex items-start gap-3">
-              <action.icon className={`w-5 h-5 ${action.color} flex-shrink-0 mt-0.5`} />
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
+        {actions.map(action => <Button key={action.label} onClick={() => onAction(action.question)} variant="outline" className="h-auto p-3 md:p-4 justify-start text-left hover:bg-primary/5 border-primary/20">
+            <div className="flex items-start gap-2 md:gap-3">
+              <action.icon className={`w-4 h-4 md:w-5 md:h-5 ${action.color} flex-shrink-0 mt-0.5`} />
               <div>
-                <p className="text-sm font-light mb-1">{action.label}</p>
-                
+                <p className="text-xs md:text-sm font-light">{action.label}</p>
               </div>
             </div>
           </Button>)}

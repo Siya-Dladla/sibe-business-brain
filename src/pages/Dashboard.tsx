@@ -24,7 +24,8 @@ const Dashboard = () => {
   const chatRef = useRef<any>(null);
   
   const handleTabChange = (value: string) => {
-    setSearchParams({ tab: value });
+    setSearchParams({ tab: value }, { preventScrollReset: true });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const fetchData = async () => {
     try {
@@ -106,35 +107,33 @@ const Dashboard = () => {
     };
   }, []);
   return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
+      <div className="p-4 md:p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground sticky top-0 z-40">
         <MobileMenu />
-        
       </div>
 
-      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-3">
-            <Brain className="w-10 h-10 text-primary animate-pulse" />
+      <div className="container mx-auto px-4 md:px-6 py-6 md:py-8 bg-primary-foreground">
+        <div className="mb-6 md:mb-8">
+          <div className="flex items-center gap-3 md:gap-4 mb-3">
+            <Brain className="w-8 h-8 md:w-10 md:h-10 text-primary animate-pulse" />
             <div>
-              <h1 className="text-4xl font-extralight tracking-wide">Sibe SI</h1>
-              
+              <h1 className="text-2xl md:text-4xl font-extralight tracking-wide">Sibe SI</h1>
             </div>
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="insights" className="flex items-center gap-2">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-full md:max-w-md h-auto">
+            <TabsTrigger value="insights" className="flex items-center gap-2 py-3 text-xs md:text-sm">
               <Brain className="w-4 h-4" />
-              Data Insights
+              <span className="hidden sm:inline">Data</span> Insights
             </TabsTrigger>
-            <TabsTrigger value="collection" className="flex items-center gap-2">
+            <TabsTrigger value="collection" className="flex items-center gap-2 py-3 text-xs md:text-sm">
               <Database className="w-4 h-4" />
-              Data Collection
+              <span className="hidden sm:inline">Data</span> Collection
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="insights" className="space-y-6">
+          <TabsContent value="insights" className="space-y-4 md:space-y-6">
             {/* Quick Actions */}
             <QuickActions onAction={handleQuickAction} />
 
@@ -147,17 +146,17 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="collection" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TabsContent value="collection" className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 gap-4 md:gap-6">
               <WebsiteAnalyzer onAnalysisComplete={fetchData} />
               <DocumentUpload onUploadSuccess={fetchData} />
             </div>
 
-            {plans.length > 0 && <Card className="glass-card p-6">
+            {plans.length > 0 && <Card className="glass-card p-4 md:p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <Lightbulb className="w-6 h-6 text-primary" />
+                  <Lightbulb className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                   <div>
-                    <h3 className="text-xl font-extralight">Collected Data</h3>
+                    <h3 className="text-lg md:text-xl font-extralight">Collected Data</h3>
                     <p className="text-xs text-muted-foreground font-light">
                       Your uploaded business plans and analyzed websites
                     </p>
