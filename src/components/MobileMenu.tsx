@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Database, Layers, Users, FileText, Settings, LogOut } from "lucide-react";
+import { Menu, Home, Database, Layers, Users, FileText, Settings, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,10 @@ const MobileMenu = () => {
     setOpen(false);
   };
   const menuItems = [{
+    icon: Home,
+    label: "Home",
+    path: "/"
+  }, {
     icon: Database,
     label: "Data",
     path: "/dashboard"

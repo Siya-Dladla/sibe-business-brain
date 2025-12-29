@@ -1,24 +1,24 @@
 import { Link } from "react-router-dom";
-import { BarChart3, Users, Calendar, TrendingUp, Settings } from "lucide-react";
+import { Database, Layers, Users, FileText, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 const Index = () => {
   const menuItems = [{
-    icon: BarChart3,
-    label: "Analytics",
+    icon: Database,
+    label: "Data",
     path: "/dashboard"
   }, {
+    icon: Layers,
+    label: "Canvas",
+    path: "/canvas"
+  }, {
     icon: Users,
-    label: "Team",
+    label: "AI Employees",
     path: "/employees"
   }, {
-    icon: Calendar,
-    label: "Meetings",
-    path: "/meeting"
-  }, {
-    icon: TrendingUp,
-    label: "Strategy",
-    path: "/forecasting"
+    icon: FileText,
+    label: "Reports",
+    path: "/reports"
   }, {
     icon: Settings,
     label: "Settings",
