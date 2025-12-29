@@ -211,16 +211,20 @@ const Settings = () => {
             </div>
 
             <div className="space-y-6">
-              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/30 bg-primary-foreground">
+            <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/30 bg-primary-foreground">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-xl font-light text-primary">Professional Plan</h3>
                     <p className="text-sm text-muted-foreground">Current subscription</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-light">$49</p>
-                    <p className="text-xs text-muted-foreground">per month</p>
+                    <p className="text-2xl font-light">$49<span className="text-sm text-muted-foreground">/mo</span></p>
+                    <p className="text-xs text-muted-foreground">after 14-day trial</p>
                   </div>
+                </div>
+                <div className="mb-4 p-3 bg-accent/10 border border-accent/30 rounded-lg">
+                  <p className="text-sm font-medium text-accent">Start with $1 for 14 days</p>
+                  <p className="text-xs text-muted-foreground">Then $49/month after trial ends</p>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm">
@@ -247,11 +251,11 @@ const Settings = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <Button onClick={() => {
                   toast({
-                    title: "Stripe Integration",
-                    description: "Redirecting to Stripe checkout..."
+                    title: "Trial Started",
+                    description: "Starting your $1 14-day trial. You'll be charged $49/month after the trial ends."
                   });
-                }} className="h-12 text-white bg-primary-foreground">
-                    SUBSCRIBE 
+                }} className="h-12 text-white bg-primary hover:bg-primary/90">
+                    Start $1 Trial
                   </Button>
                   
                 </div>

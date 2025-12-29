@@ -50,17 +50,23 @@ const SibeChat = forwardRef((props, ref) => {
         }
       });
       if (error) throw error;
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
       const assistantMessage: Message = {
         role: "assistant",
         content: data.response,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat error:", error);
+      const errorMessage = error?.message || "Failed to connect with Sibe SI. Please try again.";
       toast({
         title: "Communication Error",
-        description: "Failed to connect with Sibe SI. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

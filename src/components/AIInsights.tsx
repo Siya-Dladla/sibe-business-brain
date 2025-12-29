@@ -25,9 +25,13 @@ const AIInsights = ({ insights, onInsightGenerated }: AIInsightsProps) => {
     setIsGenerating(true);
 
     try {
-      const { error } = await supabase.functions.invoke("generate-insights");
+      const { data, error } = await supabase.functions.invoke("generate-insights");
 
       if (error) throw error;
+      
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       toast({
         title: "Insights Generated",
@@ -35,11 +39,12 @@ const AIInsights = ({ insights, onInsightGenerated }: AIInsightsProps) => {
       });
 
       onInsightGenerated();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating insights:", error);
+      const errorMessage = error?.message || "Failed to generate insights";
       toast({
         title: "Generation Failed",
-        description: error instanceof Error ? error.message : "Failed to generate insights",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
