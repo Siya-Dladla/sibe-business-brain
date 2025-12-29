@@ -13,9 +13,9 @@ serve(async (req) => {
   }
 
   try {
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -31,6 +31,7 @@ serve(async (req) => {
     }
 
     const { message } = await req.json();
+    console.log('Processing chat message for user:', user.id);
 
     // Fetch user's business context
     const { data: metrics } = await supabase
@@ -55,7 +56,7 @@ serve(async (req) => {
       .limit(1);
 
     // Build context for AI
-    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner that deeply understands the user's business.\n\n";
+    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner that deeply understands the user's business. You provide strategic, actionable insights based on data.\n\n";
     
     if (plans && plans.length > 0) {
       context += `Business Context:\n${plans[0].title}: ${plans[0].description}\n\n`;
@@ -79,33 +80,46 @@ serve(async (req) => {
 
     context += "Respond as a strategic business advisor who knows this business intimately. Be concise, actionable, and data-driven. Provide specific recommendations based on the business context.";
 
-    console.log('Calling OpenAI with context:', context);
+    console.log('Calling Lovable AI Gateway');
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: context },
           { role: 'user', content: message }
         ],
-        temperature: 0.7,
-        max_tokens: 500,
       }),
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        console.error('Rate limit exceeded');
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        console.error('Payment required');
+        return new Response(
+          JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       const error = await response.text();
-      console.error('OpenAI API error:', error);
+      console.error('AI Gateway error:', error);
       throw new Error('Failed to get AI response');
     }
 
     const data = await response.json();
     const aiResponse = data.choices[0].message.content;
+    console.log('AI response received successfully');
 
     return new Response(
       JSON.stringify({ response: aiResponse }),
