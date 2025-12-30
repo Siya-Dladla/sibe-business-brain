@@ -7,6 +7,8 @@ import MobileMenu from "@/components/MobileMenu";
 import DocumentUpload from "@/components/DocumentUpload";
 import MetricsGrid from "@/components/MetricsGrid";
 import ManualMetricsInput from "@/components/ManualMetricsInput";
+import APIDataFeeds from "@/components/APIDataFeeds";
+import KPITargetSetting from "@/components/KPITargetSetting";
 import SibeChat from "@/components/SibeChat";
 import QuickActions from "@/components/QuickActions";
 import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
@@ -148,22 +150,14 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="collection" className="space-y-4 md:space-y-6">
-            {/* Manual Metrics Input */}
+            {/* Manual Metrics Input & API Data Feeds */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <ManualMetricsInput onMetricSaved={fetchData} />
-              <Card className="glass-card p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-blue-500/10">
-                    <Database className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-medium text-foreground">API Data Feeds</h3>
-                    <p className="text-xs text-muted-foreground">Connect external data sources</p>
-                  </div>
-                  <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">Coming Soon</span>
-                </div>
-              </Card>
+              <APIDataFeeds />
             </div>
+
+            {/* KPI Target Setting */}
+            <KPITargetSetting metrics={metrics} onTargetSaved={fetchData} />
 
             <div className="grid grid-cols-1 gap-4 md:gap-6">
               <WebsiteAnalyzer onAnalysisComplete={fetchData} />
