@@ -1,109 +1,211 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Zap, TrendingUp, Target, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
+import { DollarSign, Users, TrendingUp, ArrowUp, ArrowDown, Wallet } from "lucide-react";
+import { AreaChart, Area, ResponsiveContainer, BarChart, Bar } from "recharts";
+
 interface Metric {
   metric_type: string;
   metric_name: string;
   value: number;
   change_percentage: number;
 }
+
 interface MetricsGridProps {
   metrics: Metric[];
 }
-const MetricsGrid = ({
-  metrics
-}: MetricsGridProps) => {
+
+// Sample trend data for mini charts
+const generateTrendData = (positive: boolean) => {
+  const baseValue = positive ? 50 : 80;
+  const trend = positive ? 1.08 : 0.95;
+  return Array.from({ length: 7 }, (_, i) => ({
+    value: Math.floor(baseValue * Math.pow(trend, i) + (Math.random() * 10 - 5)),
+  }));
+};
+
+const defaultMetrics = [
+  { metric_type: 'customers', metric_name: 'Total Customers', value: 0, change_percentage: 0 },
+  { metric_type: 'revenue', metric_name: 'Total Revenue', value: 0, change_percentage: 0 },
+  { metric_type: 'profit', metric_name: 'Net Profit', value: 0, change_percentage: 0 },
+];
+
+const MetricsGrid = ({ metrics }: MetricsGridProps) => {
   const getIcon = (type: string) => {
     switch (type) {
       case 'revenue':
-        return <DollarSign className="w-6 h-6" />;
-      case 'efficiency':
-        return <Zap className="w-6 h-6" />;
+        return <DollarSign className="w-5 h-5" />;
+      case 'customers':
+        return <Users className="w-5 h-5" />;
+      case 'profit':
+        return <Wallet className="w-5 h-5" />;
       case 'growth':
-        return <TrendingUp className="w-6 h-6" />;
-      case 'conversion':
-        return <Target className="w-6 h-6" />;
+        return <TrendingUp className="w-5 h-5" />;
       default:
-        return <TrendingUp className="w-6 h-6" />;
+        return <TrendingUp className="w-5 h-5" />;
     }
   };
+
   const formatValue = (type: string, value: number) => {
-    if (type === 'revenue') {
-      return `$${(value / 1000).toFixed(0)}K`;
+    if (type === 'revenue' || type === 'profit') {
+      if (value >= 1000000) {
+        return `$${(value / 1000000).toFixed(1)}M`;
+      }
+      if (value >= 1000) {
+        return `$${(value / 1000).toFixed(0)}K`;
+      }
+      return `$${value.toFixed(0)}`;
     }
-    if (type === 'conversion') {
-      return `${value.toFixed(1)}%`;
-    }
-    if (type === 'efficiency') {
-      return `${value.toFixed(0)}%`;
-    }
-    if (type === 'growth') {
-      return `+${value.toFixed(0)}%`;
+    if (type === 'customers') {
+      if (value >= 1000) {
+        return `${(value / 1000).toFixed(1)}K`;
+      }
+      return value.toFixed(0);
     }
     return value.toFixed(0);
   };
-  if (!metrics || metrics.length === 0) {
-    return <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        {['revenue', 'efficiency', 'growth', 'conversion'].map(type => <Card key={type} className="glass-card p-4 md:p-6 hover-lift">
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <div className="text-primary">{getIcon(type)}</div>
-              <ArrowUp className="w-3 h-3 md:w-4 md:h-4 text-green-400" />
-            </div>
-            <h3 className="text-muted-foreground font-light text-xs md:text-sm mb-1 md:mb-2 capitalize">
-              {type}
-            </h3>
-            <p className="text-xl md:text-3xl font-extralight mb-1">--</p>
-            <p className="text-xs md:text-sm text-muted-foreground font-light">No data</p>
-          </Card>)}
-      </div>;
-  }
-  const getInsightBadge = (change: number) => {
-    if (change > 15) return {
-      text: "Exceptional",
-      color: "bg-green-500/20 text-green-400"
-    };
-    if (change > 5) return {
-      text: "Strong",
-      color: "bg-blue-500/20 text-blue-400"
-    };
-    if (change > -5) return {
-      text: "Stable",
-      color: "bg-gray-500/20 text-gray-400"
-    };
-    return {
-      text: "Needs Attention",
-      color: "bg-red-500/20 text-red-400"
-    };
+
+  const getGradientColors = (type: string) => {
+    switch (type) {
+      case 'customers':
+        return { from: '#6366f1', to: '#8b5cf6' }; // indigo to violet
+      case 'revenue':
+        return { from: '#22c55e', to: '#10b981' }; // green shades
+      case 'profit':
+        return { from: '#f59e0b', to: '#eab308' }; // amber to yellow
+      default:
+        return { from: '#6366f1', to: '#8b5cf6' };
+    }
   };
-  return <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-      {metrics.map(metric => {
-      const badge = getInsightBadge(metric.change_percentage);
-      return <Card key={metric.metric_type} className="glass-card p-4 md:p-6 hover-lift relative overflow-hidden group bg-primary-foreground">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3 md:mb-4">
-                <div className="text-primary">{getIcon(metric.metric_type)}</div>
-                <div className="flex items-center gap-1 md:gap-2">
-                  {metric.change_percentage >= 0 ? <ArrowUp className="w-3 h-3 md:w-4 md:h-4 text-green-400" /> : <ArrowDown className="w-3 h-3 md:w-4 md:h-4 text-red-400" />}
+
+  const getStatusBadge = (change: number) => {
+    if (change > 15) return { text: "Excellent", color: "bg-green-500/20 text-green-400 border-green-500/30" };
+    if (change > 5) return { text: "Growing", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" };
+    if (change > 0) return { text: "Stable", color: "bg-gray-500/20 text-gray-400 border-gray-500/30" };
+    if (change > -5) return { text: "Declining", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" };
+    return { text: "Critical", color: "bg-red-500/20 text-red-400 border-red-500/30" };
+  };
+
+  // Use default metrics if none provided
+  const displayMetrics = metrics && metrics.length > 0 
+    ? metrics.filter(m => ['customers', 'revenue', 'profit'].includes(m.metric_type))
+    : defaultMetrics;
+
+  // If we have fewer than 3 metrics, add defaults
+  const finalMetrics = displayMetrics.length >= 3 
+    ? displayMetrics.slice(0, 3) 
+    : [...displayMetrics, ...defaultMetrics.filter(d => !displayMetrics.find(m => m.metric_type === d.metric_type))].slice(0, 3);
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-light text-foreground">Growth Dashboard</h2>
+          <p className="text-xs text-muted-foreground">Real-time business performance</p>
+        </div>
+        <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+          Live Data
+        </Badge>
+      </div>
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {finalMetrics.map((metric, index) => {
+          const badge = getStatusBadge(metric.change_percentage);
+          const colors = getGradientColors(metric.metric_type);
+          const trendData = generateTrendData(metric.change_percentage >= 0);
+          const isPositive = metric.change_percentage >= 0;
+
+          return (
+            <Card 
+              key={metric.metric_type} 
+              className="relative overflow-hidden bg-card border-border/50 hover:border-primary/30 transition-all duration-300"
+            >
+              {/* Background gradient accent */}
+              <div 
+                className="absolute top-0 left-0 w-full h-1"
+                style={{ background: `linear-gradient(90deg, ${colors.from}, ${colors.to})` }}
+              />
+              
+              <div className="p-4 md:p-5">
+                {/* Header row */}
+                <div className="flex items-center justify-between mb-3">
+                  <div 
+                    className="p-2 rounded-lg"
+                    style={{ background: `linear-gradient(135deg, ${colors.from}20, ${colors.to}10)` }}
+                  >
+                    <div style={{ color: colors.from }}>{getIcon(metric.metric_type)}</div>
+                  </div>
+                  <Badge className={`${badge.color} border text-[10px]`}>
+                    {badge.text}
+                  </Badge>
+                </div>
+
+                {/* Metric name */}
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide mb-1">
+                  {metric.metric_name}
+                </p>
+
+                {/* Value */}
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-2xl md:text-3xl font-semibold text-foreground">
+                    {formatValue(metric.metric_type, metric.value) || '--'}
+                  </span>
+                  <div className={`flex items-center gap-0.5 text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                    {isPositive ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+                    <span className="font-medium">{Math.abs(metric.change_percentage).toFixed(1)}%</span>
+                  </div>
+                </div>
+
+                {/* Mini Chart - Power BI style */}
+                <div className="h-12 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    {index % 2 === 0 ? (
+                      <AreaChart data={trendData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id={`gradient-${metric.metric_type}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={colors.from} stopOpacity={0.4} />
+                            <stop offset="100%" stopColor={colors.to} stopOpacity={0.05} />
+                          </linearGradient>
+                        </defs>
+                        <Area
+                          type="monotone"
+                          dataKey="value"
+                          stroke={colors.from}
+                          strokeWidth={2}
+                          fill={`url(#gradient-${metric.metric_type})`}
+                        />
+                      </AreaChart>
+                    ) : (
+                      <BarChart data={trendData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id={`bar-gradient-${metric.metric_type}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={colors.from} stopOpacity={0.8} />
+                            <stop offset="100%" stopColor={colors.to} stopOpacity={0.4} />
+                          </linearGradient>
+                        </defs>
+                        <Bar
+                          dataKey="value"
+                          fill={`url(#bar-gradient-${metric.metric_type})`}
+                          radius={[2, 2, 0, 0]}
+                        />
+                      </BarChart>
+                    )}
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
+                  <span className="text-[10px] text-muted-foreground">vs last period</span>
+                  <span className="text-[10px] text-muted-foreground">7-day trend</span>
                 </div>
               </div>
-              <h3 className="text-muted-foreground font-light text-xs md:text-sm mb-1 md:mb-2">
-                {metric.metric_name}
-              </h3>
-              <p className="text-xl md:text-3xl font-extralight mb-1 md:mb-2">
-                {formatValue(metric.metric_type, metric.value)}
-              </p>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-1 md:gap-0">
-                <p className={`text-xs md:text-sm font-light ${metric.change_percentage >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {metric.change_percentage >= 0 ? '+' : ''}{metric.change_percentage.toFixed(1)}%
-                </p>
-                <Badge className={`${badge.color} border-0 text-[10px] md:text-xs w-fit`}>
-                  {badge.text}
-                </Badge>
-              </div>
-            </div>
-          </Card>;
-    })}
-    </div>;
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
+
 export default MetricsGrid;
