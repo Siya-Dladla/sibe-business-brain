@@ -41,7 +41,7 @@ const Index = () => {
                 <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent"></div>
               </div>
             </div>
-            <div className="absolute -top-6 -right-12 text-4xl font-extralight text-primary tracking-widest">SI</div>
+            
             <div className="absolute inset-0 rounded-full border border-primary/10 animate-pulse-glow"></div>
           </div>
         </div>
