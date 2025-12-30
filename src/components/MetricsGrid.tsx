@@ -1,13 +1,23 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Users, TrendingUp, ArrowUp, ArrowDown, Wallet } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { DollarSign, Users, TrendingUp, ArrowUp, ArrowDown, Wallet, AlertTriangle, Target } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { useEffect, useState } from "react";
 
 interface Metric {
   metric_type: string;
   metric_name: string;
   value: number;
   change_percentage: number;
+}
+
+interface KPITarget {
+  id: string;
+  metric_type: string;
+  target_value: number;
+  current_value: number;
+  risk_percentage: number;
 }
 
 interface MetricsGridProps {
@@ -30,6 +40,27 @@ const defaultMetrics = [
 ];
 
 const MetricsGrid = ({ metrics }: MetricsGridProps) => {
+  const [targets, setTargets] = useState<KPITarget[]>([]);
+
+  // Load KPI targets from localStorage
+  useEffect(() => {
+    const savedTargets = localStorage.getItem('kpi_targets');
+    if (savedTargets) {
+      setTargets(JSON.parse(savedTargets));
+    }
+
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      const updatedTargets = localStorage.getItem('kpi_targets');
+      if (updatedTargets) {
+        setTargets(JSON.parse(updatedTargets));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   const getIcon = (type: string) => {
     switch (type) {
       case 'revenue':
@@ -83,6 +114,28 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
     if (change > 0) return { text: "Stable", color: "bg-gray-500/20 text-gray-400 border-gray-500/30" };
     if (change > -5) return { text: "Declining", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" };
     return { text: "Critical", color: "bg-red-500/20 text-red-400 border-red-500/30" };
+  };
+
+  const getRiskInfo = (metricType: string, currentValue: number) => {
+    const target = targets.find(t => t.metric_type === metricType);
+    if (!target) return null;
+
+    const progress = target.target_value > 0 
+      ? (currentValue / target.target_value) * 100
+      : 0;
+    
+    const riskThreshold = 100 - target.risk_percentage;
+    const isAtRisk = progress < 100 && progress >= riskThreshold;
+    const isBehind = progress < riskThreshold;
+
+    return {
+      target: target.target_value,
+      progress: Math.min(progress, 100),
+      riskPercentage: target.risk_percentage,
+      isAtRisk,
+      isBehind,
+      status: progress >= 100 ? 'on-target' : isAtRisk ? 'at-risk' : isBehind ? 'behind' : 'tracking'
+    };
   };
 
   // Use default metrics if none provided
@@ -147,7 +200,7 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
                 </p>
 
                 {/* Value */}
-                <div className="flex items-baseline gap-2 mb-3">
+                <div className="flex items-baseline gap-2 mb-2">
                   <span className="text-2xl md:text-3xl font-semibold text-foreground">
                     {formatValue(metric.metric_type, metric.value) || '--'}
                   </span>
@@ -157,8 +210,48 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
                   </div>
                 </div>
 
+                {/* Risk & Target Info */}
+                {(() => {
+                  const riskInfo = getRiskInfo(metric.metric_type, metric.value);
+                  if (riskInfo) {
+                    return (
+                      <div className="mb-3 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-1">
+                            <Target className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-muted-foreground">Target: {formatValue(metric.metric_type, riskInfo.target)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <AlertTriangle className={`w-3 h-3 ${riskInfo.isAtRisk ? 'text-amber-400' : riskInfo.isBehind ? 'text-red-400' : 'text-muted-foreground'}`} />
+                            <span className={`${riskInfo.isAtRisk ? 'text-amber-400' : riskInfo.isBehind ? 'text-red-400' : 'text-muted-foreground'}`}>
+                              {riskInfo.riskPercentage}% risk
+                            </span>
+                          </div>
+                        </div>
+                        <Progress 
+                          value={riskInfo.progress} 
+                          className="h-1.5"
+                        />
+                        <div className="flex justify-between text-[10px] text-muted-foreground">
+                          <span>{riskInfo.progress.toFixed(0)}% of target</span>
+                          <span className={
+                            riskInfo.status === 'on-target' ? 'text-green-400' :
+                            riskInfo.status === 'at-risk' ? 'text-amber-400' :
+                            riskInfo.status === 'behind' ? 'text-red-400' : ''
+                          }>
+                            {riskInfo.status === 'on-target' ? 'On Target' :
+                             riskInfo.status === 'at-risk' ? 'At Risk' :
+                             riskInfo.status === 'behind' ? 'Behind' : 'Tracking'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
                 {/* Mini Chart - Power BI style */}
-                <div className="h-12 w-full">
+                <div className="h-10 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     {index % 2 === 0 ? (
                       <AreaChart data={trendData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
