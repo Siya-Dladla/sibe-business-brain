@@ -38,7 +38,6 @@ interface KPITarget {
   metric_type: string;
   target_value: number;
   current_value: number;
-  risk_percentage: number;
 }
 
 interface KPITargetSettingProps {
@@ -56,7 +55,6 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
   const [loading, setLoading] = useState(false);
   const [metricType, setMetricType] = useState<string>("");
   const [targetValue, setTargetValue] = useState<string>("");
-  const [riskPercentage, setRiskPercentage] = useState<string>("10");
   const [targets, setTargets] = useState<KPITarget[]>([]);
   const { toast } = useToast();
 
@@ -110,7 +108,6 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
         metric_type: metricType,
         target_value: parseFloat(targetValue),
         current_value: currentMetric?.value || 0,
-        risk_percentage: parseFloat(riskPercentage) || 10,
       };
 
       // Remove existing target for same metric type
@@ -127,7 +124,6 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
 
       setMetricType("");
       setTargetValue("");
-      setRiskPercentage("10");
       setOpen(false);
       onTargetSaved();
     } catch (error) {
@@ -142,17 +138,17 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
     }
   };
 
-  const getProgressColor = (progress: number, risk: number) => {
+  const getProgressColor = (progress: number) => {
     if (progress >= 100) return "bg-green-500";
-    if (progress >= 100 - risk) return "bg-amber-500";
-    if (progress >= 50) return "bg-blue-500";
+    if (progress >= 75) return "bg-blue-500";
+    if (progress >= 50) return "bg-amber-500";
     return "bg-red-500";
   };
 
-  const getRiskStatus = (progress: number, risk: number) => {
-    if (progress >= 100) return { text: "On Target", color: "bg-green-500/20 text-green-400" };
-    if (progress >= 100 - risk) return { text: "At Risk", color: "bg-amber-500/20 text-amber-400" };
-    if (progress >= 50) return { text: "Tracking", color: "bg-blue-500/20 text-blue-400" };
+  const getStatus = (progress: number) => {
+    if (progress >= 100) return { text: "Achieved", color: "bg-green-500/20 text-green-400" };
+    if (progress >= 75) return { text: "On Track", color: "bg-blue-500/20 text-blue-400" };
+    if (progress >= 50) return { text: "Progressing", color: "bg-amber-500/20 text-amber-400" };
     return { text: "Behind", color: "bg-red-500/20 text-red-400" };
   };
 
@@ -247,27 +243,6 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
               />
             </div>
 
-            {/* Risk Percentage Input */}
-            <div className="space-y-2">
-              <Label htmlFor="risk" className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
-                Risk Threshold (%)
-              </Label>
-              <Input
-                id="risk"
-                type="number"
-                step="1"
-                min="0"
-                max="100"
-                placeholder="e.g., 10"
-                value={riskPercentage}
-                onChange={(e) => setRiskPercentage(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Alert when progress falls within this % of the target
-              </p>
-            </div>
-
             {/* Actions */}
             <div className="flex gap-3 pt-2">
               <Button
@@ -309,7 +284,7 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
               const progress = target.target_value > 0 
                 ? Math.min((target.current_value / target.target_value) * 100, 100)
                 : 0;
-              const status = getRiskStatus(progress, target.risk_percentage);
+              const status = getStatus(progress);
 
               return (
                 <div
@@ -321,15 +296,9 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
                       {metricOption && <metricOption.icon className={`w-4 h-4 ${metricOption.color}`} />}
                       <span className="text-sm font-medium">{metricOption?.label}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={`${status.color} border-0 text-xs`}>
-                        {status.text}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        <AlertTriangle className="w-3 h-3 mr-1" />
-                        {target.risk_percentage}% risk
-                      </Badge>
-                    </div>
+                    <Badge className={`${status.color} border-0 text-xs`}>
+                      {status.text}
+                    </Badge>
                   </div>
                   
                   <div className="space-y-1">

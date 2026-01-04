@@ -1,15 +1,17 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { DollarSign, Users, TrendingUp, ArrowUp, ArrowDown, Wallet, AlertTriangle, Target } from "lucide-react";
-import { AreaChart, Area, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { DollarSign, Users, TrendingUp, ArrowUp, ArrowDown, Wallet, Target, Calendar } from "lucide-react";
+import { AreaChart, Area, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 import { useEffect, useState } from "react";
+import { format, subDays } from "date-fns";
 
 interface Metric {
   metric_type: string;
   metric_name: string;
   value: number;
   change_percentage: number;
+  created_at?: string;
 }
 
 interface KPITarget {
@@ -17,23 +19,39 @@ interface KPITarget {
   metric_type: string;
   target_value: number;
   current_value: number;
-  risk_percentage: number;
 }
 
 interface MetricsGridProps {
-  metrics: Metric[];
+  metrics: Array<{
+    metric_type: string;
+    metric_name: string;
+    value: number;
+    change_percentage: number;
+    created_at?: string;
+  }>;
 }
 
-// Sample trend data for mini charts
-const generateTrendData = (positive: boolean) => {
-  const baseValue = positive ? 50 : 80;
-  const trend = positive ? 1.08 : 0.95;
-  return Array.from({ length: 7 }, (_, i) => ({
-    value: Math.floor(baseValue * Math.pow(trend, i) + (Math.random() * 10 - 5)),
-  }));
+// Generate trend data with dates
+const generateTrendData = (positive: boolean, currentValue: number) => {
+  const today = new Date();
+  const baseValue = currentValue > 0 ? currentValue * 0.85 : (positive ? 50 : 80);
+  const trend = positive ? 1.02 : 0.98;
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = subDays(today, 6 - i);
+    return {
+      date: format(date, 'MMM d'),
+      value: Math.floor(baseValue * Math.pow(trend, i) + (Math.random() * baseValue * 0.05)),
+    };
+  });
 };
 
-const defaultMetrics = [
+const defaultMetrics: Array<{
+  metric_type: string;
+  metric_name: string;
+  value: number;
+  change_percentage: number;
+  created_at?: string;
+}> = [
   { metric_type: 'customers', metric_name: 'Total Customers', value: 0, change_percentage: 0 },
   { metric_type: 'revenue', metric_name: 'Total Revenue', value: 0, change_percentage: 0 },
   { metric_type: 'profit', metric_name: 'Net Profit', value: 0, change_percentage: 0 },
@@ -116,25 +134,18 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
     return { text: "Critical", color: "bg-red-500/20 text-red-400 border-red-500/30" };
   };
 
-  const getRiskInfo = (metricType: string, currentValue: number) => {
+  const getTargetInfo = (metricType: string, currentValue: number) => {
     const target = targets.find(t => t.metric_type === metricType);
     if (!target) return null;
 
     const progress = target.target_value > 0 
       ? (currentValue / target.target_value) * 100
       : 0;
-    
-    const riskThreshold = 100 - target.risk_percentage;
-    const isAtRisk = progress < 100 && progress >= riskThreshold;
-    const isBehind = progress < riskThreshold;
 
     return {
       target: target.target_value,
       progress: Math.min(progress, 100),
-      riskPercentage: target.risk_percentage,
-      isAtRisk,
-      isBehind,
-      status: progress >= 100 ? 'on-target' : isAtRisk ? 'at-risk' : isBehind ? 'behind' : 'tracking'
+      status: progress >= 100 ? 'achieved' : progress >= 75 ? 'on-track' : progress >= 50 ? 'progressing' : 'behind'
     };
   };
 
@@ -166,8 +177,9 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
         {finalMetrics.map((metric, index) => {
           const badge = getStatusBadge(metric.change_percentage);
           const colors = getGradientColors(metric.metric_type);
-          const trendData = generateTrendData(metric.change_percentage >= 0);
+          const trendData = generateTrendData(metric.change_percentage >= 0, metric.value);
           const isPositive = metric.change_percentage >= 0;
+          const metricDate = metric.created_at ? format(new Date(metric.created_at), 'MMM d, yyyy') : null;
 
           return (
             <Card 
@@ -210,39 +222,33 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
                   </div>
                 </div>
 
-                {/* Risk & Target Info */}
+                {/* Target Info */}
                 {(() => {
-                  const riskInfo = getRiskInfo(metric.metric_type, metric.value);
-                  if (riskInfo) {
+                  const targetInfo = getTargetInfo(metric.metric_type, metric.value);
+                  if (targetInfo) {
                     return (
                       <div className="mb-3 space-y-1.5">
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center gap-1">
                             <Target className="w-3 h-3 text-muted-foreground" />
-                            <span className="text-muted-foreground">Target: {formatValue(metric.metric_type, riskInfo.target)}</span>
+                            <span className="text-muted-foreground">Target: {formatValue(metric.metric_type, targetInfo.target)}</span>
                           </div>
-                          <div className="flex items-center gap-1">
-                            <AlertTriangle className={`w-3 h-3 ${riskInfo.isAtRisk ? 'text-amber-400' : riskInfo.isBehind ? 'text-red-400' : 'text-muted-foreground'}`} />
-                            <span className={`${riskInfo.isAtRisk ? 'text-amber-400' : riskInfo.isBehind ? 'text-red-400' : 'text-muted-foreground'}`}>
-                              {riskInfo.riskPercentage}% risk
-                            </span>
-                          </div>
+                          <span className={
+                            targetInfo.status === 'achieved' ? 'text-green-400' :
+                            targetInfo.status === 'on-track' ? 'text-blue-400' :
+                            targetInfo.status === 'progressing' ? 'text-amber-400' : 'text-red-400'
+                          }>
+                            {targetInfo.status === 'achieved' ? 'Achieved' :
+                             targetInfo.status === 'on-track' ? 'On Track' :
+                             targetInfo.status === 'progressing' ? 'Progressing' : 'Behind'}
+                          </span>
                         </div>
                         <Progress 
-                          value={riskInfo.progress} 
+                          value={targetInfo.progress} 
                           className="h-1.5"
                         />
-                        <div className="flex justify-between text-[10px] text-muted-foreground">
-                          <span>{riskInfo.progress.toFixed(0)}% of target</span>
-                          <span className={
-                            riskInfo.status === 'on-target' ? 'text-green-400' :
-                            riskInfo.status === 'at-risk' ? 'text-amber-400' :
-                            riskInfo.status === 'behind' ? 'text-red-400' : ''
-                          }>
-                            {riskInfo.status === 'on-target' ? 'On Target' :
-                             riskInfo.status === 'at-risk' ? 'At Risk' :
-                             riskInfo.status === 'behind' ? 'Behind' : 'Tracking'}
-                          </span>
+                        <div className="text-[10px] text-muted-foreground text-right">
+                          {targetInfo.progress.toFixed(0)}% of target
                         </div>
                       </div>
                     );
@@ -250,17 +256,33 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
                   return null;
                 })()}
 
-                {/* Mini Chart - Power BI style */}
-                <div className="h-10 w-full">
+                {/* Mini Chart with dates */}
+                <div className="h-16 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     {index % 2 === 0 ? (
-                      <AreaChart data={trendData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                      <AreaChart data={trendData} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
                         <defs>
                           <linearGradient id={`gradient-${metric.metric_type}`} x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stopColor={colors.from} stopOpacity={0.4} />
                             <stop offset="100%" stopColor={colors.to} stopOpacity={0.05} />
                           </linearGradient>
                         </defs>
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 8, fill: 'hsl(var(--muted-foreground))' }}
+                          axisLine={false}
+                          tickLine={false}
+                          interval="preserveStartEnd"
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            background: 'hsl(var(--background))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                            fontSize: '11px'
+                          }}
+                          labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        />
                         <Area
                           type="monotone"
                           dataKey="value"
@@ -270,13 +292,29 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
                         />
                       </AreaChart>
                     ) : (
-                      <BarChart data={trendData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                      <BarChart data={trendData} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
                         <defs>
                           <linearGradient id={`bar-gradient-${metric.metric_type}`} x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stopColor={colors.from} stopOpacity={0.8} />
                             <stop offset="100%" stopColor={colors.to} stopOpacity={0.4} />
                           </linearGradient>
                         </defs>
+                        <XAxis 
+                          dataKey="date" 
+                          tick={{ fontSize: 8, fill: 'hsl(var(--muted-foreground))' }}
+                          axisLine={false}
+                          tickLine={false}
+                          interval="preserveStartEnd"
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            background: 'hsl(var(--background))', 
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px',
+                            fontSize: '11px'
+                          }}
+                          labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        />
                         <Bar
                           dataKey="value"
                           fill={`url(#bar-gradient-${metric.metric_type})`}
@@ -287,9 +325,14 @@ const MetricsGrid = ({ metrics }: MetricsGridProps) => {
                   </ResponsiveContainer>
                 </div>
 
-                {/* Footer */}
+                {/* Footer with date */}
                 <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
-                  <span className="text-[10px] text-muted-foreground">vs last period</span>
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-[10px] text-muted-foreground">
+                      {metricDate || 'Current'}
+                    </span>
+                  </div>
                   <span className="text-[10px] text-muted-foreground">7-day trend</span>
                 </div>
               </div>

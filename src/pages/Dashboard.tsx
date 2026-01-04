@@ -12,6 +12,7 @@ import KPITargetSetting from "@/components/KPITargetSetting";
 import SibeChat from "@/components/SibeChat";
 import QuickActions from "@/components/QuickActions";
 import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
+import BusinessDNA from "@/components/BusinessDNA";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Database, Lightbulb } from "lucide-react";
 const Dashboard = () => {
@@ -139,6 +140,9 @@ const Dashboard = () => {
           <TabsContent value="insights" className="space-y-4 md:space-y-6">
             {/* Quick Actions */}
             <QuickActions onAction={handleQuickAction} />
+
+            {/* Business Brain - Business DNA */}
+            <BusinessDNA metrics={metrics} />
 
             {/* Metrics Grid */}
             <MetricsGrid metrics={metrics} />
