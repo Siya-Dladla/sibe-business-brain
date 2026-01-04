@@ -30,14 +30,19 @@ import {
   Wallet, 
   Loader2,
   TrendingUp,
-  AlertTriangle
+  AlertTriangle,
+  Bell,
+  BellOff
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 interface KPITarget {
   id: string;
   metric_type: string;
   target_value: number;
   current_value: number;
+  alert_threshold: number;
+  alert_enabled: boolean;
 }
 
 interface KPITargetSettingProps {
@@ -55,6 +60,8 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
   const [loading, setLoading] = useState(false);
   const [metricType, setMetricType] = useState<string>("");
   const [targetValue, setTargetValue] = useState<string>("");
+  const [alertThreshold, setAlertThreshold] = useState<string>("50");
+  const [alertEnabled, setAlertEnabled] = useState<boolean>(true);
   const [targets, setTargets] = useState<KPITarget[]>([]);
   const { toast } = useToast();
 
@@ -108,6 +115,8 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
         metric_type: metricType,
         target_value: parseFloat(targetValue),
         current_value: currentMetric?.value || 0,
+        alert_threshold: parseFloat(alertThreshold) || 50,
+        alert_enabled: alertEnabled,
       };
 
       // Remove existing target for same metric type
@@ -124,6 +133,8 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
 
       setMetricType("");
       setTargetValue("");
+      setAlertThreshold("50");
+      setAlertEnabled(true);
       setOpen(false);
       onTargetSaved();
     } catch (error) {
@@ -243,6 +254,51 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
               />
             </div>
 
+            {/* Alert Settings */}
+            <div className="p-3 bg-muted/30 rounded-lg space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {alertEnabled ? (
+                    <Bell className="w-4 h-4 text-primary" />
+                  ) : (
+                    <BellOff className="w-4 h-4 text-muted-foreground" />
+                  )}
+                  <Label htmlFor="alert-enabled" className="text-sm font-normal">
+                    Enable Alerts
+                  </Label>
+                </div>
+                <Switch
+                  id="alert-enabled"
+                  checked={alertEnabled}
+                  onCheckedChange={setAlertEnabled}
+                />
+              </div>
+
+              {alertEnabled && (
+                <div className="space-y-2">
+                  <Label htmlFor="alert-threshold" className="text-xs text-muted-foreground">
+                    Alert when below (% of target)
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="alert-threshold"
+                      type="number"
+                      step="5"
+                      min="10"
+                      max="90"
+                      value={alertThreshold}
+                      onChange={(e) => setAlertThreshold(e.target.value)}
+                      className="w-20"
+                    />
+                    <span className="text-sm text-muted-foreground">%</span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      (Alert if value drops below {alertThreshold}% of target)
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Actions */}
             <div className="flex gap-3 pt-2">
               <Button
@@ -296,9 +352,16 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
                       {metricOption && <metricOption.icon className={`w-4 h-4 ${metricOption.color}`} />}
                       <span className="text-sm font-medium">{metricOption?.label}</span>
                     </div>
-                    <Badge className={`${status.color} border-0 text-xs`}>
-                      {status.text}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {target.alert_enabled ? (
+                        <Bell className="w-3.5 h-3.5 text-primary" />
+                      ) : (
+                        <BellOff className="w-3.5 h-3.5 text-muted-foreground" />
+                      )}
+                      <Badge className={`${status.color} border-0 text-xs`}>
+                        {status.text}
+                      </Badge>
+                    </div>
                   </div>
                   
                   <div className="space-y-1">
@@ -313,6 +376,13 @@ const KPITargetSetting = ({ metrics, onTargetSaved }: KPITargetSettingProps) => 
                       className="h-2"
                     />
                   </div>
+
+                  {target.alert_enabled && (
+                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <AlertTriangle className="w-3 h-3" />
+                      <span>Alert when below {target.alert_threshold}% of target</span>
+                    </div>
+                  )}
                 </div>
               );
             })}

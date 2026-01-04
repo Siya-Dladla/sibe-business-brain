@@ -13,6 +13,7 @@ import SibeChat from "@/components/SibeChat";
 import QuickActions from "@/components/QuickActions";
 import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
 import BusinessDNA from "@/components/BusinessDNA";
+import KPIAlerts from "@/components/KPIAlerts";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Database, Lightbulb } from "lucide-react";
 const Dashboard = () => {
@@ -138,6 +139,9 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="insights" className="space-y-4 md:space-y-6">
+            {/* KPI Alerts */}
+            <KPIAlerts metrics={metrics} />
+
             {/* Quick Actions */}
             <QuickActions onAction={handleQuickAction} />
 
