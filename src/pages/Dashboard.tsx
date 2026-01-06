@@ -14,6 +14,7 @@ import QuickActions from "@/components/QuickActions";
 import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
 import BusinessDNA from "@/components/BusinessDNA";
 import KPIAlerts from "@/components/KPIAlerts";
+import { HistoricalMetrics } from "@/components/HistoricalMetrics";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Database, Lightbulb } from "lucide-react";
 const Dashboard = () => {
@@ -147,6 +148,9 @@ const Dashboard = () => {
 
             {/* Business Brain - Business DNA */}
             <BusinessDNA metrics={metrics} />
+
+            {/* Historical Metrics with Trend Analysis */}
+            <HistoricalMetrics />
 
             {/* Metrics Grid */}
             <MetricsGrid metrics={metrics} />
