@@ -1,83 +1,116 @@
-import { Link } from "react-router-dom";
-import { Database, Layers, Users, FileText, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import MobileMenu from "@/components/MobileMenu";
-const Index = () => {
-  const menuItems = [{
-    icon: Database,
-    label: "Data",
-    path: "/dashboard"
-  }, {
-    icon: Layers,
-    label: "Canvas",
-    path: "/canvas"
-  }, {
-    icon: Users,
-    label: "AI Employees",
-    path: "/employees"
-  }, {
-    icon: FileText,
-    label: "Reports",
-    path: "/reports"
-  }, {
-    icon: Settings,
-    label: "Settings",
-    path: "/settings"
-  }];
-  return <div className="min-h-screen bg-background flex flex-col grid-bg">
-      {/* Header */}
-      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
-        <MobileMenu />
-        <div className="text-xs text-muted-foreground">SIBE </div>
-      </div>
+import { supabase } from "@/integrations/supabase/client";
+import { ChatInterface } from "@/components/ChatInterface";
 
-      {/* Logo Section */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-primary-foreground">
-        <div className="mb-16 animate-float">
-          <div className="relative">
-            <div className="w-72 h-72 rounded-full border border-primary/30 flex items-center justify-center bg-gradient-card backdrop-blur-sm shadow-2xl hover-lift">
-              <div className="text-center">
-                <h1 className="text-7xl font-extralight tracking-wider mb-2 glow-text">Sibe</h1>
-                <div className="h-px w-32 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent"></div>
-              </div>
-            </div>
-            
-            <div className="absolute inset-0 rounded-full border border-primary/10 animate-pulse-glow"></div>
+const Index = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Loading state
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse">
+          <Brain className="h-12 w-12 text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated - show chat interface
+  if (isAuthenticated) {
+    return <ChatInterface />;
+  }
+
+  // Not authenticated - show landing page
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <header className="h-14 border-b border-border flex items-center justify-between px-6">
+        <div className="flex items-center gap-2">
+          <Brain className="h-6 w-6 text-primary" />
+          <span className="font-medium">Sibe SI</span>
+        </div>
+        <Button onClick={() => navigate("/auth")} variant="outline" size="sm">
+          Sign In
+        </Button>
+      </header>
+
+      {/* Hero */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+        <div className="mb-12 relative">
+          <div className="w-32 h-32 rounded-full bg-card border border-border flex items-center justify-center">
+            <Brain className="w-16 h-16 text-primary" />
           </div>
+          <div className="absolute inset-0 rounded-full border border-primary/20 animate-pulse" />
         </div>
 
-        <h2 className="text-2xl text-primary text-center mb-4 font-light tracking-wide">
+        <h1 className="text-4xl md:text-5xl font-light mb-4 text-center">
+          Sibe SI
+        </h1>
+        <p className="text-lg text-muted-foreground text-center max-w-xl mb-4">
           Synthetic Intelligence Business Engine
-        </h2>
-        <p className="text-sm text-muted-foreground text-center mb-8 max-w-2xl">
-          The AI that learns your business, thinks strategically, and advises you 24/7
         </p>
-        <p className="text-xs text-muted-foreground/60 text-center mb-20 max-w-xl">
-          Unlike traditional BI tools, Sibe SI is alive — it understands how your business operates and evolves with every data point you share
+        <p className="text-sm text-muted-foreground/70 text-center max-w-lg mb-12">
+          Chat with your business data. Upload PDFs, analyze websites, connect APIs, 
+          and get AI-powered insights with beautiful visualizations.
         </p>
 
-        {/* Menu Grid */}
-        <div className="w-full max-w-3xl grid grid-cols-2 md:grid-cols-3 gap-6">
-          {menuItems.map((item, index) => <Link key={index} to={item.path}>
-              <div className="glass-card p-10 flex flex-col items-center justify-center gap-5 hover:glow-border hover-lift transition-all duration-300 min-h-[180px] group bg-primary-foreground">
-                <item.icon className="w-14 h-14 text-primary transition-transform duration-300 group-hover:scale-110" />
-                <span className="text-lg font-light tracking-wide">{item.label}</span>
-              </div>
-            </Link>)}
+        <Button onClick={() => navigate("/auth")} size="lg" className="gap-2">
+          Get Started
+        </Button>
+
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20 max-w-4xl w-full">
+          <FeatureCard
+            title="Upload Documents"
+            description="PDF, Word docs, and more. Extract insights from your business documents."
+          />
+          <FeatureCard
+            title="Analyze Websites"
+            description="Enter any URL and get strategic analysis of competitors or your own site."
+          />
+          <FeatureCard
+            title="Visual Insights"
+            description="Charts, tables, and KPI cards rendered right in your conversation."
+          />
         </div>
       </div>
 
       {/* Footer */}
-      <div className="p-6 border-t border-border/50 flex items-center justify-between bg-primary-foreground">
+      <footer className="h-14 border-t border-border flex items-center justify-center px-6">
         <p className="text-xs text-muted-foreground">
           © 2025 SGD Business Analysis & Projects
         </p>
-        <Link to="/auth">
-          <Button variant="outline" className="glass-button text-primary border-primary/30 hover:bg-primary/10">
-            Sign In
-          </Button>
-        </Link>
-      </div>
-    </div>;
+      </footer>
+    </div>
+  );
 };
+
+function FeatureCard({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="p-6 rounded-xl border border-border bg-card">
+      <h3 className="font-medium mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
 export default Index;
