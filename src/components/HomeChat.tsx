@@ -1,10 +1,19 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, BarChart3, X } from "lucide-react";
+import { Send, Loader2, BarChart3, X, Mic, MicOff, History, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
   role: "user" | "assistant";
@@ -14,14 +23,28 @@ interface Message {
   chartType?: "area" | "bar";
 }
 
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  created_at: string;
+  updated_at: string;
+}
+
 const HomeChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [graphData, setGraphData] = useState<any[]>([]);
+  const [isListening, setIsListening] = useState(false);
+  const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -31,7 +54,156 @@ const HomeChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Generate sample chart data based on query
+  // Load chat history on mount
+  useEffect(() => {
+    if (user) {
+      loadChatHistory();
+    }
+  }, [user]);
+
+  // Initialize Web Speech API
+  useEffect(() => {
+    const win = window as any;
+    if ('webkitSpeechRecognition' in win || 'SpeechRecognition' in win) {
+      const SpeechRecognitionAPI = win.SpeechRecognition || win.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognitionAPI();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event) => {
+        let finalTranscript = '';
+        let interimTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        if (finalTranscript) {
+          setInput(prev => prev + finalTranscript);
+        }
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        toast({
+          title: "Voice Input Error",
+          description: event.error === 'not-allowed' 
+            ? "Microphone access denied. Please enable it in your browser settings."
+            : "Voice recognition failed. Please try again.",
+          variant: "destructive",
+        });
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [toast]);
+
+  const loadChatHistory = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('chat_history')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      
+      const sessions = (data || []).map(session => ({
+        ...session,
+        messages: (session.messages as any[]).map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }))
+      }));
+      
+      setChatHistory(sessions);
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+    }
+  };
+
+  const saveCurrentSession = useCallback(async (sessionMessages: Message[]) => {
+    if (!user || sessionMessages.length === 0) return;
+
+    const title = sessionMessages[0]?.content.slice(0, 50) || 'New Chat';
+    const messagesForStorage = sessionMessages.map(msg => ({
+      ...msg,
+      timestamp: msg.timestamp.toISOString()
+    }));
+
+    try {
+      if (currentSessionId) {
+        await supabase
+          .from('chat_history')
+          .update({ 
+            messages: messagesForStorage,
+            title,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentSessionId);
+      } else {
+        const { data, error } = await supabase
+          .from('chat_history')
+          .insert({
+            user_id: user.id,
+            title,
+            messages: messagesForStorage
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setCurrentSessionId(data.id);
+        }
+      }
+      
+      loadChatHistory();
+    } catch (error) {
+      console.error('Error saving chat session:', error);
+    }
+  }, [user, currentSessionId]);
+
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      toast({
+        title: "Voice Input Unavailable",
+        description: "Your browser doesn't support voice input. Try Chrome or Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+      toast({
+        title: "Listening...",
+        description: "Speak now. Click the mic button again to stop.",
+      });
+    }
+  };
+
   const generateChartData = (query: string) => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
     const isRevenue = query.toLowerCase().includes("revenue") || query.toLowerCase().includes("sales");
@@ -51,13 +223,20 @@ const HomeChat = () => {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    // Stop listening if active
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+
     const userMessage: Message = {
       role: "user",
       content: input,
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     const currentInput = input;
     setInput("");
     setIsLoading(true);
@@ -70,7 +249,6 @@ const HomeChat = () => {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
-      // Check if query is about visualization
       const isVisualizationQuery = 
         currentInput.toLowerCase().includes("graph") ||
         currentInput.toLowerCase().includes("chart") ||
@@ -93,7 +271,13 @@ const HomeChat = () => {
         chartType: chartData ? "area" : undefined,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      const updatedMessages = [...newMessages, assistantMessage];
+      setMessages(updatedMessages);
+      
+      // Save to history
+      if (user) {
+        saveCurrentSession(updatedMessages);
+      }
     } catch (error: any) {
       console.error("Chat error:", error);
       toast({
@@ -113,6 +297,42 @@ const HomeChat = () => {
     }
   };
 
+  const loadSession = (session: ChatSession) => {
+    setMessages(session.messages);
+    setCurrentSessionId(session.id);
+    setHistoryOpen(false);
+  };
+
+  const startNewChat = () => {
+    setMessages([]);
+    setCurrentSessionId(null);
+    setShowGraph(false);
+    setHistoryOpen(false);
+  };
+
+  const deleteSession = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      await supabase
+        .from('chat_history')
+        .delete()
+        .eq('id', sessionId);
+
+      if (currentSessionId === sessionId) {
+        startNewChat();
+      }
+      
+      loadChatHistory();
+      toast({
+        title: "Chat deleted",
+        description: "The conversation has been removed.",
+      });
+    } catch (error) {
+      console.error('Error deleting session:', error);
+    }
+  };
+
   const suggestedPrompts = [
     "Show me revenue trends",
     "Analyze customer growth",
@@ -127,6 +347,75 @@ const HomeChat = () => {
         <div className="text-[20vw] font-extralight tracking-wider text-white/[0.02] select-none animate-float">
           Sibe
         </div>
+      </div>
+
+      {/* History Button */}
+      <div className="absolute top-4 left-4 z-20">
+        <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 p-0 bg-[#1a1a1a] hover:bg-[#252525] border border-[#2a2a2a]"
+            >
+              <History className="w-4 h-4 text-white/60" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-80 bg-[#0a0a0a] border-[#2a2a2a] p-0">
+            <SheetHeader className="p-4 border-b border-[#2a2a2a]">
+              <SheetTitle className="text-white/90 flex items-center justify-between">
+                Chat History
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={startNewChat}
+                  className="h-8 px-3 bg-primary/20 hover:bg-primary/30 text-primary"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  New
+                </Button>
+              </SheetTitle>
+            </SheetHeader>
+            <ScrollArea className="h-[calc(100vh-80px)]">
+              <div className="p-2 space-y-1">
+                {chatHistory.length === 0 ? (
+                  <p className="text-sm text-white/40 text-center py-8">
+                    No chat history yet
+                  </p>
+                ) : (
+                  chatHistory.map((session) => (
+                    <div
+                      key={session.id}
+                      onClick={() => loadSession(session)}
+                      className={`group p-3 rounded-lg cursor-pointer transition-colors ${
+                        currentSessionId === session.id
+                          ? 'bg-primary/20 border border-primary/30'
+                          : 'bg-[#1a1a1a] hover:bg-[#252525] border border-transparent'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-white/80 truncate">{session.title}</p>
+                          <p className="text-[10px] text-white/40 mt-1">
+                            {new Date(session.updated_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => deleteSession(session.id, e)}
+                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-500/20"
+                        >
+                          <Trash2 className="w-3 h-3 text-red-400" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Graph Panel */}
@@ -256,19 +545,36 @@ const HomeChat = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Message Sibe SI..."
-            className="w-full min-h-[56px] max-h-32 resize-none bg-[#1a1a1a] border-[#2a2a2a] rounded-2xl px-4 py-4 pr-14 text-sm text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-0"
+            className="w-full min-h-[56px] max-h-32 resize-none bg-[#1a1a1a] border-[#2a2a2a] rounded-2xl px-4 py-4 pr-28 text-sm text-white placeholder:text-white/30 focus:border-primary/50 focus:ring-0"
             disabled={isLoading}
           />
-          <Button
-            onClick={handleSend}
-            disabled={isLoading || !input.trim()}
-            className="absolute right-2 bottom-2 h-10 w-10 p-0 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-30"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
+          <div className="absolute right-2 bottom-2 flex items-center gap-1">
+            <Button
+              onClick={toggleVoiceInput}
+              disabled={isLoading}
+              className={`h-10 w-10 p-0 rounded-xl transition-colors ${
+                isListening 
+                  ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                  : 'bg-[#252525] hover:bg-[#303030]'
+              }`}
+            >
+              {isListening ? (
+                <MicOff className="w-4 h-4 text-white" />
+              ) : (
+                <Mic className="w-4 h-4 text-white/60" />
+              )}
+            </Button>
+            <Button
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              className="h-10 w-10 p-0 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-30"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
         <p className="text-center text-[10px] text-white/20 mt-3">
-          Sibe SI can make mistakes. Verify important information.
+          {isListening ? "🎙️ Listening... Speak now" : "Sibe SI can make mistakes. Verify important information."}
         </p>
       </div>
     </div>
