@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Sparkles } from "lucide-react";
+import { Send, Sparkles, Mic, MicOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -30,10 +30,98 @@ const EmployeeInteractionDialog = ({ employee, open, onOpenChange }: EmployeeInt
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
+
+  // Initialize Web Speech API
+  useEffect(() => {
+    const win = window as any;
+    if ('webkitSpeechRecognition' in win || 'SpeechRecognition' in win) {
+      const SpeechRecognitionAPI = win.SpeechRecognition || win.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognitionAPI();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event: any) => {
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          }
+        }
+
+        if (finalTranscript) {
+          setInput(prev => prev + finalTranscript);
+        }
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        toast({
+          title: "Voice Input Error",
+          description: event.error === 'not-allowed' 
+            ? "Microphone access denied. Please enable it in your browser settings."
+            : "Voice recognition failed. Please try again.",
+          variant: "destructive",
+        });
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [toast]);
+
+  // Stop listening when dialog closes
+  useEffect(() => {
+    if (!open && recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  }, [open, isListening]);
+
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      toast({
+        title: "Voice Input Unavailable",
+        description: "Your browser doesn't support voice input. Try Chrome or Edge.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current.start();
+      setIsListening(true);
+      toast({
+        title: "Listening...",
+        description: "Speak now. Click the mic button again to stop.",
+      });
+    }
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || !employee) return;
+
+    // Stop listening if active
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
 
     const userMessage = input.trim();
     setInput("");
@@ -127,18 +215,36 @@ const EmployeeInteractionDialog = ({ employee, open, onOpenChange }: EmployeeInt
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Type your message..."
+            placeholder={isListening ? "🎙️ Listening..." : "Type your message..."}
             className="bg-input border-primary/20 focus:border-primary font-light resize-none"
             rows={2}
             disabled={loading}
           />
-          <Button
-            onClick={sendMessage}
-            disabled={loading || !input.trim()}
-            className="h-auto"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={toggleVoiceInput}
+              disabled={loading}
+              variant="outline"
+              className={`h-10 w-10 p-0 ${
+                isListening 
+                  ? 'bg-red-500 hover:bg-red-600 border-red-500 animate-pulse' 
+                  : 'border-primary/30 hover:bg-primary/10'
+              }`}
+            >
+              {isListening ? (
+                <MicOff className="w-4 h-4 text-white" />
+              ) : (
+                <Mic className="w-4 h-4" />
+              )}
+            </Button>
+            <Button
+              onClick={sendMessage}
+              disabled={loading || !input.trim()}
+              className="h-10 w-10 p-0"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -468,7 +468,7 @@ const HomeChat = () => {
       )}
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6 relative z-10">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 pt-16 space-y-6 relative z-10">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center">
             <h2 className="text-2xl md:text-3xl font-light text-white/90 mb-2">
