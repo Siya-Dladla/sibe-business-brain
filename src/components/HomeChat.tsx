@@ -204,6 +204,46 @@ const HomeChat = () => {
     }
   };
 
+  // Fetch current business context
+  const fetchBusinessContext = async () => {
+    if (!user) return null;
+
+    try {
+      // Fetch business plan (uploaded PDF/document)
+      const { data: plans } = await supabase
+        .from('business_plans')
+        .select('title, description, content')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      // Fetch website analysis
+      const { data: websites } = await supabase
+        .from('website_analyses')
+        .select('website_url, analysis_content, recommendations')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      // Fetch latest metrics
+      const { data: metrics } = await supabase
+        .from('business_metrics')
+        .select('metric_name, value, change_percentage, period')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      return {
+        businessPlan: plans?.[0] || null,
+        websiteAnalysis: websites?.[0] || null,
+        metrics: metrics || []
+      };
+    } catch (error) {
+      console.error('Error fetching business context:', error);
+      return null;
+    }
+  };
+
   const generateChartData = (query: string) => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
     const isRevenue = query.toLowerCase().includes("revenue") || query.toLowerCase().includes("sales");
@@ -242,8 +282,14 @@ const HomeChat = () => {
     setIsLoading(true);
 
     try {
+      // Fetch current business context
+      const businessContext = await fetchBusinessContext();
+
       const { data, error } = await supabase.functions.invoke("sibe-chat", {
-        body: { message: currentInput },
+        body: { 
+          message: currentInput,
+          businessContext 
+        },
       });
 
       if (error) throw error;
