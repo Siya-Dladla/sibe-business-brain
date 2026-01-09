@@ -30,55 +30,67 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    const { message } = await req.json();
+    const { message, businessContext } = await req.json();
     console.log('Processing chat message for user:', user.id);
 
-    // Fetch user's business context
-    const { data: metrics } = await supabase
-      .from('business_metrics')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    const { data: insights } = await supabase
-      .from('ai_insights')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(3);
-
-    const { data: plans } = await supabase
-      .from('business_plans')
-      .select('title, description, content')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    // Build context for AI
-    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner that deeply understands the user's business. You provide strategic, actionable insights based on data.\n\n";
+    // Build context for AI based on current business data
+    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner. You ONLY answer based on the specific business data provided below. If no business data is available, politely ask the user to upload their business plan, connect their website, or add their business data first.\n\n";
     
-    if (plans && plans.length > 0) {
-      context += `Business Context:\n${plans[0].title}: ${plans[0].description}\n\n`;
+    let hasBusinessData = false;
+
+    // Include business plan/document context
+    if (businessContext?.businessPlan) {
+      hasBusinessData = true;
+      const plan = businessContext.businessPlan;
+      context += `=== CURRENT BUSINESS (from uploaded document) ===\n`;
+      context += `Business Name: ${plan.title}\n`;
+      if (plan.description) {
+        context += `Description: ${plan.description}\n`;
+      }
+      if (plan.content) {
+        context += `Business Details:\n${plan.content.substring(0, 3000)}\n`;
+      }
+      context += "\n";
     }
 
-    if (metrics && metrics.length > 0) {
-      context += "Recent Business Metrics:\n";
-      metrics.forEach(m => {
-        context += `- ${m.metric_name}: ${m.value} (${m.change_percentage > 0 ? '+' : ''}${m.change_percentage}%)\n`;
+    // Include website analysis context
+    if (businessContext?.websiteAnalysis) {
+      hasBusinessData = true;
+      const website = businessContext.websiteAnalysis;
+      context += `=== WEBSITE ANALYSIS ===\n`;
+      context += `Website: ${website.website_url}\n`;
+      context += `Analysis:\n${website.analysis_content.substring(0, 2000)}\n`;
+      if (website.recommendations) {
+        context += `Recommendations: ${JSON.stringify(website.recommendations).substring(0, 500)}\n`;
+      }
+      context += "\n";
+    }
+
+    // Include metrics context
+    if (businessContext?.metrics && businessContext.metrics.length > 0) {
+      hasBusinessData = true;
+      context += "=== CURRENT BUSINESS METRICS ===\n";
+      businessContext.metrics.forEach((m: any) => {
+        context += `- ${m.metric_name}: ${m.value}`;
+        if (m.change_percentage !== null) {
+          context += ` (${m.change_percentage > 0 ? '+' : ''}${m.change_percentage}% change)`;
+        }
+        if (m.period) {
+          context += ` [${m.period}]`;
+        }
+        context += "\n";
       });
       context += "\n";
     }
 
-    if (insights && insights.length > 0) {
-      context += "Recent Strategic Insights:\n";
-      insights.slice(0, 2).forEach(i => {
-        context += `- ${i.title}: ${i.content.substring(0, 150)}...\n`;
-      });
-      context += "\n";
+    if (!hasBusinessData) {
+      context += "NOTE: No business data has been uploaded yet. The user needs to:\n";
+      context += "1. Upload a business plan/document, OR\n";
+      context += "2. Analyze their website, OR\n";
+      context += "3. Input their business metrics\n\n";
     }
 
-    context += "Respond as a strategic business advisor who knows this business intimately. Be concise, actionable, and data-driven. Provide specific recommendations based on the business context.";
+    context += "IMPORTANT: Base ALL your responses on the specific business data provided above. Be concise, actionable, and reference the actual data when giving advice. If asked about something not in the data, explain what information would be needed.";
 
     console.log('Calling Lovable AI Gateway');
 
