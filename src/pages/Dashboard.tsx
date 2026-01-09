@@ -14,6 +14,7 @@ import KPITargetSetting from "@/components/KPITargetSetting";
 import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
 import BusinessDNA from "@/components/BusinessDNA";
 import KPIAlerts from "@/components/KPIAlerts";
+import CurrentBusiness from "@/components/CurrentBusiness";
 import { HistoricalMetrics } from "@/components/HistoricalMetrics";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Database, Lightbulb, RefreshCw, Clock } from "lucide-react";
@@ -182,6 +183,9 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="insights" className="space-y-6">
+            {/* Current Business Status */}
+            <CurrentBusiness onBusinessChange={fetchData} />
+
             {/* Alerts Section */}
             <KPIAlerts metrics={metrics} />
 
