@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon } from "lucide-react";
+import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon, Circle } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "@/components/ThemeProvider";
+import { useTheme, AccentColor } from "@/components/ThemeProvider";
 
 const Settings = () => {
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,16 @@ const Settings = () => {
   });
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, accentColor, setAccentColor } = useTheme();
+
+  const accentColors: { id: AccentColor; name: string; color: string; darkColor: string }[] = [
+    { id: "default", name: "Default", color: "bg-gray-800", darkColor: "bg-white" },
+    { id: "blue", name: "Blue", color: "bg-blue-500", darkColor: "bg-blue-500" },
+    { id: "green", name: "Green", color: "bg-green-500", darkColor: "bg-green-500" },
+    { id: "purple", name: "Purple", color: "bg-purple-500", darkColor: "bg-purple-500" },
+    { id: "orange", name: "Orange", color: "bg-orange-500", darkColor: "bg-orange-500" },
+    { id: "rose", name: "Rose", color: "bg-rose-500", darkColor: "bg-rose-500" },
+  ];
 
   useEffect(() => {
     fetchProfile();
@@ -108,6 +117,14 @@ const Settings = () => {
     });
   };
 
+  const handleAccentChange = (color: AccentColor) => {
+    setAccentColor(color);
+    toast({
+      title: "Accent Color Updated",
+      description: `Switched to ${color} accent`
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background grid-bg">
       <div className="p-6 flex items-center justify-between border-b border-border/50 bg-card">
@@ -129,9 +146,9 @@ const Settings = () => {
               <h2 className="text-2xl font-extralight tracking-wide text-foreground">Appearance</h2>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="theme">Theme</Label>
+                <Label htmlFor="theme">Theme Mode</Label>
                 <div className="grid grid-cols-2 gap-4">
                   <Button
                     variant={theme === "dark" ? "default" : "outline"}
@@ -157,6 +174,35 @@ const Settings = () => {
                     <Sun className="w-5 h-5" />
                     <span className="text-sm">Light Mode</span>
                   </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Accent Color</Label>
+                <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                  {accentColors.map((color) => (
+                    <button
+                      key={color.id}
+                      onClick={() => handleAccentChange(color.id)}
+                      className={`relative h-14 rounded-lg transition-all flex flex-col items-center justify-center gap-1 ${
+                        accentColor === color.id
+                          ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                          : "hover:scale-105"
+                      }`}
+                    >
+                      <div 
+                        className={`w-8 h-8 rounded-full ${theme === "dark" ? color.darkColor : color.color} ${
+                          color.id === "default" && theme === "dark" ? "border border-white/20" : ""
+                        }`}
+                      />
+                      <span className="text-[10px] text-muted-foreground">{color.name}</span>
+                      {accentColor === color.id && (
+                        <div className="absolute top-1 right-1">
+                          <Check className="w-3 h-3 text-primary" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -359,7 +405,7 @@ const Settings = () => {
 
               <div className="flex justify-between py-3 border-b border-border/30">
                 <span className="text-muted-foreground font-light">Theme</span>
-                <span className="text-primary font-light capitalize">{theme}</span>
+                <span className="text-primary font-light capitalize">{theme} / {accentColor}</span>
               </div>
 
               <div className="flex justify-between py-3">
