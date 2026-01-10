@@ -40,12 +40,6 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    /* Accent color variable - default to white */
-    --accent-hue: 0;
-    --accent-sat: 0%;
-    --accent-color: 0 0% 100%;
-    --accent-color-foreground: 0 0% 0%;
-
     /* Sidebar colors */
     --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 0 0% 85%;
@@ -75,63 +69,6 @@ All colors MUST be HSL.
       rgba(255, 255, 255, 0.05) 50%,
       rgba(255, 255, 255, 0.1) 100%
     );
-  }
-
-  /* Accent Color Themes - Dark Mode */
-  .dark.accent-default {
-    --accent-color: 0 0% 100%;
-    --accent-color-foreground: 0 0% 0%;
-    --ring: 0 0% 50%;
-  }
-
-  .dark.accent-blue {
-    --accent-color: 217 91% 60%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 217 91% 60%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-  }
-
-  .dark.accent-green {
-    --accent-color: 142 71% 45%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 142 71% 45%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 142 71% 45%;
-    --sidebar-primary: 142 71% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-  }
-
-  .dark.accent-purple {
-    --accent-color: 271 81% 56%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 271 81% 56%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 271 81% 56%;
-    --sidebar-primary: 271 81% 56%;
-    --sidebar-primary-foreground: 0 0% 100%;
-  }
-
-  .dark.accent-orange {
-    --accent-color: 24 95% 53%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 24 95% 53%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 24 95% 53%;
-    --sidebar-primary: 24 95% 53%;
-    --sidebar-primary-foreground: 0 0% 100%;
-  }
-
-  .dark.accent-rose {
-    --accent-color: 346 77% 50%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 346 77% 50%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 346 77% 50%;
-    --sidebar-primary: 346 77% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
   }
 
   .light {
@@ -164,12 +101,6 @@ All colors MUST be HSL.
     --input: 0 0% 95%;
     --ring: 0 0% 50%;
 
-    /* Accent color variable - default to dark gray */
-    --accent-hue: 0;
-    --accent-sat: 0%;
-    --accent-color: 0 0% 12%;
-    --accent-color-foreground: 0 0% 100%;
-
     /* Sidebar colors - Light */
     --sidebar-background: 0 0% 97%;
     --sidebar-foreground: 0 0% 25%;
@@ -199,63 +130,6 @@ All colors MUST be HSL.
       rgba(0, 0, 0, 0.02) 50%,
       rgba(0, 0, 0, 0.04) 100%
     );
-  }
-
-  /* Accent Color Themes - Light Mode */
-  .light.accent-default {
-    --accent-color: 0 0% 12%;
-    --accent-color-foreground: 0 0% 100%;
-    --ring: 0 0% 50%;
-  }
-
-  .light.accent-blue {
-    --accent-color: 217 91% 50%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 217 91% 50%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 217 91% 50%;
-    --sidebar-primary: 217 91% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-  }
-
-  .light.accent-green {
-    --accent-color: 142 71% 35%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 142 71% 35%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 142 71% 35%;
-    --sidebar-primary: 142 71% 35%;
-    --sidebar-primary-foreground: 0 0% 100%;
-  }
-
-  .light.accent-purple {
-    --accent-color: 271 81% 50%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 271 81% 50%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 271 81% 50%;
-    --sidebar-primary: 271 81% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-  }
-
-  .light.accent-orange {
-    --accent-color: 24 95% 45%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 24 95% 45%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 24 95% 45%;
-    --sidebar-primary: 24 95% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-  }
-
-  .light.accent-rose {
-    --accent-color: 346 77% 45%;
-    --accent-color-foreground: 0 0% 100%;
-    --primary: 346 77% 45%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 346 77% 45%;
-    --sidebar-primary: 346 77% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
   }
 }
 
