@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check } from "lucide-react";
+import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@/components/ThemeProvider";
+
 const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -22,26 +24,20 @@ const Settings = () => {
     anthropic: "",
     gemini: ""
   });
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
+
   useEffect(() => {
     fetchProfile();
   }, []);
+
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const {
-          data,
-          error
-        } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+        const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
         if (error && error.code !== 'PGRST116') throw error;
         setProfile({
           email: user.email || "",
@@ -58,19 +54,14 @@ const Settings = () => {
       setLoading(false);
     }
   };
+
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      const {
-        error
-      } = await supabase.from("profiles").upsert({
+      const { error } = await supabase.from("profiles").upsert({
         id: user.id,
         email: profile.email,
         full_name: profile.full_name,
@@ -91,6 +82,7 @@ const Settings = () => {
       setSaving(false);
     }
   };
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -107,59 +99,125 @@ const Settings = () => {
       });
     }
   };
-  return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme as "dark" | "light");
+    toast({
+      title: "Theme Updated",
+      description: `Switched to ${newTheme} mode`
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-background grid-bg">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-card">
         <MobileMenu />
         <div className="text-xs text-muted-foreground">System Settings</div>
       </div>
 
-      <div className="container mx-auto px-6 py-8 max-w-4xl bg-primary-foreground">
+      <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
-          <h1 className="text-5xl font-extralight mb-3 tracking-wide">Settings</h1>
+          <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
           <p className="text-primary text-lg font-light">Configure your SIBE SI platform</p>
         </div>
 
         <div className="space-y-6">
-          {/* Profile Settings */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          {/* Theme Settings */}
+          <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
-              <User className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide">Profile Settings</h2>
+              <Palette className="w-6 h-6 text-primary" />
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Appearance</h2>
             </div>
 
-            {loading ? <div className="flex items-center justify-center py-12">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="theme">Theme</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    variant={theme === "dark" ? "default" : "outline"}
+                    onClick={() => handleThemeChange("dark")}
+                    className={`h-16 flex flex-col items-center justify-center gap-2 ${
+                      theme === "dark" 
+                        ? "bg-primary text-primary-foreground" 
+                        : "glass-button"
+                    }`}
+                  >
+                    <Moon className="w-5 h-5" />
+                    <span className="text-sm">Dark Mode</span>
+                  </Button>
+                  <Button
+                    variant={theme === "light" ? "default" : "outline"}
+                    onClick={() => handleThemeChange("light")}
+                    className={`h-16 flex flex-col items-center justify-center gap-2 ${
+                      theme === "light" 
+                        ? "bg-primary text-primary-foreground" 
+                        : "glass-button"
+                    }`}
+                  >
+                    <Sun className="w-5 h-5" />
+                    <span className="text-sm">Light Mode</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Profile Settings */}
+          <Card className="glass-card p-8 border-border/20">
+            <div className="flex items-center gap-3 mb-6">
+              <User className="w-6 h-6 text-primary" />
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Profile Settings</h2>
+            </div>
+
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
                 <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-              </div> : <form onSubmit={saveProfile} className="space-y-6">
+              </div>
+            ) : (
+              <form onSubmit={saveProfile} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="full_name">Full Name</Label>
-                  <Input id="full_name" value={profile.full_name} onChange={e => setProfile({
-                ...profile,
-                full_name: e.target.value
-              })} className="glass-button h-12" />
+                  <Input
+                    id="full_name"
+                    value={profile.full_name}
+                    onChange={e => setProfile({ ...profile, full_name: e.target.value })}
+                    className="glass-button h-12"
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={profile.email} disabled className="glass-button h-12 opacity-60" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profile.email}
+                    disabled
+                    className="glass-button h-12 opacity-60"
+                  />
                 </div>
 
-                <Button type="submit" disabled={saving} className="h-11 px-8 bg-primary-foreground">
-                  {saving ? <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin"></div>
+                <Button type="submit" disabled={saving} className="h-11 px-8 bg-primary text-primary-foreground hover:bg-primary/90">
+                  {saving ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
                       Saving...
-                    </div> : <>
+                    </div>
+                  ) : (
+                    <>
                       <Save className="w-4 h-4 mr-2" />
                       Save Changes
-                    </>}
+                    </>
+                  )}
                 </Button>
-              </form>}
+              </form>
+            )}
           </Card>
 
           {/* AI Engine Configuration */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
               <Cpu className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide">AI Engine</h2>
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">AI Engine</h2>
             </div>
 
             <div className="space-y-4">
@@ -178,25 +236,34 @@ const Settings = () => {
                 </Select>
               </div>
 
-              {aiEngine !== "lovable-ai" && <div className="space-y-4 pt-4 border-t border-border/30">
+              {aiEngine !== "lovable-ai" && (
+                <div className="space-y-4 pt-4 border-t border-border/30">
                   <p className="text-sm text-muted-foreground">
                     Enter your API key for {aiEngine === "openai" ? "OpenAI" : aiEngine === "anthropic" ? "Anthropic" : "Google Gemini"}
                   </p>
                   <div className="space-y-2">
                     <Label htmlFor={`${aiEngine}-key`}>API Key</Label>
-                    <Input id={`${aiEngine}-key`} type="password" value={apiKeys[aiEngine as keyof typeof apiKeys]} onChange={e => setApiKeys({
-                  ...apiKeys,
-                  [aiEngine]: e.target.value
-                })} placeholder="sk-..." className="glass-button h-12 font-mono" />
+                    <Input
+                      id={`${aiEngine}-key`}
+                      type="password"
+                      value={apiKeys[aiEngine as keyof typeof apiKeys]}
+                      onChange={e => setApiKeys({ ...apiKeys, [aiEngine]: e.target.value })}
+                      placeholder="sk-..."
+                      className="glass-button h-12 font-mono"
+                    />
                   </div>
-                </div>}
+                </div>
+              )}
 
-              <Button onClick={() => {
-              toast({
-                title: "Settings Saved",
-                description: "Your AI engine preferences have been updated"
-              });
-            }} className="w-full h-11 bg-primary-foreground">
+              <Button
+                onClick={() => {
+                  toast({
+                    title: "Settings Saved",
+                    description: "Your AI engine preferences have been updated"
+                  });
+                }}
+                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
+              >
                 <Save className="w-4 h-4 mr-2" />
                 Save AI Settings
               </Button>
@@ -204,60 +271,61 @@ const Settings = () => {
           </Card>
 
           {/* Subscription & Billing */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
               <CreditCard className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide">Subscription</h2>
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Subscription</h2>
             </div>
 
             <div className="space-y-6">
-            <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/30 bg-primary-foreground">
+              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-border/30">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-xl font-light text-primary">Professional Plan</h3>
                     <p className="text-sm text-muted-foreground">Current subscription</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-light">$49<span className="text-sm text-muted-foreground">/mo</span></p>
+                    <p className="text-2xl font-light text-foreground">$49<span className="text-sm text-muted-foreground">/mo</span></p>
                     <p className="text-xs text-muted-foreground">after 14-day trial</p>
                   </div>
                 </div>
                 <div className="mb-4 p-3 bg-accent/10 border border-accent/30 rounded-lg">
-                  <p className="text-sm font-medium text-accent">Start with $1 for 14 days</p>
+                  <p className="text-sm font-medium text-foreground">Start with $1 for 14 days</p>
                   <p className="text-xs text-muted-foreground">Then $49/month after trial ends</p>
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-accent" />
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-green-500" />
                     <span>Unlimited AI Employees</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-accent" />
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-green-500" />
                     <span>Advanced Analytics & Insights</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-accent" />
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-green-500" />
                     <span>Priority Support</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="w-4 h-4 text-accent" />
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-green-500" />
                     <span>Canvas Project Management</span>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                
                 <div className="grid grid-cols-2 gap-3">
-                  <Button onClick={() => {
-                  toast({
-                    title: "Trial Started",
-                    description: "Starting your $1 14-day trial. You'll be charged $49/month after the trial ends."
-                  });
-                }} className="h-12 text-white bg-primary hover:bg-primary/90">
+                  <Button
+                    onClick={() => {
+                      toast({
+                        title: "Trial Started",
+                        description: "Starting your $1 14-day trial. You'll be charged $49/month after the trial ends."
+                      });
+                    }}
+                    className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
                     Start $1 Trial
                   </Button>
-                  
                 </div>
                 <Button variant="outline" className="w-full glass-button border-destructive/30 text-destructive hover:bg-destructive/10">
                   Cancel Subscription
@@ -267,10 +335,10 @@ const Settings = () => {
           </Card>
 
           {/* Platform Information */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
               <SettingsIcon className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide">Platform Information</h2>
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Platform Information</h2>
             </div>
 
             <div className="space-y-4 text-sm">
@@ -278,29 +346,34 @@ const Settings = () => {
                 <span className="text-muted-foreground font-light">Platform Version</span>
                 <span className="text-primary font-light">SIBE SI v6.0</span>
               </div>
-              
+
               <div className="flex justify-between py-3 border-b border-border/30">
                 <span className="text-muted-foreground font-light">AI Engine</span>
                 <span className="text-primary font-light capitalize">{aiEngine.replace('-', ' ')}</span>
               </div>
-              
+
               <div className="flex justify-between py-3 border-b border-border/30">
                 <span className="text-muted-foreground font-light">Backend</span>
                 <span className="text-primary font-light">Lovable Cloud</span>
               </div>
 
+              <div className="flex justify-between py-3 border-b border-border/30">
+                <span className="text-muted-foreground font-light">Theme</span>
+                <span className="text-primary font-light capitalize">{theme}</span>
+              </div>
+
               <div className="flex justify-between py-3">
                 <span className="text-muted-foreground font-light">Status</span>
-                <span className="font-light text-[#61e60f]">● Active</span>
+                <span className="font-light text-green-500">● Active</span>
               </div>
             </div>
           </Card>
 
           {/* Account Actions */}
-          <Card className="glass-card p-8 border-primary/20 bg-primary-foreground">
+          <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
               <LogOut className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide">Account Actions</h2>
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Account Actions</h2>
             </div>
 
             <div className="space-y-4">
@@ -316,6 +389,8 @@ const Settings = () => {
           </Card>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Settings;
