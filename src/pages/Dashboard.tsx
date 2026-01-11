@@ -16,8 +16,12 @@ import BusinessDNA from "@/components/BusinessDNA";
 import KPIAlerts from "@/components/KPIAlerts";
 import CurrentBusiness from "@/components/CurrentBusiness";
 import { HistoricalMetrics } from "@/components/HistoricalMetrics";
+import SalesAnalytics from "@/components/ecommerce/SalesAnalytics";
+import InventoryAlerts from "@/components/ecommerce/InventoryAlerts";
+import CustomerInsights from "@/components/ecommerce/CustomerInsights";
+import QuickActionsPanel from "@/components/ecommerce/QuickActionsPanel";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Database, Lightbulb, RefreshCw, Clock } from "lucide-react";
+import { Brain, Database, Lightbulb, RefreshCw, Clock, TrendingUp, ShoppingBag } from "lucide-react";
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -121,76 +125,94 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
-      <div className="p-4 md:p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground sticky top-0 z-40">
+    <div className="min-h-screen bg-background grid-bg pb-24 md:pb-0">
+      {/* Header - Sticky & Mobile optimized */}
+      <div className="p-3 md:p-6 flex items-center justify-between border-b border-border/50 bg-card sticky top-0 z-40">
         <MobileMenu />
         <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-muted-foreground" />
+          <Clock className="w-4 h-4 text-muted-foreground hidden sm:block" />
           <span className="text-xs text-muted-foreground hidden sm:inline">
-            Last updated: {lastRefresh.toLocaleTimeString()}
+            Updated: {lastRefresh.toLocaleTimeString()}
           </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="h-9 w-9 p-0 md:h-9 md:w-auto md:px-3"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+            <span className="hidden md:inline ml-2">Refresh</span>
+          </Button>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 py-6 md:py-8 bg-primary-foreground">
-        <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex items-center gap-3 md:gap-4">
+      <div className="container mx-auto px-3 md:px-6 py-4 md:py-8 bg-card">
+        {/* Header Section */}
+        <div className="mb-4 md:mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="flex items-center gap-3">
             <Brain className="w-8 h-8 md:w-10 md:h-10 text-primary animate-pulse" />
             <div>
-              <h1 className="text-2xl md:text-4xl font-extralight tracking-wide">Sibe SI</h1>
-              <p className="text-xs text-muted-foreground">Data Intelligence Dashboard</p>
+              <h1 className="text-xl md:text-4xl font-extralight tracking-wide">Sibe SI</h1>
+              <p className="text-xs text-muted-foreground">E-Commerce Intelligence Dashboard</p>
             </div>
           </div>
 
-          {/* Refresh Controls */}
-          <div className="flex items-center gap-3">
-            <Select value={timeframe} onValueChange={handleTimeframeChange}>
-              <SelectTrigger className="w-[140px] bg-background border-border/50">
-                <SelectValue placeholder="Timeframe" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="current">Current</SelectItem>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="quarterly">Quarterly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="gap-2"
-            >
-              <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">Refresh</span>
-            </Button>
-          </div>
+          {/* Timeframe Selector */}
+          <Select value={timeframe} onValueChange={handleTimeframeChange}>
+            <SelectTrigger className="w-full md:w-[140px] bg-background border-border/50 h-11">
+              <SelectValue placeholder="Timeframe" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="current">Current</SelectItem>
+              <SelectItem value="daily">Daily</SelectItem>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="monthly">Monthly</SelectItem>
+              <SelectItem value="quarterly">Quarterly</SelectItem>
+              <SelectItem value="yearly">Yearly</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
+        {/* Tabs - Mobile optimized with swipe-friendly layout */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 md:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-full md:max-w-md h-auto">
-            <TabsTrigger value="insights" className="flex items-center gap-2 py-3 text-xs md:text-sm">
-              <Brain className="w-4 h-4" />
-              <span className="hidden sm:inline">Data</span> Insights
+          <TabsList className="grid w-full grid-cols-3 h-12 md:h-auto md:max-w-lg">
+            <TabsTrigger value="insights" className="flex items-center gap-1 md:gap-2 py-2 md:py-3 text-xs md:text-sm">
+              <TrendingUp className="w-4 h-4" />
+              <span className="hidden sm:inline">Sales</span>
+              <span className="sm:hidden">Sales</span>
             </TabsTrigger>
-            <TabsTrigger value="collection" className="flex items-center gap-2 py-3 text-xs md:text-sm">
+            <TabsTrigger value="store" className="flex items-center gap-1 md:gap-2 py-2 md:py-3 text-xs md:text-sm">
+              <ShoppingBag className="w-4 h-4" />
+              <span className="hidden sm:inline">Store</span>
+              <span className="sm:hidden">Store</span>
+            </TabsTrigger>
+            <TabsTrigger value="collection" className="flex items-center gap-1 md:gap-2 py-2 md:py-3 text-xs md:text-sm">
               <Database className="w-4 h-4" />
-              <span className="hidden sm:inline">Data</span> Collection
+              <span className="hidden sm:inline">Data</span>
+              <span className="sm:hidden">Data</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="insights" className="space-y-6">
+          {/* Sales & Analytics Tab */}
+          <TabsContent value="insights" className="space-y-4 md:space-y-6">
+            {/* Sales Analytics */}
+            <SalesAnalytics />
+
             {/* Current Business Status */}
             <CurrentBusiness onBusinessChange={fetchData} />
 
-            {/* Alerts Section */}
+            {/* Inventory Alerts */}
+            <InventoryAlerts />
+
+            {/* Customer Insights */}
+            <CustomerInsights />
+
+            {/* KPI Alerts Section */}
             <KPIAlerts metrics={metrics} />
 
             {/* Overview Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
               {/* Business DNA - Takes 2 columns */}
               <div className="lg:col-span-2">
                 <BusinessDNA metrics={metrics} />
@@ -202,7 +224,7 @@ const Dashboard = () => {
                   <Lightbulb className="w-5 h-5 text-primary" />
                   Quick Stats
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="p-3 bg-background/50 rounded-lg border border-border/30">
                     <p className="text-xs text-muted-foreground">Total Metrics</p>
                     <p className="text-2xl font-light">{metrics.length}</p>
@@ -226,6 +248,19 @@ const Dashboard = () => {
             <HistoricalMetrics />
           </TabsContent>
 
+          {/* Store Management Tab */}
+          <TabsContent value="store" className="space-y-4 md:space-y-6">
+            {/* Quick Actions Panel */}
+            <QuickActionsPanel />
+
+            {/* Inventory Alerts */}
+            <InventoryAlerts />
+
+            {/* Customer Insights */}
+            <CustomerInsights />
+          </TabsContent>
+
+          {/* Data Collection Tab */}
           <TabsContent value="collection" className="space-y-4 md:space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <ManualMetricsInput onMetricSaved={fetchData} />
@@ -254,7 +289,7 @@ const Dashboard = () => {
                   {plans.map((plan) => (
                     <div
                       key={plan.id}
-                      className="p-3 bg-background/50 border border-primary/20 rounded-lg flex justify-between items-center"
+                      className="p-3 bg-background/50 border border-primary/20 rounded-lg flex justify-between items-center active:bg-muted/50 transition-colors"
                     >
                       <div>
                         <p className="text-sm font-light">{plan.title}</p>
