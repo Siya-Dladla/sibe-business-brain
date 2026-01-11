@@ -14,9 +14,9 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-[#1a1a1a] bg-[#0a0a0a]">
+      <div className="p-4 flex items-center justify-between border-b border-border bg-background">
         <MobileMenu />
         <div className="flex items-center gap-4">
           <nav className="hidden md:flex items-center gap-1">
@@ -25,7 +25,7 @@ const Index = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white/60 hover:text-white hover:bg-white/5 gap-2"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted gap-2"
                 >
                   <item.icon className="w-4 h-4" />
                   <span className="text-xs">{item.label}</span>
@@ -37,7 +37,7 @@ const Index = () => {
             <Button
               variant="outline"
               size="sm"
-              className="text-white/60 border-white/10 hover:bg-white/5 hover:text-white"
+              className="text-muted-foreground border-border hover:bg-muted hover:text-foreground"
             >
               Sign In
             </Button>
@@ -51,8 +51,8 @@ const Index = () => {
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-[#1a1a1a] flex items-center justify-center bg-[#0a0a0a]">
-        <p className="text-[10px] text-white/30">
+      <div className="p-3 border-t border-border flex items-center justify-center bg-background">
+        <p className="text-[10px] text-muted-foreground/50">
           © 2025 SGD Business Analysis & Projects | Synthetic Intelligence Business Engine
         </p>
       </div>
