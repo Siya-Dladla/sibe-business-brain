@@ -14,11 +14,11 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0">
-      {/* Header - Optimized for mobile */}
-      <div className="p-3 md:p-4 flex items-center justify-between border-b border-border bg-background sticky top-0 z-40">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
+      <div className="p-4 flex items-center justify-between border-b border-border bg-background">
         <MobileMenu />
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-4">
           <nav className="hidden md:flex items-center gap-1">
             {menuItems.map((item, index) => (
               <Link key={index} to={item.path}>
@@ -37,7 +37,7 @@ const Index = () => {
             <Button
               variant="outline"
               size="sm"
-              className="text-muted-foreground border-border hover:bg-muted hover:text-foreground h-10 px-4 min-w-[80px]"
+              className="text-muted-foreground border-border hover:bg-muted hover:text-foreground"
             >
               Sign In
             </Button>
@@ -50,8 +50,8 @@ const Index = () => {
         <HomeChat />
       </div>
 
-      {/* Footer - Hidden on mobile (bottom nav takes its place) */}
-      <div className="hidden md:flex p-3 border-t border-border items-center justify-center bg-background">
+      {/* Footer */}
+      <div className="p-3 border-t border-border flex items-center justify-center bg-background">
         <p className="text-[10px] text-muted-foreground/50">
           © 2025 SGD Business Analysis & Projects | Synthetic Intelligence Business Engine
         </p>

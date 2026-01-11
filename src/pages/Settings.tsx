@@ -109,21 +109,21 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background grid-bg pb-24 md:pb-0">
-      <div className="p-3 md:p-6 flex items-center justify-between border-b border-border/50 bg-card sticky top-0 z-40">
+    <div className="min-h-screen bg-background grid-bg">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-card">
         <MobileMenu />
         <div className="text-xs text-muted-foreground">System Settings</div>
       </div>
 
-      <div className="container mx-auto px-3 md:px-6 py-4 md:py-8 max-w-4xl">
-        <div className="mb-6 md:mb-10">
-          <h1 className="text-3xl md:text-5xl font-extralight mb-2 md:mb-3 tracking-wide text-foreground">Settings</h1>
-          <p className="text-primary text-base md:text-lg font-light">Configure your SIBE SI platform</p>
+      <div className="container mx-auto px-6 py-8 max-w-4xl">
+        <div className="mb-10">
+          <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
+          <p className="text-primary text-lg font-light">Configure your SIBE SI platform</p>
         </div>
 
-        <div className="space-y-4 md:space-y-6">
+        <div className="space-y-6">
           {/* Theme Settings */}
-          <Card className="glass-card p-4 md:p-8 border-border/20">
+          <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
               <Palette className="w-6 h-6 text-primary" />
               <h2 className="text-2xl font-extralight tracking-wide text-foreground">Appearance</h2>
@@ -132,30 +132,30 @@ const Settings = () => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="theme">Theme</Label>
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Button
                     variant={theme === "dark" ? "default" : "outline"}
                     onClick={() => handleThemeChange("dark")}
-                    className={`h-14 md:h-16 flex flex-col items-center justify-center gap-1 md:gap-2 ${
+                    className={`h-16 flex flex-col items-center justify-center gap-2 ${
                       theme === "dark" 
                         ? "bg-primary text-primary-foreground" 
                         : "glass-button"
                     }`}
                   >
                     <Moon className="w-5 h-5" />
-                    <span className="text-xs md:text-sm">Dark</span>
+                    <span className="text-sm">Dark Mode</span>
                   </Button>
                   <Button
                     variant={theme === "light" ? "default" : "outline"}
                     onClick={() => handleThemeChange("light")}
-                    className={`h-14 md:h-16 flex flex-col items-center justify-center gap-1 md:gap-2 ${
+                    className={`h-16 flex flex-col items-center justify-center gap-2 ${
                       theme === "light" 
                         ? "bg-primary text-primary-foreground" 
                         : "glass-button"
                     }`}
                   >
                     <Sun className="w-5 h-5" />
-                    <span className="text-xs md:text-sm">Light</span>
+                    <span className="text-sm">Light Mode</span>
                   </Button>
                 </div>
               </div>

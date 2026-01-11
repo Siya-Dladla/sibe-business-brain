@@ -134,17 +134,17 @@ const Employees = () => {
       supabase.removeChannel(channel);
     };
   }, []);
-  return <div className="min-h-screen bg-background grid-bg pb-24 md:pb-0">
-      <div className="p-3 md:p-6 flex items-center justify-between border-b border-border/50 bg-card sticky top-0 z-40">
+  return <div className="min-h-screen bg-background grid-bg">
+      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
         <MobileMenu />
         <div className="text-xs text-muted-foreground">Team Management</div>
       </div>
 
-      <div className="container mx-auto px-3 md:px-6 py-4 md:py-8 bg-card">
-        <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
+        <div className="mb-10 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl md:text-5xl font-extralight mb-2 md:mb-3 tracking-wide">Team Management</h1>
-            <p className="text-primary text-base md:text-lg font-light">Manage your AI employees and synthetic workforce</p>
+            <h1 className="text-5xl font-extralight mb-3 tracking-wide">Team Management</h1>
+            <p className="text-primary text-lg font-light">Manage your AI employees and synthetic workforce</p>
           </div>
           <CreateEmployeeDialog onEmployeeCreated={fetchEmployees} />
         </div>
