@@ -3,8 +3,11 @@ import { Database, Layers, Users, FileText, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import HomeChat from "@/components/HomeChat";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
+  const isMobile = useIsMobile();
+  
   const menuItems = [
     { icon: Database, label: "Data", path: "/dashboard" },
     { icon: Layers, label: "Canvas", path: "/canvas" },
@@ -14,11 +17,16 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-[100dvh] bg-background flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-border bg-background">
-        <MobileMenu />
-        <div className="flex items-center gap-4">
+      <header className="shrink-0 px-3 py-2 md:p-4 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50 safe-area-inset-top">
+        <div className="flex items-center gap-2">
+          <MobileMenu />
+          {!isMobile && (
+            <span className="text-lg font-light tracking-wider text-foreground ml-2">SIBE</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 md:gap-4">
           <nav className="hidden md:flex items-center gap-1">
             {menuItems.map((item, index) => (
               <Link key={index} to={item.path}>
@@ -37,25 +45,25 @@ const Index = () => {
             <Button
               variant="outline"
               size="sm"
-              className="text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+              className="text-muted-foreground border-border hover:bg-muted hover:text-foreground text-xs h-8 px-3"
             >
               Sign In
             </Button>
           </Link>
         </div>
-      </div>
+      </header>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex">
+      <main className="flex-1 flex min-h-0 overflow-hidden">
         <HomeChat />
-      </div>
+      </main>
 
-      {/* Footer */}
-      <div className="p-3 border-t border-border flex items-center justify-center bg-background">
+      {/* Footer - Hidden on mobile for more space */}
+      <footer className="hidden md:flex shrink-0 p-3 border-t border-border items-center justify-center bg-background">
         <p className="text-[10px] text-muted-foreground/50">
           © 2025 SGD Business Analysis & Projects | Synthetic Intelligence Business Engine
         </p>
-      </div>
+      </footer>
     </div>
   );
 };
