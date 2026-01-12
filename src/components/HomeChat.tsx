@@ -14,6 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Message {
   role: "user" | "assistant";
@@ -42,9 +43,11 @@ const HomeChat = () => {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -379,35 +382,32 @@ const HomeChat = () => {
     }
   };
 
-  const suggestedPrompts = [
-    "Show me revenue trends",
-    "Analyze customer growth",
-    "Compare monthly metrics",
-    "Forecast next quarter",
-  ];
+  const suggestedPrompts = isMobile 
+    ? ["Revenue trends", "Customer growth"]
+    : ["Show me revenue trends", "Analyze customer growth", "Compare monthly metrics", "Forecast next quarter"];
 
   return (
-    <div className="relative flex flex-col h-full w-full bg-background">
+    <div className="relative flex flex-col h-full w-full bg-background overflow-hidden">
       {/* Watermark Logo */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <div className="text-[20vw] font-extralight tracking-wider text-foreground/[0.02] select-none animate-float">
+        <div className="text-[25vw] md:text-[20vw] font-extralight tracking-wider text-foreground/[0.02] select-none">
           Sibe
         </div>
       </div>
 
       {/* History Button */}
-      <div className="absolute top-4 left-4 z-20">
+      <div className="absolute top-2 left-2 md:top-4 md:left-4 z-20">
         <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
           <SheetTrigger asChild>
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 w-9 p-0 bg-card hover:bg-muted border border-border"
+              className="h-10 w-10 md:h-9 md:w-9 p-0 bg-card hover:bg-muted border border-border active:scale-95 transition-transform touch-manipulation"
             >
-              <History className="w-4 h-4 text-muted-foreground" />
+              <History className="w-5 h-5 md:w-4 md:h-4 text-muted-foreground" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80 bg-background border-border p-0">
+          <SheetContent side="left" className="w-[85vw] max-w-80 bg-background border-border p-0">
             <SheetHeader className="p-4 border-b border-border">
               <SheetTitle className="text-foreground/90 flex items-center justify-between">
                 Chat History
@@ -415,14 +415,14 @@ const HomeChat = () => {
                   variant="ghost"
                   size="sm"
                   onClick={startNewChat}
-                  className="h-8 px-3 bg-primary/20 hover:bg-primary/30 text-primary"
+                  className="h-10 px-4 bg-primary/20 hover:bg-primary/30 text-primary active:scale-95 transition-transform"
                 >
                   <Plus className="w-4 h-4 mr-1" />
                   New
                 </Button>
               </SheetTitle>
             </SheetHeader>
-            <ScrollArea className="h-[calc(100vh-80px)]">
+            <ScrollArea className="h-[calc(100dvh-80px)]">
               <div className="p-2 space-y-1">
                 {chatHistory.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-8">
@@ -433,16 +433,16 @@ const HomeChat = () => {
                     <div
                       key={session.id}
                       onClick={() => loadSession(session)}
-                      className={`group p-3 rounded-lg cursor-pointer transition-colors ${
+                      className={`p-4 rounded-lg cursor-pointer transition-all active:scale-[0.98] touch-manipulation ${
                         currentSessionId === session.id
                           ? 'bg-primary/20 border border-primary/30'
                           : 'bg-card hover:bg-muted border border-transparent'
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-foreground/80 truncate">{session.title}</p>
-                          <p className="text-[10px] text-muted-foreground mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             {new Date(session.updated_at).toLocaleDateString()}
                           </p>
                         </div>
@@ -450,9 +450,9 @@ const HomeChat = () => {
                           variant="ghost"
                           size="sm"
                           onClick={(e) => deleteSession(session.id, e)}
-                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-destructive/20"
+                          className="h-8 w-8 p-0 hover:bg-destructive/20 shrink-0"
                         >
-                          <Trash2 className="w-3 h-3 text-destructive" />
+                          <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
                     </div>
@@ -464,10 +464,14 @@ const HomeChat = () => {
         </Sheet>
       </div>
 
-      {/* Graph Panel */}
+      {/* Graph Panel - Mobile Optimized */}
       {showGraph && graphData.length > 0 && (
-        <div className="absolute top-4 right-4 w-80 md:w-96 bg-card border border-border rounded-xl p-4 z-20 shadow-2xl">
-          <div className="flex items-center justify-between mb-4">
+        <div className={`absolute z-20 shadow-2xl ${
+          isMobile 
+            ? 'inset-x-2 top-14 bg-card border border-border rounded-xl p-3' 
+            : 'top-4 right-4 w-96 bg-card border border-border rounded-xl p-4'
+        }`}>
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-primary" />
               <span className="text-sm text-foreground/80">Data Visualization</span>
@@ -476,12 +480,12 @@ const HomeChat = () => {
               variant="ghost"
               size="sm"
               onClick={() => setShowGraph(false)}
-              className="h-6 w-6 p-0 hover:bg-muted"
+              className="h-8 w-8 p-0 hover:bg-muted active:scale-95 transition-transform"
             >
               <X className="w-4 h-4 text-muted-foreground" />
             </Button>
           </div>
-          <div className="h-48">
+          <div className={isMobile ? "h-36" : "h-48"}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={graphData}>
                 <defs>
@@ -515,21 +519,24 @@ const HomeChat = () => {
       )}
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 pt-16 space-y-6 relative z-10">
+      <div className="flex-1 overflow-y-auto px-3 md:px-8 py-4 pt-14 md:pt-16 space-y-4 md:space-y-6 relative z-10 overscroll-contain">
         {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center">
-            <h2 className="text-2xl md:text-3xl font-light text-foreground/90 mb-2">
+          <div className="h-full flex flex-col items-center justify-center px-4">
+            <h2 className="text-xl md:text-3xl font-light text-foreground/90 mb-2 text-center">
               How can I help you today?
             </h2>
-            <p className="text-sm text-muted-foreground mb-8">
+            <p className="text-xs md:text-sm text-muted-foreground mb-6 md:mb-8 text-center">
               Ask me anything about your business data
             </p>
-            <div className="grid grid-cols-2 gap-3 max-w-lg">
+            <div className={`grid gap-2 md:gap-3 w-full max-w-lg ${isMobile ? 'grid-cols-2' : 'grid-cols-2'}`}>
               {suggestedPrompts.map((prompt, i) => (
                 <button
                   key={i}
-                  onClick={() => setInput(prompt)}
-                  className="p-3 text-left text-sm text-muted-foreground bg-card hover:bg-muted border border-border rounded-xl transition-colors"
+                  onClick={() => {
+                    setInput(prompt);
+                    inputRef.current?.focus();
+                  }}
+                  className="p-3 md:p-4 text-left text-xs md:text-sm text-muted-foreground bg-card hover:bg-muted border border-border rounded-xl transition-all active:scale-[0.98] touch-manipulation"
                 >
                   {prompt}
                 </button>
@@ -543,17 +550,17 @@ const HomeChat = () => {
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[85%] md:max-w-[70%] ${
+                className={`max-w-[90%] md:max-w-[70%] ${
                   message.role === "user"
                     ? "bg-primary/20 border border-primary/30"
                     : "bg-card border border-border"
-                } rounded-2xl px-4 py-3`}
+                } rounded-2xl px-3 py-2.5 md:px-4 md:py-3`}
               >
                 <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
                   {message.content}
                 </p>
                 {message.chartData && (
-                  <div className="mt-4 h-32 bg-background rounded-lg p-2">
+                  <div className="mt-3 h-28 md:h-32 bg-background rounded-lg p-2">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={message.chartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -564,7 +571,7 @@ const HomeChat = () => {
                     </ResponsiveContainer>
                   </div>
                 )}
-                <p className="text-[10px] text-muted-foreground/50 mt-2">
+                <p className="text-[10px] text-muted-foreground/50 mt-1.5">
                   {message.timestamp.toLocaleTimeString()}
                 </p>
               </div>
@@ -573,7 +580,7 @@ const HomeChat = () => {
         )}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-card border border-border rounded-2xl px-4 py-3">
+            <div className="bg-card border border-border rounded-2xl px-3 py-2.5 md:px-4 md:py-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-primary" />
                 <span className="text-sm text-muted-foreground">Thinking...</span>
@@ -584,44 +591,45 @@ const HomeChat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 md:p-6 border-t border-border bg-background relative z-10">
+      {/* Input Area - Mobile Optimized */}
+      <div className="shrink-0 p-3 md:p-6 border-t border-border bg-background/95 backdrop-blur-sm relative z-10 safe-area-inset-bottom">
         <div className="max-w-3xl mx-auto relative">
           <Textarea
+            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Message Sibe SI..."
-            className="w-full min-h-[56px] max-h-32 resize-none bg-card border-border rounded-2xl px-4 py-4 pr-28 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-0"
+            className="w-full min-h-[48px] md:min-h-[56px] max-h-28 md:max-h-32 resize-none bg-card border-border rounded-2xl px-3 py-3 md:px-4 md:py-4 pr-24 md:pr-28 text-base md:text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-0"
             disabled={isLoading}
           />
-          <div className="absolute right-2 bottom-2 flex items-center gap-1">
+          <div className="absolute right-2 bottom-2 flex items-center gap-1.5">
             <Button
               onClick={toggleVoiceInput}
               disabled={isLoading}
-              className={`h-10 w-10 p-0 rounded-xl transition-colors ${
+              className={`h-10 w-10 md:h-10 md:w-10 p-0 rounded-xl transition-all active:scale-95 touch-manipulation ${
                 isListening 
                   ? 'bg-destructive hover:bg-destructive/90 animate-pulse' 
                   : 'bg-muted hover:bg-muted/80'
               }`}
             >
               {isListening ? (
-                <MicOff className="w-4 h-4 text-destructive-foreground" />
+                <MicOff className="w-5 h-5 md:w-4 md:h-4 text-destructive-foreground" />
               ) : (
-                <Mic className="w-4 h-4 text-muted-foreground" />
+                <Mic className="w-5 h-5 md:w-4 md:h-4 text-muted-foreground" />
               )}
             </Button>
             <Button
               onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="h-10 w-10 p-0 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-30"
+              className="h-10 w-10 md:h-10 md:w-10 p-0 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-30 active:scale-95 transition-transform touch-manipulation"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5 md:w-4 md:h-4" />
             </Button>
           </div>
         </div>
-        <p className="text-center text-[10px] text-muted-foreground/50 mt-3">
-          {isListening ? "🎙️ Listening... Speak now" : "Sibe SI can make mistakes. Verify important information."}
+        <p className={`text-center text-muted-foreground/50 mt-2 ${isMobile ? 'text-[9px]' : 'text-[10px] mt-3'}`}>
+          {isListening ? "🎙️ Listening..." : (isMobile ? "Sibe SI can make mistakes" : "Sibe SI can make mistakes. Verify important information.")}
         </p>
       </div>
     </div>
