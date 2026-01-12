@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, BarChart3, X, Mic, MicOff, History, Plus, Trash2 } from "lucide-react";
+import { Send, Loader2, BarChart3, X, Mic, MicOff, History, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 
 interface Message {
   role: "user" | "assistant";
@@ -48,6 +49,87 @@ const HomeChat = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const [graphSwipeOffset, setGraphSwipeOffset] = useState(0);
+
+  // Find current session index for navigation
+  const currentSessionIndex = chatHistory.findIndex(s => s.id === currentSessionId);
+
+  // Navigate to next/previous chat session
+  const navigateToSession = useCallback((direction: 'next' | 'prev') => {
+    if (chatHistory.length === 0) return;
+    
+    let targetIndex: number;
+    
+    if (currentSessionId === null) {
+      // If in new chat, go to most recent session
+      if (direction === 'prev' && chatHistory.length > 0) {
+        targetIndex = 0;
+      } else {
+        return;
+      }
+    } else {
+      const currentIdx = chatHistory.findIndex(s => s.id === currentSessionId);
+      if (direction === 'next') {
+        if (currentIdx === 0) {
+          // At newest session, start new chat
+          startNewChat();
+          toast({
+            title: "New Chat",
+            description: "Started a new conversation",
+          });
+          return;
+        }
+        targetIndex = currentIdx - 1;
+      } else {
+        if (currentIdx >= chatHistory.length - 1) {
+          toast({
+            title: "No older chats",
+            description: "This is the oldest conversation",
+          });
+          return;
+        }
+        targetIndex = currentIdx + 1;
+      }
+    }
+
+    const targetSession = chatHistory[targetIndex];
+    if (targetSession) {
+      setMessages(targetSession.messages);
+      setCurrentSessionId(targetSession.id);
+      toast({
+        title: "Switched chat",
+        description: targetSession.title.slice(0, 30) + (targetSession.title.length > 30 ? '...' : ''),
+      });
+    }
+  }, [chatHistory, currentSessionId, toast]);
+
+  // Swipe handlers for graph panel dismissal
+  const graphSwipeHandlers = useSwipeGesture({
+    onSwipeDown: () => {
+      setShowGraph(false);
+      setGraphSwipeOffset(0);
+    },
+    onSwipeLeft: () => {
+      setShowGraph(false);
+      setGraphSwipeOffset(0);
+    },
+    threshold: 60
+  });
+
+  // Swipe handlers for chat navigation
+  const chatSwipeHandlers = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (isMobile && messages.length > 0) {
+        navigateToSession('prev');
+      }
+    },
+    onSwipeRight: () => {
+      if (isMobile) {
+        navigateToSession('next');
+      }
+    },
+    threshold: 80
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -352,12 +434,12 @@ const HomeChat = () => {
     setHistoryOpen(false);
   };
 
-  const startNewChat = () => {
+  const startNewChat = useCallback(() => {
     setMessages([]);
     setCurrentSessionId(null);
     setShowGraph(false);
     setHistoryOpen(false);
-  };
+  }, []);
 
   const deleteSession = async (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -464,26 +546,35 @@ const HomeChat = () => {
         </Sheet>
       </div>
 
-      {/* Graph Panel - Mobile Optimized */}
+      {/* Graph Panel - Mobile Optimized with Swipe to Dismiss */}
       {showGraph && graphData.length > 0 && (
-        <div className={`absolute z-20 shadow-2xl ${
-          isMobile 
-            ? 'inset-x-2 top-14 bg-card border border-border rounded-xl p-3' 
-            : 'top-4 right-4 w-96 bg-card border border-border rounded-xl p-4'
-        }`}>
+        <div 
+          className={`absolute z-20 shadow-2xl transition-all duration-200 ${
+            isMobile 
+              ? 'inset-x-2 top-14 bg-card border border-border rounded-xl p-3' 
+              : 'top-4 right-4 w-96 bg-card border border-border rounded-xl p-4'
+          }`}
+          style={isMobile ? { transform: `translateY(${graphSwipeOffset}px)`, opacity: 1 - Math.abs(graphSwipeOffset) / 200 } : undefined}
+          {...(isMobile ? graphSwipeHandlers : {})}
+        >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-primary" />
               <span className="text-sm text-foreground/80">Data Visualization</span>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowGraph(false)}
-              className="h-8 w-8 p-0 hover:bg-muted active:scale-95 transition-transform"
-            >
-              <X className="w-4 h-4 text-muted-foreground" />
-            </Button>
+            <div className="flex items-center gap-1">
+              {isMobile && (
+                <span className="text-[10px] text-muted-foreground mr-1">Swipe to dismiss</span>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowGraph(false)}
+                className="h-8 w-8 p-0 hover:bg-muted active:scale-95 transition-transform"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </Button>
+            </div>
           </div>
           <div className={isMobile ? "h-36" : "h-48"}>
             <ResponsiveContainer width="100%" height="100%">
@@ -518,8 +609,27 @@ const HomeChat = () => {
         </div>
       )}
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-3 md:px-8 py-4 pt-14 md:pt-16 space-y-4 md:space-y-6 relative z-10 overscroll-contain">
+      {/* Swipe Navigation Indicator for Mobile */}
+      {isMobile && messages.length > 0 && (
+        <div className="absolute top-16 inset-x-0 z-10 flex items-center justify-center pointer-events-none">
+          <div className="flex items-center gap-3 px-3 py-1.5 bg-card/80 backdrop-blur-sm border border-border rounded-full">
+            <ChevronLeft className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[10px] text-muted-foreground">
+              {currentSessionIndex >= 0 
+                ? `Chat ${chatHistory.length - currentSessionIndex} of ${chatHistory.length}`
+                : 'New Chat'
+              }
+            </span>
+            <ChevronRight className="w-3 h-3 text-muted-foreground" />
+          </div>
+        </div>
+      )}
+
+      {/* Messages Area with Swipe Navigation */}
+      <div 
+        className="flex-1 overflow-y-auto px-3 md:px-8 py-4 pt-20 md:pt-16 space-y-4 md:space-y-6 relative z-10 overscroll-contain"
+        {...(isMobile ? chatSwipeHandlers : {})}
+      >
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center px-4">
             <h2 className="text-xl md:text-3xl font-light text-foreground/90 mb-2 text-center">
