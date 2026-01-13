@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Trash2, Sparkles, Brain, Plus, MessageSquare } from "lucide-react";
+import { Trash2, Brain, Plus, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import CreateEmployeeDialog from "@/components/CreateEmployeeDialog";
 import EmployeeInteractionDialog from "@/components/EmployeeInteractionDialog";
+import SibeLogo from "@/components/SibeLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 const TEMPLATE_EMPLOYEES = [{
@@ -155,9 +156,7 @@ const Employees = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {TEMPLATE_EMPLOYEES.map((template, idx) => <Card key={idx} onClick={() => addTemplateEmployee(template)} className="holographic-card p-6 cursor-pointer group hover-lift bg-primary-foreground">
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 flex items-center justify-center animate-pulse-glow">
-                    <Sparkles className="w-8 h-8 text-white" />
-                  </div>
+                  <SibeLogo size="lg" className="animate-pulse-glow" />
                   <div>
                     <h3 className="text-xl font-light tracking-wide mb-1">{template.name}</h3>
                     <Badge variant="outline" className="border-primary/30 text-primary font-light mb-3">
@@ -195,9 +194,7 @@ const Employees = () => {
             {employees.map(employee => <Card key={employee.id} className="glass-card p-6 hover-lift border-primary/20 group bg-primary-foreground">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full border border-primary/30 flex items-center justify-center bg-black/20">
-                      <Sparkles className="w-6 h-6 text-primary" />
-                    </div>
+                    <SibeLogo size="md" />
                     <div>
                       <h3 className="text-xl font-light tracking-wide">{employee.name}</h3>
                       <p className="text-sm text-muted-foreground font-light">{employee.role}</p>
