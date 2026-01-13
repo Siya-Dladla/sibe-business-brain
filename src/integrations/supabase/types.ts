@@ -52,6 +52,47 @@ export type Database = {
           },
         ]
       }
+      ai_employee_actions: {
+        Row: {
+          action_config: Json | null
+          action_type: string
+          created_at: string
+          employee_id: string
+          execution_count: number | null
+          id: string
+          is_enabled: boolean | null
+          last_executed_at: string | null
+        }
+        Insert: {
+          action_config?: Json | null
+          action_type: string
+          created_at?: string
+          employee_id: string
+          execution_count?: number | null
+          id?: string
+          is_enabled?: boolean | null
+          last_executed_at?: string | null
+        }
+        Update: {
+          action_config?: Json | null
+          action_type?: string
+          created_at?: string
+          employee_id?: string
+          execution_count?: number | null
+          id?: string
+          is_enabled?: boolean | null
+          last_executed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_employee_actions_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "ai_employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_employees: {
         Row: {
           created_at: string
@@ -128,6 +169,93 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ai_workflows: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          last_run_at: string | null
+          name: string
+          nodes: Json | null
+          run_count: number | null
+          status: string
+          trigger_config: Json | null
+          trigger_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_run_at?: string | null
+          name: string
+          nodes?: Json | null
+          run_count?: number | null
+          status?: string
+          trigger_config?: Json | null
+          trigger_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_run_at?: string | null
+          name?: string
+          nodes?: Json | null
+          run_count?: number | null
+          status?: string
+          trigger_config?: Json | null
+          trigger_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      api_connections: {
+        Row: {
+          api_endpoint: string | null
+          created_at: string
+          credentials_encrypted: string | null
+          id: string
+          last_sync_at: string | null
+          name: string
+          provider: string
+          status: string
+          sync_config: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_endpoint?: string | null
+          created_at?: string
+          credentials_encrypted?: string | null
+          id?: string
+          last_sync_at?: string | null
+          name: string
+          provider: string
+          status?: string
+          sync_config?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_endpoint?: string | null
+          created_at?: string
+          credentials_encrypted?: string | null
+          id?: string
+          last_sync_at?: string | null
+          name?: string
+          provider?: string
+          status?: string
+          sync_config?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       business_metrics: {
         Row: {
@@ -901,6 +1029,50 @@ export type Database = {
           website_url?: string
         }
         Relationships: []
+      }
+      workflow_runs: {
+        Row: {
+          completed_at: string | null
+          error: string | null
+          id: string
+          logs: Json | null
+          result: Json | null
+          started_at: string
+          status: string
+          user_id: string
+          workflow_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          error?: string | null
+          id?: string
+          logs?: Json | null
+          result?: Json | null
+          started_at?: string
+          status?: string
+          user_id: string
+          workflow_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          error?: string | null
+          id?: string
+          logs?: Json | null
+          result?: Json | null
+          started_at?: string
+          status?: string
+          user_id?: string
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_runs_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "ai_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
