@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface CommandResult {
-  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'info';
+  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'info' | 'connections' | 'documents' | 'data_overview';
   success: boolean;
   data?: any;
   message?: string;
@@ -56,6 +56,40 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
         role: roleMatch?.[1]?.trim(),
         department: departmentMatch?.[1]?.trim()
       }
+    };
+  }
+  
+  // Check connected APIs / data sources patterns
+  if (lowerMessage.includes('connected api') || lowerMessage.includes('api connection') ||
+      lowerMessage.includes('data source') || lowerMessage.includes('data feed') ||
+      lowerMessage.includes('check connection') || lowerMessage.includes('my integrations') ||
+      lowerMessage.includes('what apis') || lowerMessage.includes('show connections')) {
+    return {
+      isCommand: true,
+      commandType: 'list_connections',
+      params: {}
+    };
+  }
+  
+  // Read uploaded data / documents patterns
+  if (lowerMessage.includes('uploaded data') || lowerMessage.includes('my documents') ||
+      lowerMessage.includes('business plan') || lowerMessage.includes('show documents') ||
+      lowerMessage.includes('uploaded files') || lowerMessage.includes('my data')) {
+    return {
+      isCommand: true,
+      commandType: 'list_documents',
+      params: {}
+    };
+  }
+  
+  // Read all data patterns (comprehensive data overview)
+  if (lowerMessage.includes('all data') || lowerMessage.includes('data overview') ||
+      lowerMessage.includes('everything i have') || lowerMessage.includes('all my information') ||
+      lowerMessage.includes('full data') || lowerMessage.includes('complete data')) {
+    return {
+      isCommand: true,
+      commandType: 'data_overview',
+      params: {}
     };
   }
   
@@ -232,11 +266,83 @@ serve(async (req) => {
           
           commandResult = { type: 'data', success: true, data: metricsData };
           break;
+
+        case 'list_connections':
+          // Get all API connections for the user
+          const { data: connections } = await supabase
+            .from('api_connections')
+            .select('id, name, provider, status, last_sync_at, api_endpoint')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          
+          commandResult = { 
+            type: 'connections', 
+            success: true, 
+            data: connections || [], 
+            message: 'connections_list' 
+          };
+          break;
+
+        case 'list_documents':
+          // Get all uploaded documents/business plans
+          const { data: documents } = await supabase
+            .from('business_plans')
+            .select('id, title, description, created_at, updated_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          
+          // Get website analyses too
+          const { data: websites } = await supabase
+            .from('website_analyses')
+            .select('id, website_url, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          
+          commandResult = { 
+            type: 'documents', 
+            success: true, 
+            data: { documents: documents || [], websites: websites || [] }, 
+            message: 'documents_list' 
+          };
+          break;
+
+        case 'data_overview':
+          // Comprehensive data overview
+          const [
+            { data: overviewConnections },
+            { data: overviewDocs },
+            { data: overviewWebsites },
+            { data: overviewMetrics },
+            { data: overviewWorkflows },
+            { data: overviewEmployees }
+          ] = await Promise.all([
+            supabase.from('api_connections').select('id, name, provider, status').eq('user_id', user.id),
+            supabase.from('business_plans').select('id, title, description').eq('user_id', user.id),
+            supabase.from('website_analyses').select('id, website_url, analysis_content').eq('user_id', user.id),
+            supabase.from('business_metrics').select('metric_name, value, change_percentage, period').eq('user_id', user.id).limit(20),
+            supabase.from('ai_workflows').select('id, name, status, run_count').eq('user_id', user.id),
+            supabase.from('ai_employees').select('id, name, role, department').eq('user_id', user.id)
+          ]);
+          
+          commandResult = { 
+            type: 'data_overview', 
+            success: true, 
+            data: {
+              connections: overviewConnections || [],
+              documents: overviewDocs || [],
+              websites: overviewWebsites || [],
+              metrics: overviewMetrics || [],
+              workflows: overviewWorkflows || [],
+              employees: overviewEmployees || []
+            }, 
+            message: 'data_overview' 
+          };
+          break;
       }
     }
 
     // Build context for AI based on current business data
-    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner with FULL CONTROL over the app. You can create workflows, AI employees, visualize data, and answer all business questions.\n\n";
+    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner with FULL CONTROL over the app. You can create workflows, AI employees, visualize data, check API connections, access uploaded documents, and answer all business questions.\n\n";
     
     // Add command capabilities info
     context += "=== YOUR CAPABILITIES ===\n";
@@ -244,7 +350,10 @@ serve(async (req) => {
     context += "2. Create AI employees: User can say 'hire a marketing manager' or 'create an AI accountant'\n";
     context += "3. Delete workflows: User can say 'delete workflow [name]'\n";
     context += "4. Visualize data: User can say 'show me revenue trends' or 'graph customer growth'\n";
-    context += "5. List resources: User can say 'show my workflows' or 'list my team'\n\n";
+    context += "5. Check API connections: User can say 'show my connected APIs' or 'check data sources'\n";
+    context += "6. View documents: User can say 'show my documents' or 'what data have I uploaded'\n";
+    context += "7. Data overview: User can say 'show all my data' or 'give me a data overview'\n";
+    context += "8. List resources: User can say 'show my workflows' or 'list my team'\n\n";
 
     // Add command result to context
     if (commandResult) {
@@ -327,14 +436,29 @@ serve(async (req) => {
       context += "\n";
     }
 
+    // Include API connections info
+    if (businessContext?.apiConnections && businessContext.apiConnections.length > 0) {
+      hasBusinessData = true;
+      context += "=== CONNECTED APIS & DATA SOURCES ===\n";
+      businessContext.apiConnections.forEach((c: any) => {
+        context += `- ${c.name} (${c.provider}): ${c.status}`;
+        if (c.last_sync_at) {
+          context += ` - Last sync: ${c.last_sync_at}`;
+        }
+        context += "\n";
+      });
+      context += "\n";
+    }
+
     if (!hasBusinessData && !commandResult) {
       context += "NOTE: No business data has been uploaded yet. The user needs to:\n";
       context += "1. Upload a business plan/document, OR\n";
       context += "2. Analyze their website, OR\n";
-      context += "3. Input their business metrics\n\n";
+      context += "3. Input their business metrics, OR\n";
+      context += "4. Connect external APIs/data sources\n\n";
     }
 
-    context += "IMPORTANT: Be concise, actionable, and helpful. If a command was executed, confirm the result clearly. For visualizations, describe what data is being shown. Always offer to help with next steps.";
+    context += "IMPORTANT: Be concise, actionable, and helpful. If a command was executed, confirm the result clearly. For visualizations, describe what data is being shown. When showing API connections or documents, summarize what the user has and suggest how to use them. Always offer to help with next steps.";
 
     console.log('Calling Lovable AI Gateway');
 
