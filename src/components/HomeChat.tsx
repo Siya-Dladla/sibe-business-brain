@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, BarChart3, X, Mic, MicOff, History, Plus, Trash2, ChevronLeft, ChevronRight, Zap, Users, TrendingUp, PieChart, LineChart } from "lucide-react";
+import { Send, Loader2, BarChart3, X, Mic, MicOff, History, Plus, Trash2, ChevronLeft, ChevronRight, Zap, Users, TrendingUp, PieChart, LineChart, Database, FileText, Globe, Link2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,7 +28,7 @@ interface Message {
 }
 
 interface CommandResult {
-  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'info';
+  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'info' | 'connections' | 'documents' | 'data_overview';
   success: boolean;
   data?: any;
   message?: string;
@@ -296,12 +296,12 @@ const HomeChat = () => {
     }
   };
 
-  // Fetch extended business context including workflows and employees
+  // Fetch extended business context including workflows, employees, and API connections
   const fetchBusinessContext = async () => {
     if (!user) return null;
 
     try {
-      const [plansRes, websitesRes, metricsRes, workflowsRes, employeesRes] = await Promise.all([
+      const [plansRes, websitesRes, metricsRes, workflowsRes, employeesRes, connectionsRes] = await Promise.all([
         supabase
           .from('business_plans')
           .select('title, description, content')
@@ -330,6 +330,11 @@ const HomeChat = () => {
           .from('ai_employees')
           .select('id, name, role, department')
           .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('api_connections')
+          .select('id, name, provider, status, last_sync_at, api_endpoint')
+          .eq('user_id', user.id)
           .order('created_at', { ascending: false })
       ]);
 
@@ -338,7 +343,8 @@ const HomeChat = () => {
         websiteAnalysis: websitesRes.data?.[0] || null,
         metrics: metricsRes.data || [],
         workflows: workflowsRes.data || [],
-        employees: employeesRes.data || []
+        employees: employeesRes.data || [],
+        apiConnections: connectionsRes.data || []
       };
     } catch (error) {
       console.error('Error fetching business context:', error);
@@ -716,21 +722,153 @@ const HomeChat = () => {
       );
     }
 
+    if (result.type === 'connections' && result.message === 'connections_list') {
+      return (
+        <div className="mt-3 p-3 bg-background rounded-lg border border-border">
+          <div className="flex items-center gap-2 mb-2">
+            <Link2 className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">Connected APIs & Data Sources</span>
+          </div>
+          <div className="space-y-2">
+            {!result.data || result.data.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No API connections yet. Go to Data & API Feeds to connect external services!</p>
+            ) : (
+              result.data.map((conn: any) => (
+                <div key={conn.id} className="flex items-center justify-between p-2 bg-card rounded border border-border/50">
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-sm">{conn.name}</span>
+                    <span className="text-xs text-muted-foreground">({conn.provider})</span>
+                  </div>
+                  <Badge variant={conn.status === 'connected' ? 'default' : 'secondary'} className="text-xs">
+                    {conn.status}
+                  </Badge>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (result.type === 'documents' && result.message === 'documents_list') {
+      const docs = result.data?.documents || [];
+      const websites = result.data?.websites || [];
+      return (
+        <div className="mt-3 p-3 bg-background rounded-lg border border-border">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">Your Documents & Data</span>
+          </div>
+          <div className="space-y-3">
+            {docs.length === 0 && websites.length === 0 ? (
+              <p className="text-xs text-muted-foreground">No documents uploaded yet. Upload a business plan or analyze your website!</p>
+            ) : (
+              <>
+                {docs.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Business Plans</p>
+                    {docs.map((doc: any) => (
+                      <div key={doc.id} className="flex items-center justify-between p-2 bg-card rounded border border-border/50 mb-1">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-sm">{doc.title}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(doc.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {websites.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Analyzed Websites</p>
+                    {websites.map((site: any) => (
+                      <div key={site.id} className="flex items-center justify-between p-2 bg-card rounded border border-border/50 mb-1">
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-sm truncate max-w-[200px]">{site.website_url}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(site.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (result.type === 'data_overview' && result.message === 'data_overview') {
+      const d = result.data || {};
+      return (
+        <div className="mt-3 p-3 bg-background rounded-lg border border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Database className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium">Complete Data Overview</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="p-2 bg-card rounded border border-border/50">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <Link2 className="w-3 h-3" /> API Connections
+              </div>
+              <span className="text-lg font-semibold">{d.connections?.length || 0}</span>
+            </div>
+            <div className="p-2 bg-card rounded border border-border/50">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <FileText className="w-3 h-3" /> Documents
+              </div>
+              <span className="text-lg font-semibold">{d.documents?.length || 0}</span>
+            </div>
+            <div className="p-2 bg-card rounded border border-border/50">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <Globe className="w-3 h-3" /> Websites
+              </div>
+              <span className="text-lg font-semibold">{d.websites?.length || 0}</span>
+            </div>
+            <div className="p-2 bg-card rounded border border-border/50">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <TrendingUp className="w-3 h-3" /> Metrics
+              </div>
+              <span className="text-lg font-semibold">{d.metrics?.length || 0}</span>
+            </div>
+            <div className="p-2 bg-card rounded border border-border/50">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <Zap className="w-3 h-3" /> Workflows
+              </div>
+              <span className="text-lg font-semibold">{d.workflows?.length || 0}</span>
+            </div>
+            <div className="p-2 bg-card rounded border border-border/50">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <Users className="w-3 h-3" /> AI Employees
+              </div>
+              <span className="text-lg font-semibold">{d.employees?.length || 0}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return null;
   };
 
   const suggestedPrompts = isMobile 
     ? [
         { text: "Create workflow", icon: <Zap className="w-3 h-3" /> },
-        { text: "Hire AI employee", icon: <Users className="w-3 h-3" /> },
-        { text: "Show analytics", icon: <TrendingUp className="w-3 h-3" /> },
-        { text: "My workflows", icon: <PieChart className="w-3 h-3" /> }
+        { text: "My APIs", icon: <Link2 className="w-3 h-3" /> },
+        { text: "My documents", icon: <FileText className="w-3 h-3" /> },
+        { text: "Data overview", icon: <Database className="w-3 h-3" /> }
       ]
     : [
-        { text: "Create a workflow for customer follow-ups", icon: <Zap className="w-4 h-4" /> },
-        { text: "Hire an AI marketing manager", icon: <Users className="w-4 h-4" /> },
-        { text: "Show me revenue trends chart", icon: <LineChart className="w-4 h-4" /> },
-        { text: "List my AI team", icon: <Users className="w-4 h-4" /> }
+        { text: "Show my connected APIs and data sources", icon: <Link2 className="w-4 h-4" /> },
+        { text: "What documents have I uploaded?", icon: <FileText className="w-4 h-4" /> },
+        { text: "Give me a complete data overview", icon: <Database className="w-4 h-4" /> },
+        { text: "Show me revenue trends chart", icon: <LineChart className="w-4 h-4" /> }
       ];
 
   return (
