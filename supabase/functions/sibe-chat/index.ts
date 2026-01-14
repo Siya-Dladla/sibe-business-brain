@@ -7,6 +7,92 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface CommandResult {
+  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'info';
+  success: boolean;
+  data?: any;
+  message?: string;
+}
+
+// Parse user intent and extract commands
+function parseCommand(message: string): { isCommand: boolean; commandType: string; params: any } {
+  const lowerMessage = message.toLowerCase();
+  
+  // Create workflow patterns
+  if (lowerMessage.includes('create workflow') || lowerMessage.includes('build workflow') || 
+      lowerMessage.includes('new workflow') || lowerMessage.includes('make a workflow')) {
+    const nameMatch = message.match(/(?:called|named|titled)\s+["']?([^"'\n]+)["']?/i) ||
+                      message.match(/workflow\s+(?:for|to)\s+["']?([^"'\n]+)["']?/i);
+    return {
+      isCommand: true,
+      commandType: 'create_workflow',
+      params: { name: nameMatch?.[1]?.trim() || 'New Workflow from Chat' }
+    };
+  }
+  
+  // Delete workflow patterns
+  if (lowerMessage.includes('delete workflow') || lowerMessage.includes('remove workflow')) {
+    const nameMatch = message.match(/(?:delete|remove)\s+workflow\s+["']?([^"'\n]+)["']?/i);
+    return {
+      isCommand: true,
+      commandType: 'delete_workflow',
+      params: { name: nameMatch?.[1]?.trim() }
+    };
+  }
+  
+  // Create AI employee patterns
+  if (lowerMessage.includes('create employee') || lowerMessage.includes('add employee') ||
+      lowerMessage.includes('hire') || lowerMessage.includes('new ai employee') ||
+      lowerMessage.includes('create an ai') || lowerMessage.includes('add an ai')) {
+    const roleMatch = message.match(/(?:as a|role of|position of)\s+["']?([^"'\n,]+)["']?/i);
+    const nameMatch = message.match(/(?:called|named)\s+["']?([^"'\n,]+)["']?/i);
+    const departmentMatch = message.match(/(?:in|for)\s+(?:the\s+)?["']?(\w+)["']?\s+(?:department|team)/i);
+    
+    return {
+      isCommand: true,
+      commandType: 'create_employee',
+      params: {
+        name: nameMatch?.[1]?.trim(),
+        role: roleMatch?.[1]?.trim(),
+        department: departmentMatch?.[1]?.trim()
+      }
+    };
+  }
+  
+  // Data visualization patterns
+  if (lowerMessage.includes('show me') || lowerMessage.includes('visualize') ||
+      lowerMessage.includes('graph') || lowerMessage.includes('chart') ||
+      lowerMessage.includes('display data') || lowerMessage.includes('analytics')) {
+    return {
+      isCommand: true,
+      commandType: 'visualize_data',
+      params: { query: message }
+    };
+  }
+  
+  // List workflows
+  if (lowerMessage.includes('list workflows') || lowerMessage.includes('show workflows') ||
+      lowerMessage.includes('my workflows')) {
+    return {
+      isCommand: true,
+      commandType: 'list_workflows',
+      params: {}
+    };
+  }
+  
+  // List employees
+  if (lowerMessage.includes('list employees') || lowerMessage.includes('show employees') ||
+      lowerMessage.includes('my team') || lowerMessage.includes('ai team')) {
+    return {
+      isCommand: true,
+      commandType: 'list_employees',
+      params: {}
+    };
+  }
+  
+  return { isCommand: false, commandType: '', params: {} };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -33,9 +119,147 @@ serve(async (req) => {
     const { message, businessContext } = await req.json();
     console.log('Processing chat message for user:', user.id);
 
+    // Parse for commands
+    const { isCommand, commandType, params } = parseCommand(message);
+    let commandResult: CommandResult | null = null;
+
+    // Execute commands if detected
+    if (isCommand) {
+      switch (commandType) {
+        case 'create_workflow':
+          const { data: workflowData, error: workflowError } = await supabase
+            .from('ai_workflows')
+            .insert({
+              user_id: user.id,
+              name: params.name,
+              description: `Created via chat: "${message}"`,
+              status: 'draft',
+              trigger_type: 'manual',
+              nodes: []
+            })
+            .select()
+            .single();
+          
+          if (workflowError) {
+            commandResult = { type: 'workflow', success: false, message: workflowError.message };
+          } else {
+            commandResult = { type: 'workflow', success: true, data: workflowData, message: `Created workflow "${params.name}"` };
+          }
+          break;
+
+        case 'delete_workflow':
+          if (params.name) {
+            const { data: workflows } = await supabase
+              .from('ai_workflows')
+              .select('id, name')
+              .eq('user_id', user.id)
+              .ilike('name', `%${params.name}%`);
+            
+            if (workflows && workflows.length > 0) {
+              const { error: deleteError } = await supabase
+                .from('ai_workflows')
+                .delete()
+                .eq('id', workflows[0].id);
+              
+              if (deleteError) {
+                commandResult = { type: 'delete_workflow', success: false, message: deleteError.message };
+              } else {
+                commandResult = { type: 'delete_workflow', success: true, message: `Deleted workflow "${workflows[0].name}"` };
+              }
+            } else {
+              commandResult = { type: 'delete_workflow', success: false, message: `No workflow found matching "${params.name}"` };
+            }
+          } else {
+            commandResult = { type: 'delete_workflow', success: false, message: 'Please specify the workflow name to delete' };
+          }
+          break;
+
+        case 'create_employee':
+          const employeeName = params.name || `AI ${params.role || 'Assistant'}`;
+          const employeeRole = params.role || 'General Assistant';
+          const employeeDepartment = params.department || 'General';
+          
+          const { data: employeeData, error: employeeError } = await supabase
+            .from('ai_employees')
+            .insert({
+              user_id: user.id,
+              name: employeeName,
+              role: employeeRole,
+              department: employeeDepartment,
+              personality: `Created via chat. Specializes in ${employeeRole.toLowerCase()} tasks.`,
+              expertise: [employeeRole, employeeDepartment],
+              status: 'active'
+            })
+            .select()
+            .single();
+          
+          if (employeeError) {
+            commandResult = { type: 'employee', success: false, message: employeeError.message };
+          } else {
+            commandResult = { type: 'employee', success: true, data: employeeData, message: `Created AI employee "${employeeName}" as ${employeeRole} in ${employeeDepartment}` };
+          }
+          break;
+
+        case 'list_workflows':
+          const { data: userWorkflows } = await supabase
+            .from('ai_workflows')
+            .select('id, name, status, run_count, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+          
+          commandResult = { type: 'info', success: true, data: userWorkflows, message: 'workflows_list' };
+          break;
+
+        case 'list_employees':
+          const { data: userEmployees } = await supabase
+            .from('ai_employees')
+            .select('id, name, role, department, status')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          
+          commandResult = { type: 'info', success: true, data: userEmployees, message: 'employees_list' };
+          break;
+
+        case 'visualize_data':
+          // Get metrics for visualization
+          const { data: metricsData } = await supabase
+            .from('business_metrics')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(20);
+          
+          commandResult = { type: 'data', success: true, data: metricsData };
+          break;
+      }
+    }
+
     // Build context for AI based on current business data
-    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner. You ONLY answer based on the specific business data provided below. If no business data is available, politely ask the user to upload their business plan, connect their website, or add their business data first.\n\n";
+    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner with FULL CONTROL over the app. You can create workflows, AI employees, visualize data, and answer all business questions.\n\n";
     
+    // Add command capabilities info
+    context += "=== YOUR CAPABILITIES ===\n";
+    context += "1. Create workflows: User can say 'create workflow for...' or 'build workflow named...'\n";
+    context += "2. Create AI employees: User can say 'hire a marketing manager' or 'create an AI accountant'\n";
+    context += "3. Delete workflows: User can say 'delete workflow [name]'\n";
+    context += "4. Visualize data: User can say 'show me revenue trends' or 'graph customer growth'\n";
+    context += "5. List resources: User can say 'show my workflows' or 'list my team'\n\n";
+
+    // Add command result to context
+    if (commandResult) {
+      context += "=== COMMAND EXECUTED ===\n";
+      context += `Action: ${commandResult.type}\n`;
+      context += `Success: ${commandResult.success}\n`;
+      if (commandResult.message) {
+        context += `Result: ${commandResult.message}\n`;
+      }
+      if (commandResult.data) {
+        context += `Data: ${JSON.stringify(commandResult.data).substring(0, 1000)}\n`;
+      }
+      context += "\n";
+    }
+
     let hasBusinessData = false;
 
     // Include business plan/document context
@@ -83,14 +307,34 @@ serve(async (req) => {
       context += "\n";
     }
 
-    if (!hasBusinessData) {
+    // Include workflows info
+    if (businessContext?.workflows && businessContext.workflows.length > 0) {
+      hasBusinessData = true;
+      context += "=== ACTIVE WORKFLOWS ===\n";
+      businessContext.workflows.forEach((w: any) => {
+        context += `- ${w.name} (${w.status}) - ${w.run_count} runs\n`;
+      });
+      context += "\n";
+    }
+
+    // Include AI employees info
+    if (businessContext?.employees && businessContext.employees.length > 0) {
+      hasBusinessData = true;
+      context += "=== AI TEAM ===\n";
+      businessContext.employees.forEach((e: any) => {
+        context += `- ${e.name}: ${e.role} in ${e.department}\n`;
+      });
+      context += "\n";
+    }
+
+    if (!hasBusinessData && !commandResult) {
       context += "NOTE: No business data has been uploaded yet. The user needs to:\n";
       context += "1. Upload a business plan/document, OR\n";
       context += "2. Analyze their website, OR\n";
       context += "3. Input their business metrics\n\n";
     }
 
-    context += "IMPORTANT: Base ALL your responses on the specific business data provided above. Be concise, actionable, and reference the actual data when giving advice. If asked about something not in the data, explain what information would be needed.";
+    context += "IMPORTANT: Be concise, actionable, and helpful. If a command was executed, confirm the result clearly. For visualizations, describe what data is being shown. Always offer to help with next steps.";
 
     console.log('Calling Lovable AI Gateway');
 
@@ -134,7 +378,10 @@ serve(async (req) => {
     console.log('AI response received successfully');
 
     return new Response(
-      JSON.stringify({ response: aiResponse }),
+      JSON.stringify({ 
+        response: aiResponse,
+        commandResult: commandResult 
+      }),
       { 
         headers: { 
           ...corsHeaders, 
