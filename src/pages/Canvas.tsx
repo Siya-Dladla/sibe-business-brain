@@ -4,9 +4,20 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import MobileMenu from "@/components/MobileMenu";
 import { useToast } from "@/hooks/use-toast";
-import { Layers, Plus, CheckCircle2, Clock, Play, Pause, Zap } from "lucide-react";
+import { Layers, Plus, Clock, Play, Pause, Zap, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import WorkflowBuilder from "@/components/workflow/WorkflowBuilder";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Workflow {
   id: string;
@@ -23,6 +34,7 @@ const Canvas = () => {
   const [loading, setLoading] = useState(true);
   const [editingWorkflowId, setEditingWorkflowId] = useState<string | null>(null);
   const [showBuilder, setShowBuilder] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchWorkflows = async () => {
@@ -76,6 +88,40 @@ const Canvas = () => {
     fetchWorkflows();
   };
 
+  const handleDeleteWorkflow = async (workflowId: string) => {
+    try {
+      // First delete related workflow runs
+      await supabase
+        .from('workflow_runs')
+        .delete()
+        .eq('workflow_id', workflowId);
+
+      // Then delete the workflow
+      const { error } = await supabase
+        .from('ai_workflows')
+        .delete()
+        .eq('id', workflowId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Workflow Deleted",
+        description: "The workflow has been removed successfully.",
+      });
+
+      fetchWorkflows();
+    } catch (error: any) {
+      console.error('Error deleting workflow:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete workflow",
+        variant: "destructive"
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (showBuilder) {
     return (
       <WorkflowBuilder
@@ -118,7 +164,7 @@ const Canvas = () => {
             workflows.map((workflow) => (
               <Card
                 key={workflow.id}
-                className="glass-card p-6 hover-lift cursor-pointer"
+                className="glass-card p-6 hover-lift cursor-pointer group relative"
                 onClick={() => handleOpenBuilder(workflow.id)}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -131,7 +177,41 @@ const Canvas = () => {
                       {workflow.description || "No description"}
                     </p>
                   </div>
-                  {getStatusIcon(workflow.status)}
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(workflow.status)}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletingId(workflow.id);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Workflow</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{workflow.name}"? This action cannot be undone and will also remove all workflow run history.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteWorkflow(workflow.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Badge variant="outline">{workflow.status}</Badge>
