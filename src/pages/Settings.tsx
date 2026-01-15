@@ -286,11 +286,11 @@ const Settings = () => {
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-light text-foreground">$49<span className="text-sm text-muted-foreground">/mo</span></p>
-                    <p className="text-xs text-muted-foreground">after 14-day trial</p>
+                    <p className="text-xs text-muted-foreground">after 30-day trial</p>
                   </div>
                 </div>
                 <div className="mb-4 p-3 bg-accent/10 border border-accent/30 rounded-lg">
-                  <p className="text-sm font-medium text-foreground">Start with $1 for 14 days</p>
+                  <p className="text-sm font-medium text-foreground">Start with $1 for 30 days</p>
                   <p className="text-xs text-muted-foreground">Then $49/month after trial ends</p>
                 </div>
                 <div className="space-y-2">
@@ -319,7 +319,7 @@ const Settings = () => {
                     onClick={() => {
                       toast({
                         title: "Trial Started",
-                        description: "Starting your $1 14-day trial. You'll be charged $49/month after the trial ends."
+                        description: "Starting your $1 30-day trial. You'll be charged $49/month after the trial ends."
                       });
                     }}
                     className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
