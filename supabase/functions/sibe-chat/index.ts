@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface CommandResult {
-  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'info' | 'connections' | 'documents' | 'data_overview' | 'edit_employee';
+  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'delete_employee' | 'info' | 'connections' | 'documents' | 'data_overview' | 'edit_employee';
   success: boolean;
   data?: any;
   message?: string;
@@ -281,6 +281,22 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
     };
   }
   
+  // Delete AI employee patterns
+  if (lowerMessage.includes('delete employee') || lowerMessage.includes('remove employee') ||
+      lowerMessage.includes('fire employee') || lowerMessage.includes('delete ai employee') ||
+      lowerMessage.includes('remove ai employee') || lowerMessage.includes('fire ai')) {
+    
+    // Extract the employee name to delete
+    const deleteNameMatch = message.match(/(?:delete|remove|fire)\s+(?:ai\s+)?employee\s+["']?([^"'\n,]+?)["']?(?:\s|$)/i) ||
+                            message.match(/(?:delete|remove|fire)\s+["']?([^"'\n,]+?)["']?\s+(?:from\s+)?(?:ai\s+)?(?:team|employees)?/i);
+    
+    return {
+      isCommand: true,
+      commandType: 'delete_employee',
+      params: { employeeName: deleteNameMatch?.[1]?.trim() }
+    };
+  }
+  
   return { isCommand: false, commandType: '', params: {} };
 }
 
@@ -331,7 +347,7 @@ serve(async (req) => {
     // Execute commands if detected (some require authentication)
     if (isCommand) {
       // Commands that require authentication
-      const authRequiredCommands = ['create_workflow', 'delete_workflow', 'create_employee', 'edit_employee', 'list_workflows', 'list_employees', 'visualize_data', 'list_connections', 'list_documents', 'data_overview'];
+      const authRequiredCommands = ['create_workflow', 'delete_workflow', 'create_employee', 'edit_employee', 'delete_employee', 'list_workflows', 'list_employees', 'visualize_data', 'list_connections', 'list_documents', 'data_overview'];
       
       if (authRequiredCommands.includes(commandType) && !isAuthenticated) {
         commandResult = { 
@@ -469,6 +485,40 @@ serve(async (req) => {
               }
             } else {
               commandResult = { type: 'edit_employee', success: false, message: 'Please specify the employee name to edit. For example: "edit employee Alex to Marketing Manager"' };
+            }
+            break;
+
+          case 'delete_employee':
+            if (params.employeeName) {
+              // Find the employee by name (fuzzy match)
+              const { data: employeesToDelete } = await supabase
+                .from('ai_employees')
+                .select('id, name, role, department')
+                .eq('user_id', userId)
+                .ilike('name', `%${params.employeeName}%`);
+              
+              if (employeesToDelete && employeesToDelete.length > 0) {
+                const employeeToDelete = employeesToDelete[0];
+                
+                const { error: deleteEmployeeError } = await supabase
+                  .from('ai_employees')
+                  .delete()
+                  .eq('id', employeeToDelete.id);
+                
+                if (deleteEmployeeError) {
+                  commandResult = { type: 'delete_employee', success: false, message: deleteEmployeeError.message };
+                } else {
+                  commandResult = { 
+                    type: 'delete_employee', 
+                    success: true, 
+                    message: `Deleted AI employee "${employeeToDelete.name}" (${employeeToDelete.role} in ${employeeToDelete.department})` 
+                  };
+                }
+              } else {
+                commandResult = { type: 'delete_employee', success: false, message: `No employee found matching "${params.employeeName}". Say "list my team" to see all employees.` };
+              }
+            } else {
+              commandResult = { type: 'delete_employee', success: false, message: 'Please specify the employee name to delete. For example: "delete employee Alex"' };
             }
             break;
 
