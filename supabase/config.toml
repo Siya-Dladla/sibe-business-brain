@@ -16,7 +16,10 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.sibe-chat]
-verify_jwt = true
+verify_jwt = false
+
+[functions.execute-workflow]
+verify_jwt = false
 
 [functions.analyze-website]
 verify_jwt = true

@@ -217,205 +217,230 @@ serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      throw new Error('Unauthorized');
-    }
-
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
     const { message, businessContext } = await req.json();
-    console.log('Processing chat message for user:', user.id);
+    
+    // Check for authentication
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+    let isAuthenticated = false;
+    
+    if (authHeader?.startsWith('Bearer ')) {
+      const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
+      
+      const token = authHeader.replace('Bearer ', '');
+      const { data, error } = await supabaseAuth.auth.getUser(token);
+      
+      if (!error && data?.user) {
+        userId = data.user.id;
+        isAuthenticated = true;
+        console.log('Processing chat message for authenticated user:', userId);
+      }
+    }
+    
+    // Create service client for database operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Parse for commands
     const { isCommand, commandType, params } = parseCommand(message);
     let commandResult: CommandResult | null = null;
 
-    // Execute commands if detected
+    // Execute commands if detected (some require authentication)
     if (isCommand) {
-      switch (commandType) {
-        case 'create_workflow':
-          const { data: workflowData, error: workflowError } = await supabase
-            .from('ai_workflows')
-            .insert({
-              user_id: user.id,
-              name: params.name,
-              description: `Created via chat: "${message}"`,
-              status: 'draft',
-              trigger_type: 'manual',
-              nodes: []
-            })
-            .select()
-            .single();
-          
-          if (workflowError) {
-            commandResult = { type: 'workflow', success: false, message: workflowError.message };
-          } else {
-            commandResult = { type: 'workflow', success: true, data: workflowData, message: `Created workflow "${params.name}"` };
-          }
-          break;
-
-        case 'delete_workflow':
-          if (params.name) {
-            const { data: workflows } = await supabase
+      // Commands that require authentication
+      const authRequiredCommands = ['create_workflow', 'delete_workflow', 'create_employee', 'list_workflows', 'list_employees', 'visualize_data', 'list_connections', 'list_documents', 'data_overview'];
+      
+      if (authRequiredCommands.includes(commandType) && !isAuthenticated) {
+        commandResult = { 
+          type: 'info', 
+          success: false, 
+          message: 'Please log in to use this feature. You can sign up or log in to access all capabilities.' 
+        };
+      } else {
+        switch (commandType) {
+          case 'create_workflow':
+            const { data: workflowData, error: workflowError } = await supabase
               .from('ai_workflows')
-              .select('id, name')
-              .eq('user_id', user.id)
-              .ilike('name', `%${params.name}%`);
+              .insert({
+                user_id: userId,
+                name: params.name,
+                description: `Created via chat: "${message}"`,
+                status: 'draft',
+                trigger_type: 'manual',
+                nodes: []
+              })
+              .select()
+              .single();
             
-            if (workflows && workflows.length > 0) {
-              const { error: deleteError } = await supabase
+            if (workflowError) {
+              commandResult = { type: 'workflow', success: false, message: workflowError.message };
+            } else {
+              commandResult = { type: 'workflow', success: true, data: workflowData, message: `Created workflow "${params.name}"` };
+            }
+            break;
+
+          case 'delete_workflow':
+            if (params.name) {
+              const { data: workflows } = await supabase
                 .from('ai_workflows')
-                .delete()
-                .eq('id', workflows[0].id);
+                .select('id, name')
+                .eq('user_id', userId)
+                .ilike('name', `%${params.name}%`);
               
-              if (deleteError) {
-                commandResult = { type: 'delete_workflow', success: false, message: deleteError.message };
+              if (workflows && workflows.length > 0) {
+                const { error: deleteError } = await supabase
+                  .from('ai_workflows')
+                  .delete()
+                  .eq('id', workflows[0].id);
+                
+                if (deleteError) {
+                  commandResult = { type: 'delete_workflow', success: false, message: deleteError.message };
+                } else {
+                  commandResult = { type: 'delete_workflow', success: true, message: `Deleted workflow "${workflows[0].name}"` };
+                }
               } else {
-                commandResult = { type: 'delete_workflow', success: true, message: `Deleted workflow "${workflows[0].name}"` };
+                commandResult = { type: 'delete_workflow', success: false, message: `No workflow found matching "${params.name}"` };
               }
             } else {
-              commandResult = { type: 'delete_workflow', success: false, message: `No workflow found matching "${params.name}"` };
+              commandResult = { type: 'delete_workflow', success: false, message: 'Please specify the workflow name to delete' };
             }
-          } else {
-            commandResult = { type: 'delete_workflow', success: false, message: 'Please specify the workflow name to delete' };
-          }
-          break;
+            break;
 
-        case 'create_employee':
-          const employeeName = params.name || `AI ${params.role || 'Assistant'}`;
-          const employeeRole = params.role || 'General Assistant';
-          const employeeDepartment = params.department || 'General';
-          
-          const { data: employeeData, error: employeeError } = await supabase
-            .from('ai_employees')
-            .insert({
-              user_id: user.id,
-              name: employeeName,
-              role: employeeRole,
-              department: employeeDepartment,
-              personality: `Created via chat. Specializes in ${employeeRole.toLowerCase()} tasks.`,
-              expertise: [employeeRole, employeeDepartment],
-              status: 'active'
-            })
-            .select()
-            .single();
-          
-          if (employeeError) {
-            commandResult = { type: 'employee', success: false, message: employeeError.message };
-          } else {
-            commandResult = { type: 'employee', success: true, data: employeeData, message: `Created AI employee "${employeeName}" as ${employeeRole} in ${employeeDepartment}` };
-          }
-          break;
+          case 'create_employee':
+            const employeeName = params.name || `AI ${params.role || 'Assistant'}`;
+            const employeeRole = params.role || 'General Assistant';
+            const employeeDepartment = params.department || 'General';
+            
+            const { data: employeeData, error: employeeError } = await supabase
+              .from('ai_employees')
+              .insert({
+                user_id: userId,
+                name: employeeName,
+                role: employeeRole,
+                department: employeeDepartment,
+                personality: `Created via chat. Specializes in ${employeeRole.toLowerCase()} tasks.`,
+                expertise: [employeeRole, employeeDepartment],
+                status: 'active'
+              })
+              .select()
+              .single();
+            
+            if (employeeError) {
+              commandResult = { type: 'employee', success: false, message: employeeError.message };
+            } else {
+              commandResult = { type: 'employee', success: true, data: employeeData, message: `Created AI employee "${employeeName}" as ${employeeRole} in ${employeeDepartment}` };
+            }
+            break;
 
-        case 'list_workflows':
-          const { data: userWorkflows } = await supabase
-            .from('ai_workflows')
-            .select('id, name, status, run_count, created_at')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(10);
-          
-          commandResult = { type: 'info', success: true, data: userWorkflows, message: 'workflows_list' };
-          break;
+          case 'list_workflows':
+            const { data: userWorkflows } = await supabase
+              .from('ai_workflows')
+              .select('id, name, status, run_count, created_at')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false })
+              .limit(10);
+            
+            commandResult = { type: 'info', success: true, data: userWorkflows, message: 'workflows_list' };
+            break;
 
-        case 'list_employees':
-          const { data: userEmployees } = await supabase
-            .from('ai_employees')
-            .select('id, name, role, department, status')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-          
-          commandResult = { type: 'info', success: true, data: userEmployees, message: 'employees_list' };
-          break;
+          case 'list_employees':
+            const { data: userEmployees } = await supabase
+              .from('ai_employees')
+              .select('id, name, role, department, status')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false });
+            
+            commandResult = { type: 'info', success: true, data: userEmployees, message: 'employees_list' };
+            break;
 
-        case 'visualize_data':
-          // Get metrics for visualization
-          const { data: metricsData } = await supabase
-            .from('business_metrics')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(20);
-          
-          commandResult = { type: 'data', success: true, data: metricsData };
-          break;
+          case 'visualize_data':
+            // Get metrics for visualization
+            const { data: metricsData } = await supabase
+              .from('business_metrics')
+              .select('*')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false })
+              .limit(20);
+            
+            commandResult = { type: 'data', success: true, data: metricsData };
+            break;
 
-        case 'list_connections':
-          // Get all API connections for the user
-          const { data: connections } = await supabase
-            .from('api_connections')
-            .select('id, name, provider, status, last_sync_at, api_endpoint')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-          
-          commandResult = { 
-            type: 'connections', 
-            success: true, 
-            data: connections || [], 
-            message: 'connections_list' 
+          case 'list_connections':
+            // Get all API connections for the user
+            const { data: connections } = await supabase
+              .from('api_connections')
+              .select('id, name, provider, status, last_sync_at, api_endpoint')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false });
+            
+            commandResult = { 
+              type: 'connections', 
+              success: true, 
+              data: connections || [], 
+              message: 'connections_list' 
+            };
+            break;
+
+          case 'list_documents':
+            // Get all uploaded documents/business plans
+            const { data: documents } = await supabase
+              .from('business_plans')
+              .select('id, title, description, created_at, updated_at')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false });
+            
+            // Get website analyses too
+            const { data: websites } = await supabase
+              .from('website_analyses')
+              .select('id, website_url, created_at')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false });
+            
+            commandResult = { 
+              type: 'documents', 
+              success: true, 
+              data: { documents: documents || [], websites: websites || [] }, 
+              message: 'documents_list' 
+            };
+            break;
+
+          case 'data_overview':
+            // Comprehensive data overview
+            const [
+              { data: overviewConnections },
+              { data: overviewDocs },
+              { data: overviewWebsites },
+              { data: overviewMetrics },
+              { data: overviewWorkflows },
+              { data: overviewEmployees }
+            ] = await Promise.all([
+              supabase.from('api_connections').select('id, name, provider, status').eq('user_id', userId),
+              supabase.from('business_plans').select('id, title, description').eq('user_id', userId),
+              supabase.from('website_analyses').select('id, website_url, analysis_content').eq('user_id', userId),
+              supabase.from('business_metrics').select('metric_name, value, change_percentage, period').eq('user_id', userId).limit(20),
+              supabase.from('ai_workflows').select('id, name, status, run_count').eq('user_id', userId),
+              supabase.from('ai_employees').select('id, name, role, department').eq('user_id', userId)
+            ]);
+            
+            commandResult = { 
+              type: 'data_overview', 
+              success: true, 
+              data: {
+                connections: overviewConnections || [],
+                documents: overviewDocs || [],
+                websites: overviewWebsites || [],
+                metrics: overviewMetrics || [],
+                workflows: overviewWorkflows || [],
+                employees: overviewEmployees || []
+              }, 
+              message: 'data_overview'
           };
           break;
-
-        case 'list_documents':
-          // Get all uploaded documents/business plans
-          const { data: documents } = await supabase
-            .from('business_plans')
-            .select('id, title, description, created_at, updated_at')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-          
-          // Get website analyses too
-          const { data: websites } = await supabase
-            .from('website_analyses')
-            .select('id, website_url, created_at')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-          
-          commandResult = { 
-            type: 'documents', 
-            success: true, 
-            data: { documents: documents || [], websites: websites || [] }, 
-            message: 'documents_list' 
-          };
-          break;
-
-        case 'data_overview':
-          // Comprehensive data overview
-          const [
-            { data: overviewConnections },
-            { data: overviewDocs },
-            { data: overviewWebsites },
-            { data: overviewMetrics },
-            { data: overviewWorkflows },
-            { data: overviewEmployees }
-          ] = await Promise.all([
-            supabase.from('api_connections').select('id, name, provider, status').eq('user_id', user.id),
-            supabase.from('business_plans').select('id, title, description').eq('user_id', user.id),
-            supabase.from('website_analyses').select('id, website_url, analysis_content').eq('user_id', user.id),
-            supabase.from('business_metrics').select('metric_name, value, change_percentage, period').eq('user_id', user.id).limit(20),
-            supabase.from('ai_workflows').select('id, name, status, run_count').eq('user_id', user.id),
-            supabase.from('ai_employees').select('id, name, role, department').eq('user_id', user.id)
-          ]);
-          
-          commandResult = { 
-            type: 'data_overview', 
-            success: true, 
-            data: {
-              connections: overviewConnections || [],
-              documents: overviewDocs || [],
-              websites: overviewWebsites || [],
-              metrics: overviewMetrics || [],
-              workflows: overviewWorkflows || [],
-              employees: overviewEmployees || []
-            }, 
-            message: 'data_overview' 
-          };
-          break;
+        }
       }
     }
 
