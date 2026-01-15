@@ -43,18 +43,96 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
   // Create AI employee patterns
   if (lowerMessage.includes('create employee') || lowerMessage.includes('add employee') ||
       lowerMessage.includes('hire') || lowerMessage.includes('new ai employee') ||
-      lowerMessage.includes('create an ai') || lowerMessage.includes('add an ai')) {
-    const roleMatch = message.match(/(?:as a|role of|position of)\s+["']?([^"'\n,]+)["']?/i);
-    const nameMatch = message.match(/(?:called|named)\s+["']?([^"'\n,]+)["']?/i);
+      lowerMessage.includes('create an ai') || lowerMessage.includes('add an ai') ||
+      lowerMessage.includes('create ai') || lowerMessage.includes('add ai')) {
+    
+    // Multiple patterns to extract the role - ordered by specificity
+    let role = null;
+    let name = null;
+    let department = null;
+    
+    // Pattern: "hire a [role]" or "hire an [role]"
+    const hireMatch = message.match(/hire\s+(?:a|an)\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$))/i);
+    if (hireMatch) role = hireMatch[1].trim();
+    
+    // Pattern: "create an AI [role]" or "create AI [role]"
+    if (!role) {
+      const createAIMatch = message.match(/create\s+(?:an?\s+)?ai\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$)|$)/i);
+      if (createAIMatch) role = createAIMatch[1].trim();
+    }
+    
+    // Pattern: "add an AI [role]" or "add AI [role]"
+    if (!role) {
+      const addAIMatch = message.match(/add\s+(?:an?\s+)?ai\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$)|$)/i);
+      if (addAIMatch) role = addAIMatch[1].trim();
+    }
+    
+    // Pattern: "as a [role]" or "role of [role]"
+    if (!role) {
+      const roleMatch = message.match(/(?:as\s+(?:a|an)|role\s+of|position\s+of)\s+["']?([^"'\n,]+?)["']?/i);
+      if (roleMatch) role = roleMatch[1].trim();
+    }
+    
+    // Pattern: "new ai employee [role]"
+    if (!role) {
+      const newEmployeeMatch = message.match(/new\s+ai\s+employee\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$)|$)/i);
+      if (newEmployeeMatch) role = newEmployeeMatch[1].trim();
+    }
+    
+    // Pattern: "create employee [role]" / "add employee [role]"
+    if (!role) {
+      const employeeMatch = message.match(/(?:create|add)\s+employee\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$)|$)/i);
+      if (employeeMatch) role = employeeMatch[1].trim();
+    }
+    
+    // Clean up role - remove trailing words like "employee", "ai", etc.
+    if (role) {
+      role = role.replace(/\s+(employee|ai|assistant)$/i, '').trim();
+      // Capitalize first letter of each word
+      role = role.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+    }
+    
+    // Extract name if specified
+    const nameMatch = message.match(/(?:called|named)\s+["']?([^"'\n,]+?)["']?(?:\s|$)/i);
+    if (nameMatch) name = nameMatch[1].trim();
+    
+    // Extract department if specified
     const departmentMatch = message.match(/(?:in|for)\s+(?:the\s+)?["']?(\w+)["']?\s+(?:department|team)/i);
+    if (departmentMatch) department = departmentMatch[1].trim();
+    
+    // Also try to infer department from role
+    if (!department && role) {
+      const roleLower = role.toLowerCase();
+      if (roleLower.includes('market') || roleLower.includes('sales') || roleLower.includes('growth')) {
+        department = 'Marketing';
+      } else if (roleLower.includes('financ') || roleLower.includes('account') || roleLower.includes('budget')) {
+        department = 'Finance';
+      } else if (roleLower.includes('engineer') || roleLower.includes('develop') || roleLower.includes('tech')) {
+        department = 'Engineering';
+      } else if (roleLower.includes('hr') || roleLower.includes('human') || roleLower.includes('recruit')) {
+        department = 'Human Resources';
+      } else if (roleLower.includes('operation') || roleLower.includes('ops')) {
+        department = 'Operations';
+      } else if (roleLower.includes('strateg') || roleLower.includes('analyst') || roleLower.includes('research')) {
+        department = 'Strategy';
+      } else if (roleLower.includes('customer') || roleLower.includes('support') || roleLower.includes('service')) {
+        department = 'Customer Success';
+      } else if (roleLower.includes('legal') || roleLower.includes('compliance')) {
+        department = 'Legal';
+      } else if (roleLower.includes('product')) {
+        department = 'Product';
+      } else if (roleLower.includes('design') || roleLower.includes('creative') || roleLower.includes('ux')) {
+        department = 'Design';
+      }
+    }
     
     return {
       isCommand: true,
       commandType: 'create_employee',
       params: {
-        name: nameMatch?.[1]?.trim(),
-        role: roleMatch?.[1]?.trim(),
-        department: departmentMatch?.[1]?.trim()
+        name: name,
+        role: role,
+        department: department
       }
     };
   }
