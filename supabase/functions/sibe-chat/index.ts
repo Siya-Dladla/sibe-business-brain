@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface CommandResult {
-  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'info' | 'connections' | 'documents' | 'data_overview';
+  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'info' | 'connections' | 'documents' | 'data_overview' | 'edit_employee';
   success: boolean;
   data?: any;
   message?: string;
@@ -137,6 +137,85 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
     };
   }
   
+  // Edit AI employee patterns
+  if (lowerMessage.includes('edit employee') || lowerMessage.includes('update employee') ||
+      lowerMessage.includes('change employee') || lowerMessage.includes('modify employee') ||
+      lowerMessage.includes('rename employee') || lowerMessage.includes('edit ai employee') ||
+      lowerMessage.includes('update ai employee') || lowerMessage.includes('change ai employee') ||
+      (lowerMessage.includes('change') && lowerMessage.includes('role')) ||
+      (lowerMessage.includes('move') && lowerMessage.includes('department'))) {
+    
+    // Extract the employee name to edit
+    let employeeName = null;
+    let newName = null;
+    let newRole = null;
+    let newDepartment = null;
+    
+    // Pattern: "edit employee [name]" or "update [name] employee"
+    const employeeNameMatch = message.match(/(?:edit|update|change|modify)\s+(?:ai\s+)?employee\s+["']?([^"'\n,]+?)["']?(?:\s+(?:to|as|role|name|department)|$)/i) ||
+                              message.match(/(?:edit|update|change|modify)\s+["']?([^"'\n,]+?)["']?\s+(?:ai\s+)?employee/i);
+    if (employeeNameMatch) employeeName = employeeNameMatch[1].trim();
+    
+    // Pattern: "rename [name] to [new name]"
+    const renameMatch = message.match(/rename\s+(?:employee\s+)?["']?([^"'\n,]+?)["']?\s+to\s+["']?([^"'\n,]+?)["']?/i);
+    if (renameMatch) {
+      employeeName = renameMatch[1].trim();
+      newName = renameMatch[2].trim();
+    }
+    
+    // Pattern: "change [name]'s name to [new name]"
+    const nameChangeMatch = message.match(/change\s+["']?([^"'\n,]+?)["']?(?:'s)?\s+name\s+to\s+["']?([^"'\n,]+?)["']?/i);
+    if (nameChangeMatch) {
+      employeeName = nameChangeMatch[1].trim();
+      newName = nameChangeMatch[2].trim();
+    }
+    
+    // Pattern: "change [name]'s role to [role]"
+    const roleChangeMatch = message.match(/change\s+["']?([^"'\n,]+?)["']?(?:'s)?\s+role\s+to\s+["']?([^"'\n,]+?)["']?/i);
+    if (roleChangeMatch) {
+      employeeName = roleChangeMatch[1].trim();
+      newRole = roleChangeMatch[2].trim();
+    }
+    
+    // Pattern: "move [name] to [department]"
+    const deptMoveMatch = message.match(/move\s+["']?([^"'\n,]+?)["']?\s+to\s+(?:the\s+)?["']?([^"'\n,]+?)["']?\s*(?:department|team)?/i);
+    if (deptMoveMatch) {
+      employeeName = deptMoveMatch[1].trim();
+      newDepartment = deptMoveMatch[2].trim();
+    }
+    
+    // Pattern: "change [name]'s department to [department]"
+    const deptChangeMatch = message.match(/change\s+["']?([^"'\n,]+?)["']?(?:'s)?\s+department\s+to\s+["']?([^"'\n,]+?)["']?/i);
+    if (deptChangeMatch) {
+      employeeName = deptChangeMatch[1].trim();
+      newDepartment = deptChangeMatch[2].trim();
+    }
+    
+    // Generic update patterns: "update [name] role to [role]"
+    const genericRoleMatch = message.match(/(?:update|set)\s+["']?([^"'\n,]+?)["']?\s+role\s+(?:to|as)\s+["']?([^"'\n,]+?)["']?/i);
+    if (genericRoleMatch) {
+      employeeName = genericRoleMatch[1].trim();
+      newRole = genericRoleMatch[2].trim();
+    }
+    
+    // Pattern: "to [role]" if role not already set
+    if (!newRole && !newName && !newDepartment) {
+      const toMatch = message.match(/\bto\s+(?:a\s+)?["']?([^"'\n,]+?)["']?$/i);
+      if (toMatch) newRole = toMatch[1].trim();
+    }
+    
+    return {
+      isCommand: true,
+      commandType: 'edit_employee',
+      params: {
+        employeeName,
+        newName,
+        newRole,
+        newDepartment
+      }
+    };
+  }
+
   // Check connected APIs / data sources patterns
   if (lowerMessage.includes('connected api') || lowerMessage.includes('api connection') ||
       lowerMessage.includes('data source') || lowerMessage.includes('data feed') ||
@@ -252,7 +331,7 @@ serve(async (req) => {
     // Execute commands if detected (some require authentication)
     if (isCommand) {
       // Commands that require authentication
-      const authRequiredCommands = ['create_workflow', 'delete_workflow', 'create_employee', 'list_workflows', 'list_employees', 'visualize_data', 'list_connections', 'list_documents', 'data_overview'];
+      const authRequiredCommands = ['create_workflow', 'delete_workflow', 'create_employee', 'edit_employee', 'list_workflows', 'list_employees', 'visualize_data', 'list_connections', 'list_documents', 'data_overview'];
       
       if (authRequiredCommands.includes(commandType) && !isAuthenticated) {
         commandResult = { 
@@ -333,6 +412,63 @@ serve(async (req) => {
               commandResult = { type: 'employee', success: false, message: employeeError.message };
             } else {
               commandResult = { type: 'employee', success: true, data: employeeData, message: `Created AI employee "${employeeName}" as ${employeeRole} in ${employeeDepartment}` };
+            }
+            break;
+
+          case 'edit_employee':
+            if (params.employeeName) {
+              // Find the employee by name (fuzzy match)
+              const { data: matchingEmployees } = await supabase
+                .from('ai_employees')
+                .select('id, name, role, department')
+                .eq('user_id', userId)
+                .ilike('name', `%${params.employeeName}%`);
+              
+              if (matchingEmployees && matchingEmployees.length > 0) {
+                const targetEmployee = matchingEmployees[0];
+                const updateData: any = {};
+                
+                if (params.newName) updateData.name = params.newName;
+                if (params.newRole) {
+                  updateData.role = params.newRole;
+                  updateData.personality = `Specializes in ${params.newRole.toLowerCase()} tasks.`;
+                  updateData.expertise = [params.newRole, params.newDepartment || targetEmployee.department];
+                }
+                if (params.newDepartment) updateData.department = params.newDepartment;
+                
+                if (Object.keys(updateData).length > 0) {
+                  updateData.updated_at = new Date().toISOString();
+                  
+                  const { data: updatedEmployee, error: updateError } = await supabase
+                    .from('ai_employees')
+                    .update(updateData)
+                    .eq('id', targetEmployee.id)
+                    .select()
+                    .single();
+                  
+                  if (updateError) {
+                    commandResult = { type: 'edit_employee', success: false, message: updateError.message };
+                  } else {
+                    let changeDesc = [];
+                    if (params.newName) changeDesc.push(`name to "${params.newName}"`);
+                    if (params.newRole) changeDesc.push(`role to "${params.newRole}"`);
+                    if (params.newDepartment) changeDesc.push(`department to "${params.newDepartment}"`);
+                    
+                    commandResult = { 
+                      type: 'edit_employee', 
+                      success: true, 
+                      data: updatedEmployee, 
+                      message: `Updated ${targetEmployee.name}: ${changeDesc.join(', ')}` 
+                    };
+                  }
+                } else {
+                  commandResult = { type: 'edit_employee', success: false, message: 'No changes specified. Please specify what to update (name, role, or department).' };
+                }
+              } else {
+                commandResult = { type: 'edit_employee', success: false, message: `No employee found matching "${params.employeeName}". Say "list my team" to see all employees.` };
+              }
+            } else {
+              commandResult = { type: 'edit_employee', success: false, message: 'Please specify the employee name to edit. For example: "edit employee Alex to Marketing Manager"' };
             }
             break;
 
@@ -451,12 +587,13 @@ serve(async (req) => {
     context += "=== YOUR CAPABILITIES ===\n";
     context += "1. Create workflows: User can say 'create workflow for...' or 'build workflow named...'\n";
     context += "2. Create AI employees: User can say 'hire a marketing manager' or 'create an AI accountant'\n";
-    context += "3. Delete workflows: User can say 'delete workflow [name]'\n";
-    context += "4. Visualize data: User can say 'show me revenue trends' or 'graph customer growth'\n";
-    context += "5. Check API connections: User can say 'show my connected APIs' or 'check data sources'\n";
-    context += "6. View documents: User can say 'show my documents' or 'what data have I uploaded'\n";
-    context += "7. Data overview: User can say 'show all my data' or 'give me a data overview'\n";
-    context += "8. List resources: User can say 'show my workflows' or 'list my team'\n\n";
+    context += "3. Edit AI employees: User can say 'edit employee [name] role to [new role]', 'rename employee [name] to [new name]', 'move [name] to [department]'\n";
+    context += "4. Delete workflows: User can say 'delete workflow [name]'\n";
+    context += "5. Visualize data: User can say 'show me revenue trends' or 'graph customer growth'\n";
+    context += "6. Check API connections: User can say 'show my connected APIs' or 'check data sources'\n";
+    context += "7. View documents: User can say 'show my documents' or 'what data have I uploaded'\n";
+    context += "8. Data overview: User can say 'show all my data' or 'give me a data overview'\n";
+    context += "9. List resources: User can say 'show my workflows' or 'list my team'\n\n";
 
     // Add command result to context
     if (commandResult) {
