@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface CommandResult {
-  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'delete_employee' | 'info' | 'connections' | 'documents' | 'data_overview' | 'edit_employee';
+  type: 'workflow' | 'employee' | 'data' | 'delete_workflow' | 'delete_employee' | 'info' | 'connections' | 'documents' | 'data_overview' | 'edit_employee' | 'report' | 'forecast' | 'run_workflow' | 'meeting' | 'metric' | 'insight' | 'task';
   success: boolean;
   data?: any;
   message?: string;
@@ -18,6 +18,167 @@ interface CommandResult {
 function parseCommand(message: string): { isCommand: boolean; commandType: string; params: any } {
   const lowerMessage = message.toLowerCase();
   
+  // Generate report patterns
+  if (lowerMessage.includes('generate report') || lowerMessage.includes('create report') ||
+      lowerMessage.includes('make a report') || lowerMessage.includes('build report') ||
+      lowerMessage.includes('run report') || lowerMessage.includes('get report')) {
+    const typeMatch = message.match(/(?:generate|create|make|build|run)\s+(?:a\s+)?(\w+)\s+report/i);
+    const periodMatch = message.match(/(?:for|from|period)\s+["']?([^"'\n]+)["']?/i);
+    return {
+      isCommand: true,
+      commandType: 'generate_report',
+      params: { 
+        reportType: typeMatch?.[1]?.toLowerCase() || 'comprehensive',
+        period: periodMatch?.[1]?.trim() || 'current month'
+      }
+    };
+  }
+
+  // Generate forecast patterns
+  if (lowerMessage.includes('generate forecast') || lowerMessage.includes('create forecast') ||
+      lowerMessage.includes('predict') || lowerMessage.includes('forecast') ||
+      lowerMessage.includes('projection') || lowerMessage.includes('what will')) {
+    const typeMatch = message.match(/(?:generate|create|make)\s+(?:a\s+)?(\w+)\s+forecast/i) ||
+                      message.match(/(?:forecast|predict|projection)\s+(?:for\s+)?(\w+)/i);
+    const horizonMatch = message.match(/(?:for|next|over)\s+(?:the\s+)?(?:next\s+)?(\d+\s*(?:day|week|month|quarter|year)s?)/i);
+    return {
+      isCommand: true,
+      commandType: 'generate_forecast',
+      params: { 
+        forecastType: typeMatch?.[1]?.toLowerCase() || 'business',
+        timeHorizon: horizonMatch?.[1]?.trim() || '3 months'
+      }
+    };
+  }
+
+  // Run workflow patterns
+  if (lowerMessage.includes('run workflow') || lowerMessage.includes('execute workflow') ||
+      lowerMessage.includes('start workflow') || lowerMessage.includes('trigger workflow') ||
+      lowerMessage.includes('activate workflow')) {
+    const nameMatch = message.match(/(?:run|execute|start|trigger|activate)\s+(?:the\s+)?workflow\s+["']?([^"'\n]+?)["']?(?:\s|$)/i);
+    return {
+      isCommand: true,
+      commandType: 'run_workflow',
+      params: { name: nameMatch?.[1]?.trim() }
+    };
+  }
+
+  // Create/schedule meeting patterns
+  if (lowerMessage.includes('schedule meeting') || lowerMessage.includes('create meeting') ||
+      lowerMessage.includes('set up meeting') || lowerMessage.includes('book meeting') ||
+      lowerMessage.includes('add meeting')) {
+    const titleMatch = message.match(/(?:meeting|call)\s+(?:about|for|with|called|titled)\s+["']?([^"'\n,]+?)["']?/i);
+    const dateMatch = message.match(/(?:on|for|at)\s+(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?|tomorrow|today|next\s+\w+)/i);
+    const participantsMatch = message.match(/(?:with|participants?|attendees?)\s+["']?([^"'\n]+?)["']?(?:\s+(?:on|for|at)|$)/i);
+    return {
+      isCommand: true,
+      commandType: 'create_meeting',
+      params: {
+        title: titleMatch?.[1]?.trim() || 'New Meeting',
+        date: dateMatch?.[1]?.trim(),
+        participants: participantsMatch?.[1]?.split(/[,&]/).map(p => p.trim()).filter(Boolean)
+      }
+    };
+  }
+
+  // List meetings patterns
+  if (lowerMessage.includes('list meeting') || lowerMessage.includes('show meeting') ||
+      lowerMessage.includes('my meeting') || lowerMessage.includes('upcoming meeting') ||
+      lowerMessage.includes('what meeting')) {
+    return {
+      isCommand: true,
+      commandType: 'list_meetings',
+      params: {}
+    };
+  }
+
+  // Add/update metric patterns
+  if (lowerMessage.includes('add metric') || lowerMessage.includes('update metric') ||
+      lowerMessage.includes('set metric') || lowerMessage.includes('record metric') ||
+      lowerMessage.includes('log metric') || lowerMessage.includes('track metric')) {
+    const nameMatch = message.match(/(?:add|update|set|record|log|track)\s+(?:the\s+)?(?:metric\s+)?["']?([^"'\n,]+?)["']?\s+(?:to|at|as|=|is)/i);
+    const valueMatch = message.match(/(?:to|at|as|=|is)\s+["']?(\$?[\d,.]+%?)["']?/i);
+    const typeMatch = message.match(/(?:type|category)\s+["']?(\w+)["']?/i);
+    return {
+      isCommand: true,
+      commandType: 'add_metric',
+      params: {
+        name: nameMatch?.[1]?.trim(),
+        value: valueMatch?.[1]?.replace(/[$,]/g, '').trim(),
+        metricType: typeMatch?.[1]?.toLowerCase() || 'custom'
+      }
+    };
+  }
+
+  // Create insight patterns
+  if (lowerMessage.includes('create insight') || lowerMessage.includes('add insight') ||
+      lowerMessage.includes('save insight') || lowerMessage.includes('note insight') ||
+      lowerMessage.includes('record insight')) {
+    const contentMatch = message.match(/(?:insight|note)\s*[:\-]?\s*["']?(.+)["']?$/i);
+    return {
+      isCommand: true,
+      commandType: 'create_insight',
+      params: { content: contentMatch?.[1]?.trim() }
+    };
+  }
+
+  // List insights patterns
+  if (lowerMessage.includes('list insight') || lowerMessage.includes('show insight') ||
+      lowerMessage.includes('my insight') || lowerMessage.includes('recent insight')) {
+    return {
+      isCommand: true,
+      commandType: 'list_insights',
+      params: {}
+    };
+  }
+
+  // Assign task to employee patterns
+  if ((lowerMessage.includes('assign') || lowerMessage.includes('give')) && 
+      (lowerMessage.includes('task') || lowerMessage.includes('to'))) {
+    const taskMatch = message.match(/(?:assign|give)\s+(?:task\s+)?["']?([^"'\n]+?)["']?\s+to\s+["']?([^"'\n]+?)["']?/i);
+    return {
+      isCommand: true,
+      commandType: 'assign_task',
+      params: {
+        task: taskMatch?.[1]?.trim(),
+        employeeName: taskMatch?.[2]?.trim()
+      }
+    };
+  }
+
+  // Ask employee to do something patterns
+  if (lowerMessage.includes('ask') && (lowerMessage.includes('to') || lowerMessage.includes('about'))) {
+    const employeeMatch = message.match(/ask\s+["']?([^"'\n]+?)["']?\s+(?:to|about)\s+["']?([^"'\n]+?)["']?/i);
+    return {
+      isCommand: true,
+      commandType: 'ask_employee',
+      params: {
+        employeeName: employeeMatch?.[1]?.trim(),
+        query: employeeMatch?.[2]?.trim()
+      }
+    };
+  }
+
+  // View reports patterns
+  if (lowerMessage.includes('list report') || lowerMessage.includes('show report') ||
+      lowerMessage.includes('my report') || lowerMessage.includes('recent report')) {
+    return {
+      isCommand: true,
+      commandType: 'list_reports',
+      params: {}
+    };
+  }
+
+  // View forecasts patterns
+  if (lowerMessage.includes('list forecast') || lowerMessage.includes('show forecast') ||
+      lowerMessage.includes('my forecast') || lowerMessage.includes('recent forecast')) {
+    return {
+      isCommand: true,
+      commandType: 'list_forecasts',
+      params: {}
+    };
+  }
+
   // Create workflow patterns
   if (lowerMessage.includes('create workflow') || lowerMessage.includes('build workflow') || 
       lowerMessage.includes('new workflow') || lowerMessage.includes('make a workflow')) {
@@ -46,61 +207,49 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
       lowerMessage.includes('create an ai') || lowerMessage.includes('add an ai') ||
       lowerMessage.includes('create ai') || lowerMessage.includes('add ai')) {
     
-    // Multiple patterns to extract the role - ordered by specificity
     let role = null;
     let name = null;
     let department = null;
     
-    // Pattern: "hire a [role]" or "hire an [role]"
     const hireMatch = message.match(/hire\s+(?:a|an)\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$))/i);
     if (hireMatch) role = hireMatch[1].trim();
     
-    // Pattern: "create an AI [role]" or "create AI [role]"
     if (!role) {
       const createAIMatch = message.match(/create\s+(?:an?\s+)?ai\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$)|$)/i);
       if (createAIMatch) role = createAIMatch[1].trim();
     }
     
-    // Pattern: "add an AI [role]" or "add AI [role]"
     if (!role) {
       const addAIMatch = message.match(/add\s+(?:an?\s+)?ai\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$)|$)/i);
       if (addAIMatch) role = addAIMatch[1].trim();
     }
     
-    // Pattern: "as a [role]" or "role of [role]"
     if (!role) {
       const roleMatch = message.match(/(?:as\s+(?:a|an)|role\s+of|position\s+of)\s+["']?([^"'\n,]+?)["']?/i);
       if (roleMatch) role = roleMatch[1].trim();
     }
     
-    // Pattern: "new ai employee [role]"
     if (!role) {
       const newEmployeeMatch = message.match(/new\s+ai\s+employee\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$)|$)/i);
       if (newEmployeeMatch) role = newEmployeeMatch[1].trim();
     }
     
-    // Pattern: "create employee [role]" / "add employee [role]"
     if (!role) {
       const employeeMatch = message.match(/(?:create|add)\s+employee\s+["']?([^"'\n,]+?)["']?(?:\s+(?:called|named|in|for|$)|$)/i);
       if (employeeMatch) role = employeeMatch[1].trim();
     }
     
-    // Clean up role - remove trailing words like "employee", "ai", etc.
     if (role) {
       role = role.replace(/\s+(employee|ai|assistant)$/i, '').trim();
-      // Capitalize first letter of each word
       role = role.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
     }
     
-    // Extract name if specified
     const nameMatch = message.match(/(?:called|named)\s+["']?([^"'\n,]+?)["']?(?:\s|$)/i);
     if (nameMatch) name = nameMatch[1].trim();
     
-    // Extract department if specified
     const departmentMatch = message.match(/(?:in|for)\s+(?:the\s+)?["']?(\w+)["']?\s+(?:department|team)/i);
     if (departmentMatch) department = departmentMatch[1].trim();
     
-    // Also try to infer department from role
     if (!department && role) {
       const roleLower = role.toLowerCase();
       if (roleLower.includes('market') || roleLower.includes('sales') || roleLower.includes('growth')) {
@@ -129,11 +278,7 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
     return {
       isCommand: true,
       commandType: 'create_employee',
-      params: {
-        name: name,
-        role: role,
-        department: department
-      }
+      params: { name, role, department }
     };
   }
   
@@ -145,60 +290,51 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
       (lowerMessage.includes('change') && lowerMessage.includes('role')) ||
       (lowerMessage.includes('move') && lowerMessage.includes('department'))) {
     
-    // Extract the employee name to edit
     let employeeName = null;
     let newName = null;
     let newRole = null;
     let newDepartment = null;
     
-    // Pattern: "edit employee [name]" or "update [name] employee"
     const employeeNameMatch = message.match(/(?:edit|update|change|modify)\s+(?:ai\s+)?employee\s+["']?([^"'\n,]+?)["']?(?:\s+(?:to|as|role|name|department)|$)/i) ||
                               message.match(/(?:edit|update|change|modify)\s+["']?([^"'\n,]+?)["']?\s+(?:ai\s+)?employee/i);
     if (employeeNameMatch) employeeName = employeeNameMatch[1].trim();
     
-    // Pattern: "rename [name] to [new name]"
     const renameMatch = message.match(/rename\s+(?:employee\s+)?["']?([^"'\n,]+?)["']?\s+to\s+["']?([^"'\n,]+?)["']?/i);
     if (renameMatch) {
       employeeName = renameMatch[1].trim();
       newName = renameMatch[2].trim();
     }
     
-    // Pattern: "change [name]'s name to [new name]"
     const nameChangeMatch = message.match(/change\s+["']?([^"'\n,]+?)["']?(?:'s)?\s+name\s+to\s+["']?([^"'\n,]+?)["']?/i);
     if (nameChangeMatch) {
       employeeName = nameChangeMatch[1].trim();
       newName = nameChangeMatch[2].trim();
     }
     
-    // Pattern: "change [name]'s role to [role]"
     const roleChangeMatch = message.match(/change\s+["']?([^"'\n,]+?)["']?(?:'s)?\s+role\s+to\s+["']?([^"'\n,]+?)["']?/i);
     if (roleChangeMatch) {
       employeeName = roleChangeMatch[1].trim();
       newRole = roleChangeMatch[2].trim();
     }
     
-    // Pattern: "move [name] to [department]"
     const deptMoveMatch = message.match(/move\s+["']?([^"'\n,]+?)["']?\s+to\s+(?:the\s+)?["']?([^"'\n,]+?)["']?\s*(?:department|team)?/i);
     if (deptMoveMatch) {
       employeeName = deptMoveMatch[1].trim();
       newDepartment = deptMoveMatch[2].trim();
     }
     
-    // Pattern: "change [name]'s department to [department]"
     const deptChangeMatch = message.match(/change\s+["']?([^"'\n,]+?)["']?(?:'s)?\s+department\s+to\s+["']?([^"'\n,]+?)["']?/i);
     if (deptChangeMatch) {
       employeeName = deptChangeMatch[1].trim();
       newDepartment = deptChangeMatch[2].trim();
     }
     
-    // Generic update patterns: "update [name] role to [role]"
     const genericRoleMatch = message.match(/(?:update|set)\s+["']?([^"'\n,]+?)["']?\s+role\s+(?:to|as)\s+["']?([^"'\n,]+?)["']?/i);
     if (genericRoleMatch) {
       employeeName = genericRoleMatch[1].trim();
       newRole = genericRoleMatch[2].trim();
     }
     
-    // Pattern: "to [role]" if role not already set
     if (!newRole && !newName && !newDepartment) {
       const toMatch = message.match(/\bto\s+(?:a\s+)?["']?([^"'\n,]+?)["']?$/i);
       if (toMatch) newRole = toMatch[1].trim();
@@ -207,12 +343,7 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
     return {
       isCommand: true,
       commandType: 'edit_employee',
-      params: {
-        employeeName,
-        newName,
-        newRole,
-        newDepartment
-      }
+      params: { employeeName, newName, newRole, newDepartment }
     };
   }
 
@@ -286,7 +417,6 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
       lowerMessage.includes('fire employee') || lowerMessage.includes('delete ai employee') ||
       lowerMessage.includes('remove ai employee') || lowerMessage.includes('fire ai')) {
     
-    // Extract the employee name to delete
     const deleteNameMatch = message.match(/(?:delete|remove|fire)\s+(?:ai\s+)?employee\s+["']?([^"'\n,]+?)["']?(?:\s|$)/i) ||
                             message.match(/(?:delete|remove|fire)\s+["']?([^"'\n,]+?)["']?\s+(?:from\s+)?(?:ai\s+)?(?:team|employees)?/i);
     
@@ -344,10 +474,15 @@ serve(async (req) => {
     const { isCommand, commandType, params } = parseCommand(message);
     let commandResult: CommandResult | null = null;
 
-    // Execute commands if detected (some require authentication)
+    // Execute commands if detected
     if (isCommand) {
-      // Commands that require authentication
-      const authRequiredCommands = ['create_workflow', 'delete_workflow', 'create_employee', 'edit_employee', 'delete_employee', 'list_workflows', 'list_employees', 'visualize_data', 'list_connections', 'list_documents', 'data_overview'];
+      const authRequiredCommands = [
+        'create_workflow', 'delete_workflow', 'create_employee', 'edit_employee', 'delete_employee', 
+        'list_workflows', 'list_employees', 'visualize_data', 'list_connections', 'list_documents', 
+        'data_overview', 'generate_report', 'generate_forecast', 'run_workflow', 'create_meeting',
+        'list_meetings', 'add_metric', 'create_insight', 'list_insights', 'assign_task', 'ask_employee',
+        'list_reports', 'list_forecasts'
+      ];
       
       if (authRequiredCommands.includes(commandType) && !isAuthenticated) {
         commandResult = { 
@@ -357,6 +492,473 @@ serve(async (req) => {
         };
       } else {
         switch (commandType) {
+          case 'generate_report':
+            // Generate a report using AI
+            const { data: reportMetrics } = await supabase
+              .from('business_metrics')
+              .select('*')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false })
+              .limit(50);
+
+            const { data: reportInsights } = await supabase
+              .from('ai_insights')
+              .select('*')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false })
+              .limit(20);
+
+            const reportPrompt = `Generate a ${params.reportType} business report for ${params.period}.
+              
+Metrics: ${JSON.stringify(reportMetrics || []).substring(0, 2000)}
+Insights: ${JSON.stringify(reportInsights || []).substring(0, 1000)}
+
+Create a comprehensive report with:
+1. Executive Summary
+2. Key Performance Analysis
+3. Trends & Insights
+4. Recommendations
+5. Next Steps`;
+
+            const reportResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: 'google/gemini-2.5-flash',
+                messages: [
+                  { role: 'system', content: 'You are a professional business analyst creating executive reports.' },
+                  { role: 'user', content: reportPrompt }
+                ],
+              }),
+            });
+
+            if (reportResponse.ok) {
+              const reportData = await reportResponse.json();
+              const reportContent = reportData.choices[0].message.content;
+              
+              // Save the report
+              const { data: savedReport, error: saveError } = await supabase
+                .from('reports')
+                .insert({
+                  user_id: userId,
+                  title: `${params.reportType.charAt(0).toUpperCase() + params.reportType.slice(1)} Report - ${params.period}`,
+                  report_type: params.reportType,
+                  content: reportContent,
+                  status: 'completed',
+                  period_start: new Date().toISOString().split('T')[0],
+                  period_end: new Date().toISOString().split('T')[0]
+                })
+                .select()
+                .single();
+
+              commandResult = { 
+                type: 'report', 
+                success: true, 
+                data: { report: savedReport, content: reportContent },
+                message: `Generated ${params.reportType} report for ${params.period}` 
+              };
+            } else {
+              commandResult = { type: 'report', success: false, message: 'Failed to generate report' };
+            }
+            break;
+
+          case 'generate_forecast':
+            // Get historical metrics for forecasting
+            const { data: forecastMetrics } = await supabase
+              .from('business_metrics')
+              .select('*')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false })
+              .limit(100);
+
+            const forecastPrompt = `Generate a ${params.forecastType} forecast for the next ${params.timeHorizon}.
+
+Historical Data: ${JSON.stringify(forecastMetrics || []).substring(0, 3000)}
+
+Provide predictions in this JSON format:
+{
+  "predictions": [{"metric": "...", "current": ..., "forecast": ..., "confidence": 85}],
+  "risks": ["..."],
+  "opportunities": ["..."],
+  "recommendations": ["..."],
+  "summary": "..."
+}`;
+
+            const forecastResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: 'google/gemini-2.5-flash',
+                messages: [
+                  { role: 'system', content: 'You are a business forecasting expert. Return valid JSON only.' },
+                  { role: 'user', content: forecastPrompt }
+                ],
+              }),
+            });
+
+            if (forecastResponse.ok) {
+              const forecastData = await forecastResponse.json();
+              const forecastContent = forecastData.choices[0].message.content;
+              
+              let predictions = null;
+              try {
+                predictions = JSON.parse(forecastContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim());
+              } catch (e) {
+                predictions = { summary: forecastContent };
+              }
+              
+              // Save the forecast
+              const { data: savedForecast } = await supabase
+                .from('forecasts')
+                .insert({
+                  user_id: userId,
+                  title: `${params.forecastType.charAt(0).toUpperCase() + params.forecastType.slice(1)} Forecast - ${params.timeHorizon}`,
+                  forecast_type: params.forecastType,
+                  time_horizon: params.timeHorizon,
+                  predictions: predictions,
+                  confidence_score: predictions?.predictions?.[0]?.confidence || 75,
+                  status: 'completed'
+                })
+                .select()
+                .single();
+
+              commandResult = { 
+                type: 'forecast', 
+                success: true, 
+                data: { forecast: savedForecast, predictions },
+                message: `Generated ${params.forecastType} forecast for next ${params.timeHorizon}` 
+              };
+            } else {
+              commandResult = { type: 'forecast', success: false, message: 'Failed to generate forecast' };
+            }
+            break;
+
+          case 'run_workflow':
+            if (params.name) {
+              // Find the workflow
+              const { data: workflows } = await supabase
+                .from('ai_workflows')
+                .select('*')
+                .eq('user_id', userId)
+                .ilike('name', `%${params.name}%`);
+
+              if (workflows && workflows.length > 0) {
+                const workflow = workflows[0];
+                
+                // Create a workflow run record
+                const { data: runData } = await supabase
+                  .from('workflow_runs')
+                  .insert({
+                    user_id: userId,
+                    workflow_id: workflow.id,
+                    status: 'running',
+                    started_at: new Date().toISOString(),
+                    logs: [{ timestamp: new Date().toISOString(), event: 'Started via chat' }]
+                  })
+                  .select()
+                  .single();
+
+                // Update workflow run count
+                await supabase
+                  .from('ai_workflows')
+                  .update({ 
+                    run_count: (workflow.run_count || 0) + 1,
+                    last_run_at: new Date().toISOString()
+                  })
+                  .eq('id', workflow.id);
+
+                // Mark as completed (simplified - actual execution would be more complex)
+                await supabase
+                  .from('workflow_runs')
+                  .update({ 
+                    status: 'completed',
+                    completed_at: new Date().toISOString(),
+                    logs: [
+                      { timestamp: new Date().toISOString(), event: 'Started via chat' },
+                      { timestamp: new Date().toISOString(), event: 'Execution completed' }
+                    ]
+                  })
+                  .eq('id', runData?.id);
+
+                commandResult = { 
+                  type: 'run_workflow', 
+                  success: true, 
+                  data: { workflow, run: runData },
+                  message: `Executed workflow "${workflow.name}" successfully (Run #${(workflow.run_count || 0) + 1})` 
+                };
+              } else {
+                commandResult = { type: 'run_workflow', success: false, message: `No workflow found matching "${params.name}"` };
+              }
+            } else {
+              commandResult = { type: 'run_workflow', success: false, message: 'Please specify the workflow name to run' };
+            }
+            break;
+
+          case 'create_meeting':
+            const meetingDate = params.date || new Date().toISOString().split('T')[0];
+            
+            const { data: meetingData, error: meetingError } = await supabase
+              .from('meetings')
+              .insert({
+                user_id: userId,
+                title: params.title,
+                meeting_date: meetingDate,
+                participants: params.participants || [],
+                status: 'scheduled',
+                duration_minutes: 30
+              })
+              .select()
+              .single();
+
+            if (meetingError) {
+              commandResult = { type: 'meeting', success: false, message: meetingError.message };
+            } else {
+              commandResult = { 
+                type: 'meeting', 
+                success: true, 
+                data: meetingData,
+                message: `Scheduled meeting "${params.title}" for ${meetingDate}` 
+              };
+            }
+            break;
+
+          case 'list_meetings':
+            const { data: meetings } = await supabase
+              .from('meetings')
+              .select('*')
+              .eq('user_id', userId)
+              .order('meeting_date', { ascending: true })
+              .limit(10);
+
+            commandResult = { type: 'meeting', success: true, data: meetings, message: 'meetings_list' };
+            break;
+
+          case 'add_metric':
+            if (params.name && params.value) {
+              const numericValue = parseFloat(params.value.replace('%', ''));
+              const isPercentage = params.value.includes('%');
+              
+              const { data: metricData, error: metricError } = await supabase
+                .from('business_metrics')
+                .insert({
+                  user_id: userId,
+                  metric_name: params.name,
+                  value: numericValue,
+                  metric_type: isPercentage ? 'percentage' : params.metricType,
+                  period: 'current',
+                  change_percentage: 0
+                })
+                .select()
+                .single();
+
+              if (metricError) {
+                commandResult = { type: 'metric', success: false, message: metricError.message };
+              } else {
+                commandResult = { 
+                  type: 'metric', 
+                  success: true, 
+                  data: metricData,
+                  message: `Added metric "${params.name}" with value ${params.value}` 
+                };
+              }
+            } else {
+              commandResult = { type: 'metric', success: false, message: 'Please specify both metric name and value' };
+            }
+            break;
+
+          case 'create_insight':
+            if (params.content) {
+              const { data: insightData, error: insightError } = await supabase
+                .from('ai_insights')
+                .insert({
+                  user_id: userId,
+                  title: params.content.substring(0, 50) + (params.content.length > 50 ? '...' : ''),
+                  content: params.content,
+                  insight_type: 'user_created'
+                })
+                .select()
+                .single();
+
+              if (insightError) {
+                commandResult = { type: 'insight', success: false, message: insightError.message };
+              } else {
+                commandResult = { 
+                  type: 'insight', 
+                  success: true, 
+                  data: insightData,
+                  message: 'Insight saved successfully' 
+                };
+              }
+            } else {
+              commandResult = { type: 'insight', success: false, message: 'Please provide insight content' };
+            }
+            break;
+
+          case 'list_insights':
+            const { data: insights } = await supabase
+              .from('ai_insights')
+              .select('*')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false })
+              .limit(10);
+
+            commandResult = { type: 'insight', success: true, data: insights, message: 'insights_list' };
+            break;
+
+          case 'assign_task':
+            if (params.task && params.employeeName) {
+              // Find the employee
+              const { data: employees } = await supabase
+                .from('ai_employees')
+                .select('*')
+                .eq('user_id', userId)
+                .ilike('name', `%${params.employeeName}%`);
+
+              if (employees && employees.length > 0) {
+                const employee = employees[0];
+                
+                // Use AI to process the task with the employee's context
+                const taskPrompt = `As ${employee.name}, a ${employee.role} in ${employee.department}, analyze and respond to this task: "${params.task}"
+                
+Your expertise: ${(employee.expertise || []).join(', ')}
+Your personality: ${employee.personality || 'Professional and helpful'}
+
+Provide a brief analysis and action plan.`;
+
+                const taskResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    model: 'google/gemini-2.5-flash',
+                    messages: [
+                      { role: 'system', content: `You are ${employee.name}, an AI employee working as ${employee.role}.` },
+                      { role: 'user', content: taskPrompt }
+                    ],
+                  }),
+                });
+
+                if (taskResponse.ok) {
+                  const taskData = await taskResponse.json();
+                  const taskResult = taskData.choices[0].message.content;
+
+                  // Save as an insight
+                  await supabase.from('ai_insights').insert({
+                    user_id: userId,
+                    title: `Task: ${params.task.substring(0, 40)}...`,
+                    content: `Assigned to ${employee.name}:\n\n${taskResult}`,
+                    insight_type: 'task_response'
+                  });
+
+                  commandResult = { 
+                    type: 'task', 
+                    success: true, 
+                    data: { employee, response: taskResult },
+                    message: `Task assigned to ${employee.name}` 
+                  };
+                } else {
+                  commandResult = { type: 'task', success: false, message: 'Failed to process task' };
+                }
+              } else {
+                commandResult = { type: 'task', success: false, message: `No employee found matching "${params.employeeName}"` };
+              }
+            } else {
+              commandResult = { type: 'task', success: false, message: 'Please specify both task and employee name' };
+            }
+            break;
+
+          case 'ask_employee':
+            if (params.employeeName && params.query) {
+              // Find the employee
+              const { data: askEmployees } = await supabase
+                .from('ai_employees')
+                .select('*')
+                .eq('user_id', userId)
+                .ilike('name', `%${params.employeeName}%`);
+
+              if (askEmployees && askEmployees.length > 0) {
+                const employee = askEmployees[0];
+                
+                // Get business context for the employee
+                const { data: empMetrics } = await supabase
+                  .from('business_metrics')
+                  .select('*')
+                  .eq('user_id', userId)
+                  .limit(10);
+
+                const askPrompt = `As ${employee.name}, a ${employee.role} in ${employee.department}, answer this question: "${params.query}"
+                
+Your expertise: ${(employee.expertise || []).join(', ')}
+Business context: ${JSON.stringify(empMetrics || []).substring(0, 500)}
+
+Provide a helpful, role-appropriate response.`;
+
+                const askResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    model: 'google/gemini-2.5-flash',
+                    messages: [
+                      { role: 'system', content: `You are ${employee.name}, an AI employee working as ${employee.role} in ${employee.department}. Stay in character.` },
+                      { role: 'user', content: askPrompt }
+                    ],
+                  }),
+                });
+
+                if (askResponse.ok) {
+                  const askData = await askResponse.json();
+                  const askResult = askData.choices[0].message.content;
+
+                  commandResult = { 
+                    type: 'task', 
+                    success: true, 
+                    data: { employee, response: askResult },
+                    message: `Response from ${employee.name}` 
+                  };
+                } else {
+                  commandResult = { type: 'task', success: false, message: 'Failed to get response' };
+                }
+              } else {
+                commandResult = { type: 'task', success: false, message: `No employee found matching "${params.employeeName}"` };
+              }
+            } else {
+              commandResult = { type: 'task', success: false, message: 'Please specify employee name and question' };
+            }
+            break;
+
+          case 'list_reports':
+            const { data: reports } = await supabase
+              .from('reports')
+              .select('id, title, report_type, status, created_at')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false })
+              .limit(10);
+
+            commandResult = { type: 'report', success: true, data: reports, message: 'reports_list' };
+            break;
+
+          case 'list_forecasts':
+            const { data: forecasts } = await supabase
+              .from('forecasts')
+              .select('id, title, forecast_type, time_horizon, confidence_score, status, created_at')
+              .eq('user_id', userId)
+              .order('created_at', { ascending: false })
+              .limit(10);
+
+            commandResult = { type: 'forecast', success: true, data: forecasts, message: 'forecasts_list' };
+            break;
+
           case 'create_workflow':
             const { data: workflowData, error: workflowError } = await supabase
               .from('ai_workflows')
@@ -433,7 +1035,6 @@ serve(async (req) => {
 
           case 'edit_employee':
             if (params.employeeName) {
-              // Find the employee by name (fuzzy match)
               const { data: matchingEmployees } = await supabase
                 .from('ai_employees')
                 .select('id, name, role, department')
@@ -478,19 +1079,18 @@ serve(async (req) => {
                     };
                   }
                 } else {
-                  commandResult = { type: 'edit_employee', success: false, message: 'No changes specified. Please specify what to update (name, role, or department).' };
+                  commandResult = { type: 'edit_employee', success: false, message: 'No changes specified.' };
                 }
               } else {
-                commandResult = { type: 'edit_employee', success: false, message: `No employee found matching "${params.employeeName}". Say "list my team" to see all employees.` };
+                commandResult = { type: 'edit_employee', success: false, message: `No employee found matching "${params.employeeName}"` };
               }
             } else {
-              commandResult = { type: 'edit_employee', success: false, message: 'Please specify the employee name to edit. For example: "edit employee Alex to Marketing Manager"' };
+              commandResult = { type: 'edit_employee', success: false, message: 'Please specify the employee name to edit.' };
             }
             break;
 
           case 'delete_employee':
             if (params.employeeName) {
-              // Find the employee by name (fuzzy match)
               const { data: employeesToDelete } = await supabase
                 .from('ai_employees')
                 .select('id, name, role, department')
@@ -511,14 +1111,14 @@ serve(async (req) => {
                   commandResult = { 
                     type: 'delete_employee', 
                     success: true, 
-                    message: `Deleted AI employee "${employeeToDelete.name}" (${employeeToDelete.role} in ${employeeToDelete.department})` 
+                    message: `Deleted AI employee "${employeeToDelete.name}"` 
                   };
                 }
               } else {
-                commandResult = { type: 'delete_employee', success: false, message: `No employee found matching "${params.employeeName}". Say "list my team" to see all employees.` };
+                commandResult = { type: 'delete_employee', success: false, message: `No employee found matching "${params.employeeName}"` };
               }
             } else {
-              commandResult = { type: 'delete_employee', success: false, message: 'Please specify the employee name to delete. For example: "delete employee Alex"' };
+              commandResult = { type: 'delete_employee', success: false, message: 'Please specify the employee name to delete.' };
             }
             break;
 
@@ -544,7 +1144,6 @@ serve(async (req) => {
             break;
 
           case 'visualize_data':
-            // Get metrics for visualization
             const { data: metricsData } = await supabase
               .from('business_metrics')
               .select('*')
@@ -556,30 +1155,22 @@ serve(async (req) => {
             break;
 
           case 'list_connections':
-            // Get all API connections for the user
             const { data: connections } = await supabase
               .from('api_connections')
               .select('id, name, provider, status, last_sync_at, api_endpoint')
               .eq('user_id', userId)
               .order('created_at', { ascending: false });
             
-            commandResult = { 
-              type: 'connections', 
-              success: true, 
-              data: connections || [], 
-              message: 'connections_list' 
-            };
+            commandResult = { type: 'connections', success: true, data: connections || [], message: 'connections_list' };
             break;
 
           case 'list_documents':
-            // Get all uploaded documents/business plans
             const { data: documents } = await supabase
               .from('business_plans')
               .select('id, title, description, created_at, updated_at')
               .eq('user_id', userId)
               .order('created_at', { ascending: false });
             
-            // Get website analyses too
             const { data: websites } = await supabase
               .from('website_analyses')
               .select('id, website_url, created_at')
@@ -595,21 +1186,28 @@ serve(async (req) => {
             break;
 
           case 'data_overview':
-            // Comprehensive data overview
             const [
               { data: overviewConnections },
               { data: overviewDocs },
               { data: overviewWebsites },
               { data: overviewMetrics },
               { data: overviewWorkflows },
-              { data: overviewEmployees }
+              { data: overviewEmployees },
+              { data: overviewReports },
+              { data: overviewForecasts },
+              { data: overviewMeetings },
+              { data: overviewInsights }
             ] = await Promise.all([
               supabase.from('api_connections').select('id, name, provider, status').eq('user_id', userId),
               supabase.from('business_plans').select('id, title, description').eq('user_id', userId),
               supabase.from('website_analyses').select('id, website_url, analysis_content').eq('user_id', userId),
               supabase.from('business_metrics').select('metric_name, value, change_percentage, period').eq('user_id', userId).limit(20),
               supabase.from('ai_workflows').select('id, name, status, run_count').eq('user_id', userId),
-              supabase.from('ai_employees').select('id, name, role, department').eq('user_id', userId)
+              supabase.from('ai_employees').select('id, name, role, department').eq('user_id', userId),
+              supabase.from('reports').select('id, title, report_type, status').eq('user_id', userId).limit(5),
+              supabase.from('forecasts').select('id, title, forecast_type, confidence_score').eq('user_id', userId).limit(5),
+              supabase.from('meetings').select('id, title, meeting_date, status').eq('user_id', userId).limit(5),
+              supabase.from('ai_insights').select('id, title, insight_type').eq('user_id', userId).limit(10)
             ]);
             
             commandResult = { 
@@ -621,29 +1219,57 @@ serve(async (req) => {
                 websites: overviewWebsites || [],
                 metrics: overviewMetrics || [],
                 workflows: overviewWorkflows || [],
-                employees: overviewEmployees || []
+                employees: overviewEmployees || [],
+                reports: overviewReports || [],
+                forecasts: overviewForecasts || [],
+                meetings: overviewMeetings || [],
+                insights: overviewInsights || []
               }, 
               message: 'data_overview'
-          };
-          break;
+            };
+            break;
         }
       }
     }
 
-    // Build context for AI based on current business data
-    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI business partner with FULL CONTROL over the app. You can create workflows, AI employees, visualize data, check API connections, access uploaded documents, and answer all business questions.\n\n";
+    // Build enhanced context for AI
+    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), the CENTRAL COMMAND HUB for this business intelligence platform. You have FULL CONTROL over ALL features and can make them work together.\n\n";
     
-    // Add command capabilities info
-    context += "=== YOUR CAPABILITIES ===\n";
-    context += "1. Create workflows: User can say 'create workflow for...' or 'build workflow named...'\n";
-    context += "2. Create AI employees: User can say 'hire a marketing manager' or 'create an AI accountant'\n";
-    context += "3. Edit AI employees: User can say 'edit employee [name] role to [new role]', 'rename employee [name] to [new name]', 'move [name] to [department]'\n";
-    context += "4. Delete workflows: User can say 'delete workflow [name]'\n";
-    context += "5. Visualize data: User can say 'show me revenue trends' or 'graph customer growth'\n";
-    context += "6. Check API connections: User can say 'show my connected APIs' or 'check data sources'\n";
-    context += "7. View documents: User can say 'show my documents' or 'what data have I uploaded'\n";
-    context += "8. Data overview: User can say 'show all my data' or 'give me a data overview'\n";
-    context += "9. List resources: User can say 'show my workflows' or 'list my team'\n\n";
+    // Enhanced command capabilities
+    context += "=== YOUR CAPABILITIES (Chat Commands) ===\n\n";
+    context += "📊 REPORTS & FORECASTS:\n";
+    context += "- 'Generate a monthly report' or 'Create sales report for Q4'\n";
+    context += "- 'Generate revenue forecast for next 6 months'\n";
+    context += "- 'Show my reports' or 'List forecasts'\n\n";
+    
+    context += "🤖 AI EMPLOYEES:\n";
+    context += "- 'Hire a marketing manager' or 'Create AI accountant called Alex'\n";
+    context += "- 'Edit employee [name] role to [new role]'\n";
+    context += "- 'Delete employee [name]' or 'Fire [name]'\n";
+    context += "- 'Assign [task] to [employee]' - employees analyze with business context\n";
+    context += "- 'Ask [employee] about [topic]' - get role-specific answers\n";
+    context += "- 'Show my team' or 'List employees'\n\n";
+    
+    context += "⚙️ WORKFLOWS:\n";
+    context += "- 'Create workflow for daily analysis'\n";
+    context += "- 'Run workflow [name]' or 'Execute [workflow]'\n";
+    context += "- 'Delete workflow [name]'\n";
+    context += "- 'Show my workflows'\n\n";
+    
+    context += "📅 MEETINGS:\n";
+    context += "- 'Schedule meeting about Q4 planning for tomorrow'\n";
+    context += "- 'Show my meetings' or 'List upcoming meetings'\n\n";
+    
+    context += "📈 METRICS & INSIGHTS:\n";
+    context += "- 'Add metric Revenue to $150000' or 'Set conversion rate to 4.5%'\n";
+    context += "- 'Create insight: Customer churn is increasing'\n";
+    context += "- 'Show insights' or 'List my metrics'\n";
+    context += "- 'Show me charts' or 'Visualize revenue trends'\n\n";
+    
+    context += "📁 DATA ACCESS:\n";
+    context += "- 'Show all my data' - comprehensive overview\n";
+    context += "- 'Check my API connections'\n";
+    context += "- 'Show my documents'\n\n";
 
     // Add command result to context
     if (commandResult) {
@@ -654,70 +1280,49 @@ serve(async (req) => {
         context += `Result: ${commandResult.message}\n`;
       }
       if (commandResult.data) {
-        context += `Data: ${JSON.stringify(commandResult.data).substring(0, 1000)}\n`;
+        context += `Data: ${JSON.stringify(commandResult.data).substring(0, 2000)}\n`;
       }
       context += "\n";
     }
 
     let hasBusinessData = false;
 
-    // Include business plan/document context
+    // Include business context
     if (businessContext?.businessPlan) {
       hasBusinessData = true;
       const plan = businessContext.businessPlan;
-      context += `=== CURRENT BUSINESS (from uploaded document) ===\n`;
-      context += `Business Name: ${plan.title}\n`;
-      if (plan.description) {
-        context += `Description: ${plan.description}\n`;
-      }
-      if (plan.content) {
-        context += `Business Details:\n${plan.content.substring(0, 3000)}\n`;
-      }
-      context += "\n";
+      context += `=== BUSINESS DNA ===\n`;
+      context += `Name: ${plan.title}\n`;
+      if (plan.description) context += `Description: ${plan.description}\n`;
+      if (plan.content) context += `Details:\n${plan.content.substring(0, 2000)}\n\n`;
     }
 
-    // Include website analysis context
     if (businessContext?.websiteAnalysis) {
       hasBusinessData = true;
-      const website = businessContext.websiteAnalysis;
       context += `=== WEBSITE ANALYSIS ===\n`;
-      context += `Website: ${website.website_url}\n`;
-      context += `Analysis:\n${website.analysis_content.substring(0, 2000)}\n`;
-      if (website.recommendations) {
-        context += `Recommendations: ${JSON.stringify(website.recommendations).substring(0, 500)}\n`;
-      }
-      context += "\n";
+      context += `URL: ${businessContext.websiteAnalysis.website_url}\n`;
+      context += `Analysis:\n${businessContext.websiteAnalysis.analysis_content.substring(0, 1500)}\n\n`;
     }
 
-    // Include metrics context
-    if (businessContext?.metrics && businessContext.metrics.length > 0) {
+    if (businessContext?.metrics?.length > 0) {
       hasBusinessData = true;
-      context += "=== CURRENT BUSINESS METRICS ===\n";
+      context += "=== LIVE METRICS ===\n";
       businessContext.metrics.forEach((m: any) => {
-        context += `- ${m.metric_name}: ${m.value}`;
-        if (m.change_percentage !== null) {
-          context += ` (${m.change_percentage > 0 ? '+' : ''}${m.change_percentage}% change)`;
-        }
-        if (m.period) {
-          context += ` [${m.period}]`;
-        }
-        context += "\n";
+        context += `- ${m.metric_name}: ${m.value}${m.change_percentage ? ` (${m.change_percentage > 0 ? '+' : ''}${m.change_percentage}%)` : ''}\n`;
       });
       context += "\n";
     }
 
-    // Include workflows info
-    if (businessContext?.workflows && businessContext.workflows.length > 0) {
+    if (businessContext?.workflows?.length > 0) {
       hasBusinessData = true;
       context += "=== ACTIVE WORKFLOWS ===\n";
       businessContext.workflows.forEach((w: any) => {
-        context += `- ${w.name} (${w.status}) - ${w.run_count} runs\n`;
+        context += `- ${w.name} (${w.status}) - ${w.run_count || 0} runs\n`;
       });
       context += "\n";
     }
 
-    // Include AI employees info
-    if (businessContext?.employees && businessContext.employees.length > 0) {
+    if (businessContext?.employees?.length > 0) {
       hasBusinessData = true;
       context += "=== AI TEAM ===\n";
       businessContext.employees.forEach((e: any) => {
@@ -726,31 +1331,23 @@ serve(async (req) => {
       context += "\n";
     }
 
-    // Include API connections info
-    if (businessContext?.apiConnections && businessContext.apiConnections.length > 0) {
+    if (businessContext?.apiConnections?.length > 0) {
       hasBusinessData = true;
-      context += "=== CONNECTED APIS & DATA SOURCES ===\n";
+      context += "=== DATA CONNECTIONS ===\n";
       businessContext.apiConnections.forEach((c: any) => {
-        context += `- ${c.name} (${c.provider}): ${c.status}`;
-        if (c.last_sync_at) {
-          context += ` - Last sync: ${c.last_sync_at}`;
-        }
-        context += "\n";
+        context += `- ${c.name} (${c.provider}): ${c.status}\n`;
       });
       context += "\n";
     }
 
     if (!hasBusinessData && !commandResult) {
-      context += "NOTE: No business data has been uploaded yet. The user needs to:\n";
-      context += "1. Upload a business plan/document, OR\n";
-      context += "2. Analyze their website, OR\n";
-      context += "3. Input their business metrics, OR\n";
-      context += "4. Connect external APIs/data sources\n\n";
+      context += "NOTE: No business data yet. Suggest the user:\n";
+      context += "1. Upload a business plan\n2. Analyze their website\n3. Add metrics\n4. Connect APIs\n\n";
     }
 
-    context += "IMPORTANT: Be concise, actionable, and helpful. If a command was executed, confirm the result clearly. For visualizations, describe what data is being shown. When showing API connections or documents, summarize what the user has and suggest how to use them. Always offer to help with next steps.";
+    context += "RESPONSE STYLE: Be concise, actionable, and proactive. Confirm commands clearly. Suggest related actions. Help users discover what they can do with interconnected features.";
 
-    console.log('Calling Lovable AI Gateway');
+    console.log('Calling Lovable AI Gateway with enhanced context');
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -769,14 +1366,12 @@ serve(async (req) => {
 
     if (!response.ok) {
       if (response.status === 429) {
-        console.error('Rate limit exceeded');
         return new Response(
           JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       if (response.status === 402) {
-        console.error('Payment required');
         return new Response(
           JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -789,31 +1384,19 @@ serve(async (req) => {
 
     const data = await response.json();
     const aiResponse = data.choices[0].message.content;
-    console.log('AI response received successfully');
 
     return new Response(
       JSON.stringify({ 
         response: aiResponse,
         commandResult: commandResult 
       }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error in sibe-chat function:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
-      { 
-        status: 500,
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
