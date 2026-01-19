@@ -397,45 +397,6 @@ export const HistoricalMetrics = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Data Table */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-lg">Historical Data</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Date</th>
-                  <th className="text-right py-3 px-4 font-medium text-muted-foreground">Revenue</th>
-                  <th className="text-right py-3 px-4 font-medium text-muted-foreground">Customers</th>
-                  <th className="text-right py-3 px-4 font-medium text-muted-foreground">Conversion</th>
-                  <th className="text-right py-3 px-4 font-medium text-muted-foreground">Satisfaction</th>
-                </tr>
-              </thead>
-              <tbody>
-                {historicalData.slice(-10).reverse().map((row, index) => (
-                  <tr key={row.date} className={cn(
-                    "border-b border-border/50",
-                    index % 2 === 0 ? "bg-muted/20" : ""
-                  )}>
-                    <td className="py-3 px-4">{format(new Date(row.date), 'MMM d, yyyy')}</td>
-                    <td className="text-right py-3 px-4 font-medium">${row.revenue.toLocaleString()}</td>
-                    <td className="text-right py-3 px-4">{row.customers.toLocaleString()}</td>
-                    <td className="text-right py-3 px-4">{row.conversion}%</td>
-                    <td className="text-right py-3 px-4">{row.satisfaction}/5</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="text-xs text-muted-foreground mt-4">
-            Showing last 10 records. {historicalData.length} total records in selected range.
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 };
