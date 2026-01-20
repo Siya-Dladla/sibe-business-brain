@@ -27,19 +27,19 @@ const MobileMenu = () => {
   };
   const menuItems = [{
     icon: Home,
-    label: "Operator",
+    label: "Home",
     path: "/"
   }, {
     icon: Database,
-    label: "Analytics",
+    label: "Data",
     path: "/dashboard"
   }, {
     icon: Layers,
-    label: "Automations",
+    label: "Canvas",
     path: "/canvas"
   }, {
     icon: Users,
-    label: "AI Agents",
+    label: "AI Employees",
     path: "/employees"
   }, {
     icon: FileText,
