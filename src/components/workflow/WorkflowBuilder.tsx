@@ -239,6 +239,8 @@ const WorkflowBuilder = ({ workflowId, onBack }: WorkflowBuilderProps) => {
         isSaving={isSaving}
         isRunning={isRunning}
         runCount={workflow.run_count}
+        nodes={workflow.nodes}
+        aiEmployees={aiEmployees}
       />
 
       <div className="flex-1 flex overflow-hidden">
