@@ -6,16 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import MobileMenu from "@/components/MobileMenu";
-import DocumentUpload from "@/components/DocumentUpload";
 import MetricsGrid from "@/components/MetricsGrid";
-import ManualMetricsInput from "@/components/ManualMetricsInput";
 import APIDataFeeds from "@/components/APIDataFeeds";
 import KPITargetSetting from "@/components/KPITargetSetting";
-import WebsiteAnalyzer from "@/components/WebsiteAnalyzer";
 import BusinessDNA from "@/components/BusinessDNA";
 import KPIAlerts from "@/components/KPIAlerts";
-import CurrentBusiness from "@/components/CurrentBusiness";
-import { HistoricalMetrics } from "@/components/HistoricalMetrics";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Database, Lightbulb, RefreshCw, Clock } from "lucide-react";
 
@@ -183,9 +178,6 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="insights" className="space-y-6">
-            {/* Current Business Status */}
-            <CurrentBusiness onBusinessChange={fetchData} />
-
             {/* Alerts Section */}
             <KPIAlerts metrics={metrics} />
 
@@ -221,52 +213,14 @@ const Dashboard = () => {
 
             {/* Metrics Grid */}
             <MetricsGrid metrics={metrics} />
-
-            {/* Historical Analysis */}
-            <HistoricalMetrics />
           </TabsContent>
 
           <TabsContent value="collection" className="space-y-4 md:space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ManualMetricsInput onMetricSaved={fetchData} />
-              <APIDataFeeds />
-            </div>
+            {/* API Data Feeds - Full Width */}
+            <APIDataFeeds />
 
+            {/* KPI Target Setting */}
             <KPITargetSetting metrics={metrics} onTargetSaved={fetchData} />
-
-            <div className="grid grid-cols-1 gap-4 md:gap-6">
-              <WebsiteAnalyzer onAnalysisComplete={fetchData} />
-              <DocumentUpload onUploadSuccess={fetchData} />
-            </div>
-
-            {plans.length > 0 && (
-              <Card className="glass-card p-4 md:p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <Lightbulb className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                  <div>
-                    <h3 className="text-lg md:text-xl font-extralight">Collected Data</h3>
-                    <p className="text-xs text-muted-foreground font-light">
-                      Your uploaded business plans and analyzed websites
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {plans.map((plan) => (
-                    <div
-                      key={plan.id}
-                      className="p-3 bg-background/50 border border-primary/20 rounded-lg flex justify-between items-center"
-                    >
-                      <div>
-                        <p className="text-sm font-light">{plan.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(plan.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
           </TabsContent>
         </Tabs>
       </div>
