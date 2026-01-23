@@ -57,6 +57,8 @@ const APIDataFeeds = () => {
   const feedOptions = [
     { value: "google_analytics", label: "Google Analytics", icon: BarChart3, color: "text-orange-400" },
     { value: "stripe", label: "Stripe", icon: TrendingUp, color: "text-purple-400" },
+    { value: "shopify", label: "Shopify Store", icon: Database, color: "text-green-400" },
+    { value: "meta", label: "Meta (Facebook/Instagram)", icon: Globe, color: "text-blue-500" },
     { value: "custom_api", label: "Custom REST API", icon: Globe, color: "text-blue-400" },
   ];
 
