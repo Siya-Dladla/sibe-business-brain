@@ -1,240 +1,365 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Brain, Plus, MessageSquare } from "lucide-react";
+import { Bot, ExternalLink, Sparkles, Cpu, Brain, MessageSquare, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
-import CreateEmployeeDialog from "@/components/CreateEmployeeDialog";
-import EmployeeInteractionDialog from "@/components/EmployeeInteractionDialog";
-import SibeLogo from "@/components/SibeLogo";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-const TEMPLATE_EMPLOYEES = [{
-  name: "AI Business Analyst",
-  department: "Strategy",
-  role: "Business Analyst",
-  personality: "Analytical and data-driven professional specializing in market trends, competitive analysis, and strategic insights.",
-  expertise: ["Market Research", "Data Analysis", "Strategic Planning", "KPI Tracking", "Business Intelligence"]
-}, {
-  name: "AI Software Engineer",
-  department: "Engineering",
-  role: "Software Engineer",
-  personality: "Expert coder with deep knowledge of modern frameworks, architecture patterns, and best practices in software development.",
-  expertise: ["Full Stack Development", "System Design", "Code Review", "DevOps", "Technical Documentation"]
-}, {
-  name: "AI Accountant",
-  department: "Finance",
-  role: "Senior Accountant",
-  personality: "Detail-oriented financial expert specializing in bookkeeping, tax compliance, and financial reporting.",
-  expertise: ["Financial Reporting", "Tax Compliance", "Budgeting", "Audit Preparation", "Cash Flow Management"]
-}, {
-  name: "AI Business Intelligence Analyst",
-  department: "Analytics",
-  role: "BI Analyst",
-  personality: "Data storyteller who transforms complex datasets into actionable insights and compelling visualizations.",
-  expertise: ["Data Visualization", "SQL", "Dashboard Creation", "Predictive Analytics", "Report Automation"]
-}];
-interface AIEmployee {
+
+interface AgentPlatform {
   id: string;
   name: string;
-  department: string;
-  role: string;
-  personality: string | null;
-  expertise: string[] | null;
-  status: string;
-  created_at: string;
+  description: string;
+  icon: typeof Bot;
+  color: string;
+  url: string;
+  features: string[];
+  category: 'builder' | 'framework' | 'marketplace';
 }
-const Employees = () => {
-  const [employees, setEmployees] = useState<AIEmployee[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedEmployee, setSelectedEmployee] = useState<AIEmployee | null>(null);
-  const {
-    toast
-  } = useToast();
-  const fetchEmployees = async () => {
-    try {
-      const {
-        data,
-        error
-      } = await supabase.from("ai_employees").select("*").order("created_at", {
-        ascending: false
-      });
-      if (error) throw error;
-      setEmployees(data || []);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-  const deleteEmployee = async (id: string) => {
-    try {
-      const {
-        error
-      } = await supabase.from("ai_employees").delete().eq("id", id);
-      if (error) throw error;
-      toast({
-        title: "Success",
-        description: "AI employee deleted successfully"
-      });
-      fetchEmployees();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  };
-  const addTemplateEmployee = async (template: typeof TEMPLATE_EMPLOYEES[0]) => {
-    try {
-      const {
-        data: {
-          user
-        }
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      const {
-        error
-      } = await supabase.from("ai_employees").insert({
-        name: template.name,
-        department: template.department,
-        role: template.role,
-        personality: template.personality,
-        expertise: template.expertise,
-        user_id: user.id
-      });
-      if (error) throw error;
-      toast({
-        title: "Success",
-        description: `${template.name} added to your team!`
-      });
-      fetchEmployees();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  };
-  useEffect(() => {
-    fetchEmployees();
 
-    // Set up realtime subscription
-    const channel = supabase.channel('employees-changes').on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'ai_employees'
-    }, fetchEmployees).subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-  return <div className="min-h-screen bg-background grid-bg">
+const AGENT_PLATFORMS: AgentPlatform[] = [
+  {
+    id: 'openai-assistants',
+    name: 'OpenAI Assistants',
+    description: 'Build custom AI assistants with GPT-4, code interpreter, and knowledge retrieval capabilities.',
+    icon: Sparkles,
+    color: 'from-green-500 to-emerald-500',
+    url: 'https://platform.openai.com/assistants',
+    features: ['GPT-4 Turbo', 'Code Interpreter', 'Function Calling', 'File Search'],
+    category: 'builder'
+  },
+  {
+    id: 'anthropic-claude',
+    name: 'Claude by Anthropic',
+    description: 'Create agents with Claude for safe, helpful, and honest AI interactions.',
+    icon: Brain,
+    color: 'from-orange-500 to-amber-500',
+    url: 'https://console.anthropic.com',
+    features: ['200K context', 'Vision capabilities', 'Tool use', 'Constitutional AI'],
+    category: 'builder'
+  },
+  {
+    id: 'google-vertex',
+    name: 'Google Vertex AI Agents',
+    description: 'Build conversational AI agents with Gemini models and Google Cloud integration.',
+    icon: Bot,
+    color: 'from-blue-500 to-cyan-500',
+    url: 'https://cloud.google.com/vertex-ai',
+    features: ['Gemini Pro', 'Grounding', 'Extensions', 'Multi-modal'],
+    category: 'builder'
+  },
+  {
+    id: 'langchain',
+    name: 'LangChain',
+    description: 'Open-source framework for building context-aware reasoning applications.',
+    icon: Cpu,
+    color: 'from-teal-500 to-green-500',
+    url: 'https://langchain.com',
+    features: ['Chain composition', 'Agent toolkits', 'Memory systems', 'RAG'],
+    category: 'framework'
+  },
+  {
+    id: 'crewai',
+    name: 'CrewAI',
+    description: 'Framework for orchestrating role-playing AI agents working together.',
+    icon: Bot,
+    color: 'from-purple-500 to-pink-500',
+    url: 'https://www.crewai.com',
+    features: ['Multi-agent', 'Role-based', 'Task delegation', 'Process types'],
+    category: 'framework'
+  },
+  {
+    id: 'autogen',
+    name: 'Microsoft AutoGen',
+    description: 'Build next-gen LLM applications with multi-agent conversation framework.',
+    icon: MessageSquare,
+    color: 'from-indigo-500 to-purple-500',
+    url: 'https://microsoft.github.io/autogen/',
+    features: ['Multi-agent', 'Human-in-loop', 'Code execution', 'Customizable'],
+    category: 'framework'
+  },
+  {
+    id: 'huggingface',
+    name: 'Hugging Face Agents',
+    description: 'Build agents with open-source models and the Transformers Agents library.',
+    icon: Sparkles,
+    color: 'from-yellow-500 to-orange-500',
+    url: 'https://huggingface.co/docs/transformers/agents',
+    features: ['Open models', 'Custom tools', 'Multi-modal', 'Community'],
+    category: 'marketplace'
+  },
+  {
+    id: 'fixie',
+    name: 'Fixie.ai',
+    description: 'Platform for building and deploying production-ready AI agents.',
+    icon: Bot,
+    color: 'from-rose-500 to-red-500',
+    url: 'https://fixie.ai',
+    features: ['Agent hosting', 'Memory', 'Tool integration', 'Analytics'],
+    category: 'marketplace'
+  }
+];
+
+const Employees = () => {
+  const [platforms] = useState<AgentPlatform[]>(AGENT_PLATFORMS);
+  const [filter, setFilter] = useState<'all' | 'builder' | 'framework' | 'marketplace'>('all');
+  const { toast } = useToast();
+
+  const handleConnect = (platform: AgentPlatform) => {
+    window.open(platform.url, '_blank');
+    toast({
+      title: `Opening ${platform.name}`,
+      description: "Create your AI agents and integrate them with Sibe.",
+    });
+  };
+
+  const filteredPlatforms = platforms.filter(
+    p => filter === 'all' || p.category === filter
+  );
+
+  const builderPlatforms = platforms.filter(p => p.category === 'builder');
+  const frameworkPlatforms = platforms.filter(p => p.category === 'framework');
+  const marketplacePlatforms = platforms.filter(p => p.category === 'marketplace');
+
+  return (
+    <div className="min-h-screen bg-background grid-bg">
       <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
         <MobileMenu />
-        <div className="text-xs text-muted-foreground">Team Management</div>
+        <div className="text-xs text-muted-foreground">AI Agent Platforms</div>
       </div>
 
       <div className="container mx-auto px-6 py-8 bg-primary-foreground">
-        <div className="mb-10 flex items-center justify-between">
-          <div>
-            <h1 className="text-5xl font-extralight mb-3 tracking-wide">Team Management</h1>
-            <p className="text-primary text-lg font-light">Manage your AI employees and synthetic workforce</p>
-          </div>
-          <CreateEmployeeDialog onEmployeeCreated={fetchEmployees} />
-        </div>
-
-        {/* Template AI Employees Section */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-extralight mb-6 tracking-wide">Ready-Made AI Employees</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {TEMPLATE_EMPLOYEES.map((template, idx) => <Card key={idx} onClick={() => addTemplateEmployee(template)} className="holographic-card p-6 cursor-pointer group hover-lift bg-primary-foreground">
-                <div className="flex flex-col items-center text-center space-y-4">
-                  <SibeLogo size="lg" className="animate-pulse-glow" />
-                  <div>
-                    <h3 className="text-xl font-light tracking-wide mb-1">{template.name}</h3>
-                    <Badge variant="outline" className="border-primary/30 text-primary font-light mb-3">
-                      {template.department}
-                    </Badge>
-                    <p className="text-sm text-muted-foreground font-light line-clamp-3 mb-4">
-                      {template.personality}
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add to Team
-                  </Button>
-                </div>
-              </Card>)}
+        <div className="mb-10">
+          <div className="flex items-center gap-4">
+            <Bot className="w-10 h-10 text-primary animate-pulse" />
+            <div>
+              <h1 className="text-4xl font-extralight tracking-wide">AI Agents</h1>
+              <p className="text-muted-foreground font-light text-sm mt-1">
+                Connect to leading AI agent builder platforms
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="border-t border-border/30 pt-8 mb-6">
-          <h2 className="text-3xl font-extralight mb-6 tracking-wide">Your AI Team</h2>
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          <Button
+            variant={filter === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilter('all')}
+          >
+            All Platforms
+          </Button>
+          <Button
+            variant={filter === 'builder' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilter('builder')}
+            className="gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            Agent Builders
+          </Button>
+          <Button
+            variant={filter === 'framework' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilter('framework')}
+            className="gap-2"
+          >
+            <Cpu className="w-4 h-4" />
+            Frameworks
+          </Button>
+          <Button
+            variant={filter === 'marketplace' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilter('marketplace')}
+            className="gap-2"
+          >
+            <Bot className="w-4 h-4" />
+            Marketplaces
+          </Button>
         </div>
 
-        {loading ? <Card className="glass-card p-16 flex flex-col items-center justify-center min-h-[400px] border-primary/20">
-            <div className="w-12 h-12 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
-            <p className="text-muted-foreground font-light">Loading AI employees...</p>
-          </Card> : employees.length === 0 ? <Card className="glass-card p-16 flex flex-col items-center justify-center min-h-[500px] hover-lift border-primary/20">
-            <Brain className="w-20 h-20 text-primary mb-8 opacity-50 animate-pulse-glow" />
-            <h2 className="text-3xl font-extralight mb-4 text-primary">No AI Employees Yet</h2>
-            <p className="text-muted-foreground text-center max-w-lg font-light leading-relaxed mb-8">
-              Create your first AI employee to build your synthetic workforce. Each employee can handle specific departments, 
-              provide insights, and participate in strategic meetings.
-            </p>
-            <CreateEmployeeDialog onEmployeeCreated={fetchEmployees} />
-          </Card> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {employees.map(employee => <Card key={employee.id} className="glass-card p-6 hover-lift border-primary/20 group bg-primary-foreground">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <SibeLogo size="md" />
-                    <div>
-                      <h3 className="text-xl font-light tracking-wide">{employee.name}</h3>
-                      <p className="text-sm text-muted-foreground font-light">{employee.role}</p>
+        {/* Agent Builder Platforms */}
+        {(filter === 'all' || filter === 'builder') && (
+          <div className="mb-10">
+            <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
+              <Sparkles className="w-6 h-6 text-primary" />
+              Agent Builder Platforms
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {builderPlatforms.map((platform) => (
+                <Card
+                  key={platform.id}
+                  className="glass-card p-6 hover-lift group relative overflow-hidden"
+                >
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${platform.color} opacity-10 blur-2xl`} />
+                  
+                  <div className="relative">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`p-3 rounded-xl bg-gradient-to-br ${platform.color}`}>
+                        <platform.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {platform.category}
+                      </Badge>
                     </div>
+
+                    <h3 className="text-xl font-light mb-2">{platform.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {platform.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {platform.features.slice(0, 3).map((feature, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs bg-primary/5">
+                          {feature}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                      onClick={() => handleConnect(platform)}
+                    >
+                      Open Platform
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => deleteEmployee(employee.id)} className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive">
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
-                <div className="space-y-3">
-                  <div>
-                    <Badge variant="outline" className="border-primary/30 text-primary font-light">
-                      {employee.department}
-                    </Badge>
+        {/* Frameworks */}
+        {(filter === 'all' || filter === 'framework') && (
+          <div className="mb-10">
+            <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
+              <Cpu className="w-6 h-6 text-primary" />
+              Agent Frameworks
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {frameworkPlatforms.map((platform) => (
+                <Card
+                  key={platform.id}
+                  className="glass-card p-6 hover-lift group relative overflow-hidden"
+                >
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${platform.color} opacity-10 blur-2xl`} />
+                  
+                  <div className="relative">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`p-3 rounded-xl bg-gradient-to-br ${platform.color}`}>
+                        <platform.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {platform.category}
+                      </Badge>
+                    </div>
+
+                    <h3 className="text-xl font-light mb-2">{platform.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {platform.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {platform.features.slice(0, 3).map((feature, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs bg-primary/5">
+                          {feature}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                      onClick={() => handleConnect(platform)}
+                    >
+                      View Documentation
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
                   </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
-                  {employee.personality && <p className="text-sm text-muted-foreground font-light line-clamp-2">
-                      {employee.personality}
-                    </p>}
+        {/* Marketplaces */}
+        {(filter === 'all' || filter === 'marketplace') && (
+          <div className="mb-10">
+            <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
+              <Bot className="w-6 h-6 text-primary" />
+              Agent Marketplaces
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {marketplacePlatforms.map((platform) => (
+                <Card
+                  key={platform.id}
+                  className="glass-card p-6 hover-lift group relative overflow-hidden"
+                >
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${platform.color} opacity-10 blur-2xl`} />
+                  
+                  <div className="relative">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`p-3 rounded-xl bg-gradient-to-br ${platform.color}`}>
+                        <platform.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {platform.category}
+                      </Badge>
+                    </div>
 
-                  {employee.expertise && employee.expertise.length > 0 && <div className="flex flex-wrap gap-2">
-                      {employee.expertise.slice(0, 3).map((skill, idx) => <Badge key={idx} variant="secondary" className="text-xs font-light bg-primary/5 border-primary/10">
-                          {skill}
-                        </Badge>)}
-                      {employee.expertise.length > 3 && <Badge variant="secondary" className="text-xs font-light bg-primary/5 border-primary/10">
-                          +{employee.expertise.length - 3}
-                        </Badge>}
-                    </div>}
+                    <h3 className="text-xl font-light mb-2">{platform.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                      {platform.description}
+                    </p>
 
-                  <Button variant="outline" size="sm" onClick={() => setSelectedEmployee(employee)} className="w-full mt-4 border-primary/30 hover:bg-primary/10">
-                    <MessageSquare className="w-3 h-3 mr-1" />
-                    Chat with {employee.name.split(' ')[0]}
-                  </Button>
-                </div>
-              </Card>)}
-          </div>}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {platform.features.slice(0, 3).map((feature, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs bg-primary/5">
+                          {feature}
+                        </Badge>
+                      ))}
+                    </div>
 
-        <EmployeeInteractionDialog employee={selectedEmployee} open={!!selectedEmployee} onOpenChange={open => !open && setSelectedEmployee(null)} />
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                      onClick={() => handleConnect(platform)}
+                    >
+                      Explore Agents
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Getting Started */}
+        <Card className="glass-card p-8 border-primary/20">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-4 rounded-full bg-primary/10">
+                <ArrowRight className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-xl font-light mb-1">Build Your AI Workforce</h3>
+                <p className="text-muted-foreground text-sm">
+                  Choose a platform, create your agents, and connect them to Sibe for seamless automation.
+                </p>
+              </div>
+            </div>
+            <Button variant="outline" className="shrink-0">
+              Integration Guide
+            </Button>
+          </div>
+        </Card>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Employees;

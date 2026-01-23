@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Home, Database, Layers, Users, FileText, Settings, LogOut } from "lucide-react";
+import { Menu, Home, Database, Layers, Bot, FileText, Settings, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -35,11 +35,11 @@ const MobileMenu = () => {
     path: "/dashboard"
   }, {
     icon: Layers,
-    label: "Canvas",
+    label: "Integrations",
     path: "/canvas"
   }, {
-    icon: Users,
-    label: "AI Employees",
+    icon: Bot,
+    label: "AI Agents",
     path: "/employees"
   }, {
     icon: FileText,
