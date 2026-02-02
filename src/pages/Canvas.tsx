@@ -11,9 +11,12 @@ import {
   GitBranch,
   Bot,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CommunityDevelopers from "@/components/CommunityDevelopers";
 
 interface Integration {
   id: string;
@@ -97,15 +100,16 @@ const INTEGRATIONS: Integration[] = [
 ];
 
 const Canvas = () => {
-  const [integrations, setIntegrations] = useState<Integration[]>(INTEGRATIONS);
+  const [integrations] = useState<Integration[]>(INTEGRATIONS);
   const [filter, setFilter] = useState<'all' | 'workflow' | 'agent'>('all');
+  const [activeTab, setActiveTab] = useState<'platforms' | 'community'>('platforms');
   const { toast } = useToast();
 
   const handleConnect = (integration: Integration) => {
     window.open(integration.url, '_blank');
     toast({
       title: `Opening ${integration.name}`,
-      description: "Follow the setup instructions to connect your account.",
+      description: "Create your workflows there, then connect them to Sibe via API Data Feeds.",
     });
   };
 
@@ -130,172 +134,205 @@ const Canvas = () => {
             <div>
               <h1 className="text-4xl font-extralight tracking-wide">Integrations</h1>
               <p className="text-muted-foreground font-light text-sm mt-1">
-                Connect workflow builders and AI agent platforms
+                Build workflows on external platforms and connect them to Sibe
               </p>
             </div>
           </div>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex gap-2 mb-8">
-          <Button
-            variant={filter === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('all')}
-          >
-            All
-          </Button>
-          <Button
-            variant={filter === 'workflow' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('workflow')}
-            className="gap-2"
-          >
-            <Workflow className="w-4 h-4" />
-            Workflow Builders
-          </Button>
-          <Button
-            variant={filter === 'agent' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('agent')}
-            className="gap-2"
-          >
-            <Bot className="w-4 h-4" />
-            AI Agent Builders
-          </Button>
-        </div>
+        {/* Main Tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="mb-8">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="platforms" className="gap-2">
+              <Layers className="w-4 h-4" />
+              Platforms
+            </TabsTrigger>
+            <TabsTrigger value="community" className="gap-2">
+              <Users className="w-4 h-4" />
+              Developer Community
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Workflow Builders Section */}
-        {(filter === 'all' || filter === 'workflow') && (
-          <div className="mb-10">
-            <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
-              <Workflow className="w-6 h-6 text-primary" />
-              Workflow Automation Platforms
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {workflowIntegrations.map((integration) => (
-                <Card
-                  key={integration.id}
-                  className="glass-card p-6 hover-lift group relative overflow-hidden"
-                >
-                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${integration.color} opacity-10 blur-2xl`} />
-                  
-                  <div className="relative">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-xl bg-gradient-to-br ${integration.color}`}>
-                        <integration.icon className="w-6 h-6 text-white" />
-                      </div>
-                      {integration.connected && (
-                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                          <CheckCircle2 className="w-3 h-3 mr-1" />
-                          Connected
-                        </Badge>
-                      )}
-                    </div>
-
-                    <h3 className="text-xl font-light mb-2">{integration.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {integration.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {integration.features.slice(0, 3).map((feature, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {feature}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                      onClick={() => handleConnect(integration)}
-                    >
-                      Open {integration.name}
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
+          <TabsContent value="platforms" className="mt-6">
+            {/* Filter Tabs */}
+            <div className="flex gap-2 mb-8">
+              <Button
+                variant={filter === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter('all')}
+              >
+                All
+              </Button>
+              <Button
+                variant={filter === 'workflow' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter('workflow')}
+                className="gap-2"
+              >
+                <Workflow className="w-4 h-4" />
+                Workflow Builders
+              </Button>
+              <Button
+                variant={filter === 'agent' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter('agent')}
+                className="gap-2"
+              >
+                <Bot className="w-4 h-4" />
+                AI Agent Builders
+              </Button>
             </div>
-          </div>
-        )}
 
-        {/* AI Agent Builders Section */}
-        {(filter === 'all' || filter === 'agent') && (
-          <div>
-            <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
-              <Bot className="w-6 h-6 text-primary" />
-              AI Agent Builder Platforms
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {agentIntegrations.map((integration) => (
-                <Card
-                  key={integration.id}
-                  className="glass-card p-6 hover-lift group relative overflow-hidden"
-                >
-                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${integration.color} opacity-10 blur-2xl`} />
-                  
-                  <div className="relative">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-xl bg-gradient-to-br ${integration.color}`}>
-                        <integration.icon className="w-6 h-6 text-white" />
-                      </div>
-                      {integration.connected && (
-                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                          <CheckCircle2 className="w-3 h-3 mr-1" />
-                          Connected
-                        </Badge>
-                      )}
-                    </div>
+            {/* Info Box */}
+            <Card className="glass-card p-4 mb-8 border-amber-500/20 bg-amber-500/5">
+              <p className="text-sm text-amber-400">
+                ⚡ <span className="font-medium">How it works:</span> Build your workflows and AI agents on these platforms, 
+                then connect them to Sibe via the <span className="font-medium">Data &gt; API Data Feeds</span> section. 
+                Extra token charges may apply on third-party platforms.
+              </p>
+            </Card>
 
-                    <h3 className="text-xl font-light mb-2">{integration.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {integration.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {integration.features.slice(0, 3).map((feature, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {feature}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                      onClick={() => handleConnect(integration)}
+            {/* Workflow Builders Section */}
+            {(filter === 'all' || filter === 'workflow') && (
+              <div className="mb-10">
+                <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
+                  <Workflow className="w-6 h-6 text-primary" />
+                  Workflow Automation Platforms
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {workflowIntegrations.map((integration) => (
+                    <Card
+                      key={integration.id}
+                      className="glass-card p-6 hover-lift group relative overflow-hidden"
                     >
-                      Open {integration.name}
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+                      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${integration.color} opacity-10 blur-2xl`} />
+                      
+                      <div className="relative">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className={`p-3 rounded-xl bg-gradient-to-br ${integration.color}`}>
+                            <integration.icon className="w-6 h-6 text-white" />
+                          </div>
+                          {integration.connected && (
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                              Connected
+                            </Badge>
+                          )}
+                        </div>
 
-        {/* Getting Started Card */}
-        <Card className="glass-card p-8 mt-10 border-primary/20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-4 rounded-full bg-primary/10">
-                <ArrowRight className="w-8 h-8 text-primary" />
+                        <h3 className="text-xl font-light mb-2">{integration.name}</h3>
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                          {integration.description}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {integration.features.slice(0, 3).map((feature, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                          onClick={() => handleConnect(integration)}
+                        >
+                          Open {integration.name}
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               </div>
+            )}
+
+            {/* AI Agent Builders Section */}
+            {(filter === 'all' || filter === 'agent') && (
               <div>
-                <h3 className="text-xl font-light mb-1">Getting Started</h3>
-                <p className="text-muted-foreground text-sm">
-                  Choose a platform, connect your account, and start building automations that work with Sibe.
-                </p>
+                <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
+                  <Bot className="w-6 h-6 text-primary" />
+                  AI Agent Builder Platforms
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {agentIntegrations.map((integration) => (
+                    <Card
+                      key={integration.id}
+                      className="glass-card p-6 hover-lift group relative overflow-hidden"
+                    >
+                      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${integration.color} opacity-10 blur-2xl`} />
+                      
+                      <div className="relative">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className={`p-3 rounded-xl bg-gradient-to-br ${integration.color}`}>
+                            <integration.icon className="w-6 h-6 text-white" />
+                          </div>
+                          {integration.connected && (
+                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                              Connected
+                            </Badge>
+                          )}
+                        </div>
+
+                        <h3 className="text-xl font-light mb-2">{integration.name}</h3>
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                          {integration.description}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {integration.features.slice(0, 3).map((feature, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                          onClick={() => handleConnect(integration)}
+                        >
+                          Open {integration.name}
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
-            <Button variant="outline" className="shrink-0">
-              View Documentation
-            </Button>
-          </div>
-        </Card>
+            )}
+
+            {/* Getting Started Card */}
+            <Card className="glass-card p-8 mt-10 border-primary/20">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 rounded-full bg-primary/10">
+                    <ArrowRight className="w-8 h-8 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-light mb-1">Ready to Connect?</h3>
+                    <p className="text-muted-foreground text-sm">
+                      After building your workflows/agents, go to Data → Connection Dashboard to link them to Sibe.
+                    </p>
+                  </div>
+                </div>
+                <Button variant="outline" className="shrink-0" onClick={() => window.location.href = '/dashboard'}>
+                  Open Dashboard
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="community" className="mt-6">
+            <CommunityDevelopers 
+              filterSpecialties={['n8n', 'make', 'zapier', 'openai', 'langchain', 'autogen']}
+              title="Workflow & Integration Experts"
+              subtitle="Get help building automations that connect to Sibe"
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
