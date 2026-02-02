@@ -1250,11 +1250,10 @@ Provide a helpful, role-appropriate response.`;
     context += "- 'Ask [employee] about [topic]' - get role-specific answers\n";
     context += "- 'Show my team' or 'List employees'\n\n";
     
-    context += "⚙️ WORKFLOWS:\n";
-    context += "- 'Create workflow for daily analysis'\n";
-    context += "- 'Run workflow [name]' or 'Execute [workflow]'\n";
-    context += "- 'Delete workflow [name]'\n";
-    context += "- 'Show my workflows'\n\n";
+    context += "⚙️ WORKFLOWS (External Integrations):\n";
+    context += "- 'Show my connected workflows' - list workflows from n8n/Make/Zapier\n";
+    context += "- 'Check workflow connections' - view third-party integrations\n";
+    context += "- Note: Create workflows on n8n.io, make.com, or zapier.com, then connect them here\n\n";
     
     context += "📅 MEETINGS:\n";
     context += "- 'Schedule meeting about Q4 planning for tomorrow'\n";
@@ -1266,10 +1265,12 @@ Provide a helpful, role-appropriate response.`;
     context += "- 'Show insights' or 'List my metrics'\n";
     context += "- 'Show me charts' or 'Visualize revenue trends'\n\n";
     
-    context += "📁 DATA ACCESS:\n";
+    context += "📁 DATA ACCESS & CONNECTIONS:\n";
     context += "- 'Show all my data' - comprehensive overview\n";
-    context += "- 'Check my API connections'\n";
-    context += "- 'Show my documents'\n\n";
+    context += "- 'Check my API connections' - view Shopify, Meta, Stripe, etc.\n";
+    context += "- 'Show my documents'\n";
+    context += "- 'Sync my data' - trigger data sync from connected APIs\n";
+    context += "- Note: Connect Shopify, Meta, Google Analytics, and more via Dashboard → Connections\n\n";
 
     // Add command result to context
     if (commandResult) {
@@ -1342,10 +1343,13 @@ Provide a helpful, role-appropriate response.`;
 
     if (!hasBusinessData && !commandResult) {
       context += "NOTE: No business data yet. Suggest the user:\n";
-      context += "1. Upload a business plan\n2. Analyze their website\n3. Add metrics\n4. Connect APIs\n\n";
+      context += "1. Connect their Shopify, Meta, or other APIs via Dashboard → Connections\n";
+      context += "2. Build workflows on n8n.io/make.com/zapier.com and connect them to Sibe\n";
+      context += "3. Create AI agents on OpenAI/Claude and link them via API Data Feeds\n";
+      context += "4. Add manual metrics to track business KPIs\n\n";
     }
 
-    context += "RESPONSE STYLE: Be concise, actionable, and proactive. Confirm commands clearly. Suggest related actions. Help users discover what they can do with interconnected features.";
+    context += "RESPONSE STYLE: Be concise, actionable, and proactive. Guide users to integrate third-party workflows and AI agents. Emphasize that Sibe is a hub connecting external automation platforms. Note that extra token charges may apply on third-party platforms.";
 
     console.log('Calling Lovable AI Gateway with enhanced context');
 

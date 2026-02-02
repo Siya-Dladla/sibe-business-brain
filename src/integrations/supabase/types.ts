@@ -221,11 +221,14 @@ export type Database = {
           created_at: string
           credentials_encrypted: string | null
           id: string
+          is_multi_store: boolean | null
           last_sync_at: string | null
           name: string
           provider: string
           status: string
+          store_name: string | null
           sync_config: Json | null
+          sync_frequency: string | null
           updated_at: string
           user_id: string
         }
@@ -234,11 +237,14 @@ export type Database = {
           created_at?: string
           credentials_encrypted?: string | null
           id?: string
+          is_multi_store?: boolean | null
           last_sync_at?: string | null
           name: string
           provider: string
           status?: string
+          store_name?: string | null
           sync_config?: Json | null
+          sync_frequency?: string | null
           updated_at?: string
           user_id: string
         }
@@ -247,11 +253,14 @@ export type Database = {
           created_at?: string
           credentials_encrypted?: string | null
           id?: string
+          is_multi_store?: boolean | null
           last_sync_at?: string | null
           name?: string
           provider?: string
           status?: string
+          store_name?: string | null
           sync_config?: Json | null
+          sync_frequency?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -424,6 +433,156 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      community_developers: {
+        Row: {
+          availability: string | null
+          created_at: string
+          description: string | null
+          email: string | null
+          hourly_rate: number | null
+          id: string
+          name: string
+          profile_url: string | null
+          rating: number | null
+          review_count: number | null
+          specialty: string[] | null
+          updated_at: string
+          verified: boolean | null
+        }
+        Insert: {
+          availability?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          hourly_rate?: number | null
+          id?: string
+          name: string
+          profile_url?: string | null
+          rating?: number | null
+          review_count?: number | null
+          specialty?: string[] | null
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Update: {
+          availability?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          hourly_rate?: number | null
+          id?: string
+          name?: string
+          profile_url?: string | null
+          rating?: number | null
+          review_count?: number | null
+          specialty?: string[] | null
+          updated_at?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      connected_agents: {
+        Row: {
+          agent_id: string | null
+          agent_name: string
+          api_endpoint: string | null
+          api_key_encrypted: string | null
+          call_count: number | null
+          config: Json | null
+          created_at: string
+          id: string
+          last_called_at: string | null
+          model: string | null
+          platform: string
+          status: string | null
+          token_usage: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agent_id?: string | null
+          agent_name: string
+          api_endpoint?: string | null
+          api_key_encrypted?: string | null
+          call_count?: number | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          last_called_at?: string | null
+          model?: string | null
+          platform: string
+          status?: string | null
+          token_usage?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agent_id?: string | null
+          agent_name?: string
+          api_endpoint?: string | null
+          api_key_encrypted?: string | null
+          call_count?: number | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          last_called_at?: string | null
+          model?: string | null
+          platform?: string
+          status?: string | null
+          token_usage?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      connected_workflows: {
+        Row: {
+          api_key_encrypted: string | null
+          config: Json | null
+          created_at: string
+          id: string
+          last_triggered_at: string | null
+          platform: string
+          status: string | null
+          trigger_count: number | null
+          updated_at: string
+          user_id: string
+          webhook_url: string | null
+          workflow_id: string | null
+          workflow_name: string
+        }
+        Insert: {
+          api_key_encrypted?: string | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          last_triggered_at?: string | null
+          platform: string
+          status?: string | null
+          trigger_count?: number | null
+          updated_at?: string
+          user_id: string
+          webhook_url?: string | null
+          workflow_id?: string | null
+          workflow_name: string
+        }
+        Update: {
+          api_key_encrypted?: string | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          last_triggered_at?: string | null
+          platform?: string
+          status?: string | null
+          trigger_count?: number | null
+          updated_at?: string
+          user_id?: string
+          webhook_url?: string | null
+          workflow_id?: string | null
+          workflow_name?: string
         }
         Relationships: []
       }

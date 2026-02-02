@@ -7,12 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import MobileMenu from "@/components/MobileMenu";
 import MetricsGrid from "@/components/MetricsGrid";
-import APIDataFeeds from "@/components/APIDataFeeds";
+import ConnectionDashboard from "@/components/ConnectionDashboard";
 import KPITargetSetting from "@/components/KPITargetSetting";
 import BusinessDNA from "@/components/BusinessDNA";
 import KPIAlerts from "@/components/KPIAlerts";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Database, Lightbulb, RefreshCw, Clock } from "lucide-react";
+import { Brain, Database, Lightbulb, RefreshCw, Clock, Plug } from "lucide-react";
 
 const Dashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -166,14 +166,18 @@ const Dashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 md:space-y-6">
-          <TabsList className="grid w-full grid-cols-2 max-w-full md:max-w-md h-auto">
+          <TabsList className="grid w-full grid-cols-3 max-w-full md:max-w-lg h-auto">
             <TabsTrigger value="insights" className="flex items-center gap-2 py-3 text-xs md:text-sm">
               <Brain className="w-4 h-4" />
               <span className="hidden sm:inline">Data</span> Insights
             </TabsTrigger>
-            <TabsTrigger value="collection" className="flex items-center gap-2 py-3 text-xs md:text-sm">
+            <TabsTrigger value="connections" className="flex items-center gap-2 py-3 text-xs md:text-sm">
+              <Plug className="w-4 h-4" />
+              Connections
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2 py-3 text-xs md:text-sm">
               <Database className="w-4 h-4" />
-              <span className="hidden sm:inline">Data</span> Collection
+              KPI Settings
             </TabsTrigger>
           </TabsList>
 
@@ -215,10 +219,12 @@ const Dashboard = () => {
             <MetricsGrid metrics={metrics} />
           </TabsContent>
 
-          <TabsContent value="collection" className="space-y-4 md:space-y-6">
-            {/* API Data Feeds - Full Width */}
-            <APIDataFeeds />
+          <TabsContent value="connections" className="space-y-4 md:space-y-6">
+            {/* Connection Dashboard - Full Width */}
+            <ConnectionDashboard />
+          </TabsContent>
 
+          <TabsContent value="settings" className="space-y-4 md:space-y-6">
             {/* KPI Target Setting */}
             <KPITargetSetting metrics={metrics} onTargetSaved={fetchData} />
           </TabsContent>

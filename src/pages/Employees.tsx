@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bot, ExternalLink, Sparkles, Cpu, Brain, MessageSquare, ArrowRight } from "lucide-react";
+import { Bot, ExternalLink, Sparkles, Cpu, Brain, MessageSquare, ArrowRight, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MobileMenu from "@/components/MobileMenu";
 import { useToast } from "@/hooks/use-toast";
+import CommunityDevelopers from "@/components/CommunityDevelopers";
 
 interface AgentPlatform {
   id: string;
@@ -103,23 +105,62 @@ const AGENT_PLATFORMS: AgentPlatform[] = [
 const Employees = () => {
   const [platforms] = useState<AgentPlatform[]>(AGENT_PLATFORMS);
   const [filter, setFilter] = useState<'all' | 'builder' | 'framework' | 'marketplace'>('all');
+  const [activeTab, setActiveTab] = useState<'platforms' | 'community'>('platforms');
   const { toast } = useToast();
 
   const handleConnect = (platform: AgentPlatform) => {
     window.open(platform.url, '_blank');
     toast({
       title: `Opening ${platform.name}`,
-      description: "Create your AI agents and integrate them with Sibe.",
+      description: "Create your AI agents there, then connect them to Sibe via API Data Feeds.",
     });
   };
-
-  const filteredPlatforms = platforms.filter(
-    p => filter === 'all' || p.category === filter
-  );
 
   const builderPlatforms = platforms.filter(p => p.category === 'builder');
   const frameworkPlatforms = platforms.filter(p => p.category === 'framework');
   const marketplacePlatforms = platforms.filter(p => p.category === 'marketplace');
+
+  const renderPlatformCard = (platform: AgentPlatform) => (
+    <Card
+      key={platform.id}
+      className="glass-card p-6 hover-lift group relative overflow-hidden"
+    >
+      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${platform.color} opacity-10 blur-2xl`} />
+      
+      <div className="relative">
+        <div className="flex items-start justify-between mb-4">
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${platform.color}`}>
+            <platform.icon className="w-6 h-6 text-white" />
+          </div>
+          <Badge variant="outline" className="text-xs">
+            {platform.category}
+          </Badge>
+        </div>
+
+        <h3 className="text-xl font-light mb-2">{platform.name}</h3>
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+          {platform.description}
+        </p>
+
+        <div className="flex flex-wrap gap-2 mb-4">
+          {platform.features.slice(0, 3).map((feature, idx) => (
+            <Badge key={idx} variant="secondary" className="text-xs bg-primary/5">
+              {feature}
+            </Badge>
+          ))}
+        </div>
+
+        <Button
+          variant="outline"
+          className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+          onClick={() => handleConnect(platform)}
+        >
+          Open Platform
+          <ExternalLink className="w-4 h-4" />
+        </Button>
+      </div>
+    </Card>
+  );
 
   return (
     <div className="min-h-screen bg-background grid-bg">
@@ -135,228 +176,141 @@ const Employees = () => {
             <div>
               <h1 className="text-4xl font-extralight tracking-wide">AI Agents</h1>
               <p className="text-muted-foreground font-light text-sm mt-1">
-                Connect to leading AI agent builder platforms
+                Build AI agents on external platforms and connect them to Sibe
               </p>
             </div>
           </div>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          <Button
-            variant={filter === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('all')}
-          >
-            All Platforms
-          </Button>
-          <Button
-            variant={filter === 'builder' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('builder')}
-            className="gap-2"
-          >
-            <Sparkles className="w-4 h-4" />
-            Agent Builders
-          </Button>
-          <Button
-            variant={filter === 'framework' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('framework')}
-            className="gap-2"
-          >
-            <Cpu className="w-4 h-4" />
-            Frameworks
-          </Button>
-          <Button
-            variant={filter === 'marketplace' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter('marketplace')}
-            className="gap-2"
-          >
-            <Bot className="w-4 h-4" />
-            Marketplaces
-          </Button>
-        </div>
+        {/* Main Tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="mb-8">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="platforms" className="gap-2">
+              <Bot className="w-4 h-4" />
+              Platforms
+            </TabsTrigger>
+            <TabsTrigger value="community" className="gap-2">
+              <Users className="w-4 h-4" />
+              Developer Community
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Agent Builder Platforms */}
-        {(filter === 'all' || filter === 'builder') && (
-          <div className="mb-10">
-            <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
-              <Sparkles className="w-6 h-6 text-primary" />
-              Agent Builder Platforms
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {builderPlatforms.map((platform) => (
-                <Card
-                  key={platform.id}
-                  className="glass-card p-6 hover-lift group relative overflow-hidden"
-                >
-                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${platform.color} opacity-10 blur-2xl`} />
-                  
-                  <div className="relative">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-xl bg-gradient-to-br ${platform.color}`}>
-                        <platform.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {platform.category}
-                      </Badge>
-                    </div>
-
-                    <h3 className="text-xl font-light mb-2">{platform.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {platform.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {platform.features.slice(0, 3).map((feature, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs bg-primary/5">
-                          {feature}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                      onClick={() => handleConnect(platform)}
-                    >
-                      Open Platform
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
+          <TabsContent value="platforms" className="mt-6">
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              <Button
+                variant={filter === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter('all')}
+              >
+                All Platforms
+              </Button>
+              <Button
+                variant={filter === 'builder' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter('builder')}
+                className="gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                Agent Builders
+              </Button>
+              <Button
+                variant={filter === 'framework' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter('framework')}
+                className="gap-2"
+              >
+                <Cpu className="w-4 h-4" />
+                Frameworks
+              </Button>
+              <Button
+                variant={filter === 'marketplace' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilter('marketplace')}
+                className="gap-2"
+              >
+                <Bot className="w-4 h-4" />
+                Marketplaces
+              </Button>
             </div>
-          </div>
-        )}
 
-        {/* Frameworks */}
-        {(filter === 'all' || filter === 'framework') && (
-          <div className="mb-10">
-            <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
-              <Cpu className="w-6 h-6 text-primary" />
-              Agent Frameworks
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {frameworkPlatforms.map((platform) => (
-                <Card
-                  key={platform.id}
-                  className="glass-card p-6 hover-lift group relative overflow-hidden"
-                >
-                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${platform.color} opacity-10 blur-2xl`} />
-                  
-                  <div className="relative">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-xl bg-gradient-to-br ${platform.color}`}>
-                        <platform.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {platform.category}
-                      </Badge>
-                    </div>
+            {/* Info Box */}
+            <Card className="glass-card p-4 mb-8 border-amber-500/20 bg-amber-500/5">
+              <p className="text-sm text-amber-400">
+                ⚡ <span className="font-medium">How it works:</span> Build your AI agents on these platforms, 
+                then connect them to Sibe via the <span className="font-medium">Data → Connection Dashboard</span>. 
+                Extra token charges may apply on third-party platforms.
+              </p>
+            </Card>
 
-                    <h3 className="text-xl font-light mb-2">{platform.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {platform.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {platform.features.slice(0, 3).map((feature, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs bg-primary/5">
-                          {feature}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                      onClick={() => handleConnect(platform)}
-                    >
-                      View Documentation
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Marketplaces */}
-        {(filter === 'all' || filter === 'marketplace') && (
-          <div className="mb-10">
-            <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
-              <Bot className="w-6 h-6 text-primary" />
-              Agent Marketplaces
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {marketplacePlatforms.map((platform) => (
-                <Card
-                  key={platform.id}
-                  className="glass-card p-6 hover-lift group relative overflow-hidden"
-                >
-                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${platform.color} opacity-10 blur-2xl`} />
-                  
-                  <div className="relative">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-3 rounded-xl bg-gradient-to-br ${platform.color}`}>
-                        <platform.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {platform.category}
-                      </Badge>
-                    </div>
-
-                    <h3 className="text-xl font-light mb-2">{platform.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {platform.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {platform.features.slice(0, 3).map((feature, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs bg-primary/5">
-                          {feature}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                      onClick={() => handleConnect(platform)}
-                    >
-                      Explore Agents
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Getting Started */}
-        <Card className="glass-card p-8 border-primary/20">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-4 rounded-full bg-primary/10">
-                <ArrowRight className="w-8 h-8 text-primary" />
+            {/* Agent Builder Platforms */}
+            {(filter === 'all' || filter === 'builder') && (
+              <div className="mb-10">
+                <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                  Agent Builder Platforms
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {builderPlatforms.map(renderPlatformCard)}
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-light mb-1">Build Your AI Workforce</h3>
-                <p className="text-muted-foreground text-sm">
-                  Choose a platform, create your agents, and connect them to Sibe for seamless automation.
-                </p>
+            )}
+
+            {/* Frameworks */}
+            {(filter === 'all' || filter === 'framework') && (
+              <div className="mb-10">
+                <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
+                  <Cpu className="w-6 h-6 text-primary" />
+                  Agent Frameworks
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {frameworkPlatforms.map(renderPlatformCard)}
+                </div>
               </div>
-            </div>
-            <Button variant="outline" className="shrink-0">
-              Integration Guide
-            </Button>
-          </div>
-        </Card>
+            )}
+
+            {/* Marketplaces */}
+            {(filter === 'all' || filter === 'marketplace') && (
+              <div className="mb-10">
+                <h2 className="text-2xl font-extralight mb-6 flex items-center gap-3">
+                  <Bot className="w-6 h-6 text-primary" />
+                  Agent Marketplaces
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {marketplacePlatforms.map(renderPlatformCard)}
+                </div>
+              </div>
+            )}
+
+            {/* Getting Started */}
+            <Card className="glass-card p-8 border-primary/20">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 rounded-full bg-primary/10">
+                    <ArrowRight className="w-8 h-8 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-light mb-1">Ready to Connect Your AI Agent?</h3>
+                    <p className="text-muted-foreground text-sm">
+                      After creating your agent, go to Data → Connection Dashboard to link it to Sibe.
+                    </p>
+                  </div>
+                </div>
+                <Button variant="outline" className="shrink-0" onClick={() => window.location.href = '/dashboard'}>
+                  Open Dashboard
+                </Button>
+              </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="community" className="mt-6">
+            <CommunityDevelopers 
+              filterSpecialties={['openai', 'anthropic', 'langchain', 'crewai', 'autogen', 'huggingface']}
+              title="AI Agent Developers"
+              subtitle="Connect with experts who can help you build and deploy AI agents"
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

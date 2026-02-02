@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Database, Layers, Users, FileText, Settings } from "lucide-react";
+import { Database, Layers, Bot, FileText, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import HomeChat from "@/components/HomeChat";
@@ -10,8 +10,8 @@ const Index = () => {
   
   const menuItems = [
     { icon: Database, label: "Data", path: "/dashboard" },
-    { icon: Layers, label: "Canvas", path: "/canvas" },
-    { icon: Users, label: "AI Employees", path: "/employees" },
+    { icon: Layers, label: "Integrations", path: "/canvas" },
+    { icon: Bot, label: "AI Agents", path: "/employees" },
     { icon: FileText, label: "Reports", path: "/reports" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
