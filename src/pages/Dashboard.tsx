@@ -11,7 +11,9 @@ import ConnectionDashboard from "@/components/ConnectionDashboard";
 import KPITargetSetting from "@/components/KPITargetSetting";
 import BusinessDNA from "@/components/BusinessDNA";
 import KPIAlerts from "@/components/KPIAlerts";
+import OnboardingWizard from "@/components/OnboardingWizard";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Brain, Database, Lightbulb, RefreshCw, Clock, Plug } from "lucide-react";
 
 const Dashboard = () => {
@@ -20,11 +22,14 @@ const Dashboard = () => {
   const [metrics, setMetrics] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
+  const [connections, setConnections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [timeframe, setTimeframe] = useState("current");
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleTabChange = (value: string) => {
     setSearchParams({ tab: value }, { preventScrollReset: true });
@@ -36,34 +41,45 @@ const Dashboard = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: metricsData, error: metricsError } = await supabase
-        .from("business_metrics")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("period", period)
-        .order("created_at", { ascending: false })
-        .limit(4);
-      if (metricsError) throw metricsError;
+      const [metricsRes, insightsRes, plansRes, connectionsRes] = await Promise.all([
+        supabase
+          .from("business_metrics")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("period", period)
+          .order("created_at", { ascending: false })
+          .limit(4),
+        supabase
+          .from("ai_insights")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("business_plans")
+          .select("id, title, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("api_connections")
+          .select("*")
+          .eq("user_id", user.id)
+      ]);
 
-      const { data: insightsData, error: insightsError } = await supabase
-        .from("ai_insights")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(5);
-      if (insightsError) throw insightsError;
+      if (metricsRes.error) throw metricsRes.error;
+      if (insightsRes.error) throw insightsRes.error;
+      if (plansRes.error) throw plansRes.error;
 
-      const { data: plansData, error: plansError } = await supabase
-        .from("business_plans")
-        .select("id, title, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      if (plansError) throw plansError;
-
-      setMetrics(metricsData || []);
-      setInsights(insightsData || []);
-      setPlans(plansData || []);
+      setMetrics(metricsRes.data || []);
+      setInsights(insightsRes.data || []);
+      setPlans(plansRes.data || []);
+      setConnections(connectionsRes.data || []);
       setLastRefresh(new Date());
+
+      // Show onboarding if no connections exist
+      if ((connectionsRes.data || []).length === 0 && !localStorage.getItem('sibe_onboarding_complete')) {
+        setShowOnboarding(true);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
       toast({
@@ -75,6 +91,12 @@ const Dashboard = () => {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('sibe_onboarding_complete', 'true');
+    setShowOnboarding(false);
+    fetchData();
   };
 
   const handleRefresh = async () => {
@@ -230,6 +252,13 @@ const Dashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Onboarding Wizard */}
+      <OnboardingWizard 
+        open={showOnboarding} 
+        onOpenChange={setShowOnboarding}
+        onComplete={handleOnboardingComplete}
+      />
     </div>
   );
 };

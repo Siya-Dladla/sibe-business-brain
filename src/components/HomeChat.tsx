@@ -859,15 +859,15 @@ const HomeChat = () => {
 
   const suggestedPrompts = isMobile 
     ? [
-        { text: "Create workflow", icon: <Zap className="w-3 h-3" /> },
-        { text: "My APIs", icon: <Link2 className="w-3 h-3" /> },
-        { text: "My documents", icon: <FileText className="w-3 h-3" /> },
-        { text: "Data overview", icon: <Database className="w-3 h-3" /> }
+        { text: "Sync my data", icon: <Database className="w-3 h-3" /> },
+        { text: "My connections", icon: <Link2 className="w-3 h-3" /> },
+        { text: "Revenue chart", icon: <LineChart className="w-3 h-3" /> },
+        { text: "Data overview", icon: <BarChart3 className="w-3 h-3" /> }
       ]
     : [
         { text: "Show my connected APIs and data sources", icon: <Link2 className="w-4 h-4" /> },
-        { text: "What documents have I uploaded?", icon: <FileText className="w-4 h-4" /> },
-        { text: "Give me a complete data overview", icon: <Database className="w-4 h-4" /> },
+        { text: "Sync all my data from connected sources", icon: <Database className="w-4 h-4" /> },
+        { text: "Give me a complete data overview", icon: <BarChart3 className="w-4 h-4" /> },
         { text: "Show me revenue trends chart", icon: <LineChart className="w-4 h-4" /> }
       ];
 
@@ -1009,10 +1009,10 @@ const HomeChat = () => {
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center px-4">
             <h2 className="text-xl md:text-3xl font-light text-foreground/90 mb-2 text-center">
-              Command Center
+              Operator Chat
             </h2>
             <p className="text-xs md:text-sm text-muted-foreground mb-6 md:mb-8 text-center max-w-md">
-              Create workflows, hire AI employees, visualize data, and control your entire business from here
+              Manage integrations, sync data, visualize analytics, and control your e-commerce ecosystem
             </p>
             <div className={`grid gap-2 md:gap-3 w-full max-w-lg ${isMobile ? 'grid-cols-2' : 'grid-cols-2'}`}>
               {suggestedPrompts.map((prompt, i) => (
@@ -1080,7 +1080,7 @@ const HomeChat = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Create workflow, hire AI, visualize data..."
+            placeholder="Sync data, view metrics, analyze performance..."
             className="w-full min-h-[48px] md:min-h-[56px] max-h-28 md:max-h-32 resize-none bg-card border-border rounded-2xl px-3 py-3 md:px-4 md:py-4 pr-24 md:pr-28 text-base md:text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-0"
             disabled={isLoading}
           />
@@ -1110,7 +1110,7 @@ const HomeChat = () => {
           </div>
         </div>
         <p className={`text-center text-muted-foreground/50 mt-2 ${isMobile ? 'text-[9px]' : 'text-[10px] mt-3'}`}>
-          {isListening ? "🎙️ Listening..." : "Sibe SI • Full app control enabled"}
+          {isListening ? "🎙️ Listening..." : "Sibe SI • Integration & Data Hub"}
         </p>
       </div>
     </div>
