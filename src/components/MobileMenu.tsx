@@ -27,7 +27,7 @@ const MobileMenu = () => {
   };
   const menuItems = [{
     icon: Home,
-    label: "Home",
+    label: "Command Centre",
     path: "/"
   }, {
     icon: Database,
