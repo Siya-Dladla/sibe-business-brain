@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon } from "lucide-react";
+import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Headphones } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -86,7 +86,7 @@ const Settings = () => {
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
-      navigate("/");
+      navigate("/auth");
       toast({
         title: "Signed Out",
         description: "You have been signed out successfully"
@@ -118,7 +118,7 @@ const Settings = () => {
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
-          <p className="text-primary text-lg font-light">Configure your SIBE SI platform</p>
+          <p className="text-primary text-lg font-light">Configure your SIBE platform & integrations</p>
         </div>
 
         <div className="space-y-6">
@@ -274,15 +274,19 @@ const Settings = () => {
           <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
               <CreditCard className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Subscription</h2>
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Subscription Plans</h2>
             </div>
 
             <div className="space-y-6">
+              {/* Professional Plan */}
               <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-border/30">
                 <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-light text-primary">Professional Plan</h3>
-                    <p className="text-sm text-muted-foreground">Current subscription</p>
+                  <div className="flex items-center gap-3">
+                    <Zap className="w-6 h-6 text-primary" />
+                    <div>
+                      <h3 className="text-xl font-light text-primary">Professional Plan</h3>
+                      <p className="text-sm text-muted-foreground">Self-service automation</p>
+                    </div>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-light text-foreground">$49<span className="text-sm text-muted-foreground">/mo</span></p>
@@ -296,41 +300,114 @@ const Settings = () => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-foreground">
                     <Check className="w-4 h-4 text-green-500" />
-                    <span>Unlimited AI Employees</span>
+                    <span>Unlimited Data Source Connections</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-foreground">
                     <Check className="w-4 h-4 text-green-500" />
-                    <span>Advanced Analytics & Insights</span>
+                    <span>Third-Party Workflow Integrations</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-foreground">
                     <Check className="w-4 h-4 text-green-500" />
-                    <span>Priority Support</span>
+                    <span>AI Agent Connections</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-foreground">
                     <Check className="w-4 h-4 text-green-500" />
-                    <span>Canvas Project Management</span>
+                    <span>Operator Chat Assistant</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-green-500" />
+                    <span>Community Developer Access</span>
                   </div>
                 </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    onClick={() => {
-                      toast({
-                        title: "Trial Started",
-                        description: "Starting your $1 30-day trial. You'll be charged $49/month after the trial ends."
-                      });
-                    }}
-                    className="h-12 bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    Start $1 Trial
-                  </Button>
-                </div>
-                <Button variant="outline" className="w-full glass-button border-destructive/30 text-destructive hover:bg-destructive/10">
-                  Cancel Subscription
+                <Button
+                  onClick={() => {
+                    toast({
+                      title: "Trial Started",
+                      description: "Starting your $1 30-day trial. You'll be charged $49/month after the trial ends."
+                    });
+                  }}
+                  className="w-full mt-4 h-12 bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  Start $1 Trial
                 </Button>
               </div>
+
+              {/* VIP Plan */}
+              <div className="p-6 rounded-lg bg-gradient-to-br from-yellow-500/20 via-amber-500/10 to-orange-500/20 border-2 border-yellow-500/50 relative overflow-hidden">
+                <div className="absolute top-3 right-3">
+                  <span className="px-3 py-1 text-xs font-semibold bg-yellow-500 text-black rounded-full">
+                    RECOMMENDED
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <Crown className="w-7 h-7 text-yellow-500" />
+                    <div>
+                      <h3 className="text-xl font-light text-yellow-500">VIP Plan</h3>
+                      <p className="text-sm text-muted-foreground">Full-service managed solution</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-light text-foreground">$199<span className="text-sm text-muted-foreground">/mo</span></p>
+                    <p className="text-xs text-yellow-500/80">Done-for-you service</p>
+                  </div>
+                </div>
+                <div className="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                  <p className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-yellow-500" />
+                    SGD Business Analysis & Projects Included FREE
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Our team builds, configures, and deploys your entire ecosystem
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-yellow-500" />
+                    <span className="font-medium">Everything in Professional, plus:</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-yellow-500" />
+                    <span>Custom Store Setup & Configuration</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-yellow-500" />
+                    <span>AI Agent & Workflow Creation</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-yellow-500" />
+                    <span>Full Ecosystem Deployment</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-yellow-500" />
+                    <span>Dedicated Account Manager</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-yellow-500" />
+                    <span>Priority 24/7 Support</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-4 h-4 text-yellow-500" />
+                    <span>Monthly Strategy Consultation</span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => {
+                    toast({
+                      title: "VIP Upgrade Request Sent",
+                      description: "Our team will contact you within 24 hours to set up your VIP account."
+                    });
+                  }}
+                  className="w-full mt-4 h-12 bg-yellow-500 text-black hover:bg-yellow-400 font-medium"
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Upgrade to VIP
+                </Button>
+              </div>
+
+              <Button variant="outline" className="w-full glass-button border-destructive/30 text-destructive hover:bg-destructive/10">
+                Cancel Subscription
+              </Button>
             </div>
           </Card>
 
@@ -344,7 +421,7 @@ const Settings = () => {
             <div className="space-y-4 text-sm">
               <div className="flex justify-between py-3 border-b border-border/30">
                 <span className="text-muted-foreground font-light">Platform Version</span>
-                <span className="text-primary font-light">SIBE SI v6.0</span>
+                <span className="text-primary font-light">SIBE v6.0</span>
               </div>
 
               <div className="flex justify-between py-3 border-b border-border/30">
@@ -378,7 +455,7 @@ const Settings = () => {
 
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground font-light">
-                Sign out from your SIBE SI account. You can sign back in at any time.
+                Sign out from your SIBE account. You can sign back in at any time.
               </p>
 
               <Button onClick={handleSignOut} variant="outline" className="glass-button border-destructive/30 text-destructive hover:bg-destructive/10 h-11 px-8">

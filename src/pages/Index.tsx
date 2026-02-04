@@ -1,12 +1,17 @@
-import { Link } from "react-router-dom";
-import { Database, Layers, Bot, FileText, Settings } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Database, Layers, Bot, FileText, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import HomeChat from "@/components/HomeChat";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const isMobile = useIsMobile();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   const menuItems = [
     { icon: Database, label: "Data", path: "/dashboard" },
@@ -15,6 +20,15 @@ const Index = () => {
     { icon: FileText, label: "Reports", path: "/reports" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been successfully signed out."
+    });
+    navigate("/");
+  };
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col overflow-hidden">
@@ -41,15 +55,27 @@ const Index = () => {
               </Link>
             ))}
           </nav>
-          <Link to="/auth">
+          {user ? (
             <Button
               variant="outline"
               size="sm"
+              onClick={handleSignOut}
               className="text-muted-foreground border-border hover:bg-muted hover:text-foreground text-xs h-8 px-3"
             >
-              Sign In
+              <LogOut className="w-3 h-3 mr-1" />
+              Sign Out
             </Button>
-          </Link>
+          ) : (
+            <Link to="/auth">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-muted-foreground border-border hover:bg-muted hover:text-foreground text-xs h-8 px-3"
+              >
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
       </header>
 
