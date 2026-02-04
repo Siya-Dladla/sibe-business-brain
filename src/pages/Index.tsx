@@ -31,9 +31,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col overflow-hidden">
-      {/* Header */}
-      <header className="shrink-0 px-3 py-2 md:p-4 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50 safe-area-inset-top">
+    <div className="min-h-[100dvh] bg-background flex flex-col overflow-hidden safe-area-inset">
+      {/* Header - Mobile optimized */}
+      <header className="shrink-0 px-3 py-2 md:p-4 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50 pt-safe">
         <div className="flex items-center gap-2">
           <MobileMenu />
           {!isMobile && (
@@ -60,17 +60,17 @@ const Index = () => {
               variant="outline"
               size="sm"
               onClick={handleSignOut}
-              className="text-muted-foreground border-border hover:bg-muted hover:text-foreground text-xs h-8 px-3"
+              className="text-muted-foreground border-border hover:bg-muted hover:text-foreground text-xs h-8 px-3 active:scale-95 transition-transform"
             >
               <LogOut className="w-3 h-3 mr-1" />
-              Sign Out
+              <span className="hidden sm:inline">Sign Out</span>
             </Button>
           ) : (
             <Link to="/auth">
               <Button
                 variant="outline"
                 size="sm"
-                className="text-muted-foreground border-border hover:bg-muted hover:text-foreground text-xs h-8 px-3"
+                className="text-muted-foreground border-border hover:bg-muted hover:text-foreground text-xs h-8 px-3 active:scale-95 transition-transform"
               >
                 Sign In
               </Button>
@@ -80,12 +80,12 @@ const Index = () => {
       </header>
 
       {/* Main Chat Area */}
-      <main className="flex-1 flex min-h-0 overflow-hidden">
+      <main className="flex-1 flex min-h-0 overflow-hidden touch-pan-y">
         <HomeChat />
       </main>
 
       {/* Footer - Hidden on mobile for more space */}
-      <footer className="hidden md:flex shrink-0 p-3 border-t border-border items-center justify-center bg-background">
+      <footer className="hidden md:flex shrink-0 p-3 border-t border-border items-center justify-center bg-background pb-safe">
         <p className="text-[10px] text-muted-foreground/50">
           © 2025 SGD Business Analysis & Projects | Synthetic Intelligence Business Engine
         </p>

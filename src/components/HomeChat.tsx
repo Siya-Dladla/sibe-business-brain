@@ -859,16 +859,17 @@ const HomeChat = () => {
 
   const suggestedPrompts = isMobile 
     ? [
-        { text: "Sync my data", icon: <Database className="w-3 h-3" /> },
-        { text: "My connections", icon: <Link2 className="w-3 h-3" /> },
-        { text: "Revenue chart", icon: <LineChart className="w-3 h-3" /> },
-        { text: "Data overview", icon: <BarChart3 className="w-3 h-3" /> }
+        { text: "Scale my store", icon: <TrendingUp className="w-3 h-3" /> },
+        { text: "Top products", icon: <BarChart3 className="w-3 h-3" /> },
+        { text: "Revenue trends", icon: <LineChart className="w-3 h-3" /> },
+        { text: "Sync data", icon: <Database className="w-3 h-3" /> }
       ]
     : [
-        { text: "Show my connected APIs and data sources", icon: <Link2 className="w-4 h-4" /> },
-        { text: "Sync all my data from connected sources", icon: <Database className="w-4 h-4" /> },
-        { text: "Give me a complete data overview", icon: <BarChart3 className="w-4 h-4" /> },
-        { text: "Show me revenue trends chart", icon: <LineChart className="w-4 h-4" /> }
+        { text: "How can I scale my ecommerce store faster?", icon: <TrendingUp className="w-4 h-4" /> },
+        { text: "What are my top performing products this month?", icon: <BarChart3 className="w-4 h-4" /> },
+        { text: "Show me customer acquisition trends", icon: <LineChart className="w-4 h-4" /> },
+        { text: "Sync all my data from Shopify and Meta", icon: <Database className="w-4 h-4" /> },
+        { text: "Analyze my ad spend ROI", icon: <PieChart className="w-4 h-4" /> }
       ];
 
   return (
