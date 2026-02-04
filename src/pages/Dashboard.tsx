@@ -139,7 +139,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background grid-bg">
-      <div className="p-4 md:p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground sticky top-0 z-40">
+      <div className="p-4 md:p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground sticky top-0 z-40 pt-safe">
         <MobileMenu />
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-muted-foreground" />
@@ -149,20 +149,20 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 py-6 md:py-8 bg-primary-foreground">
+      <div className="container mx-auto px-4 md:px-6 py-6 md:py-8 bg-primary-foreground pb-safe">
         <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-3 md:gap-4">
             <Brain className="w-8 h-8 md:w-10 md:h-10 text-primary animate-pulse" />
             <div>
-              <h1 className="text-2xl md:text-4xl font-extralight tracking-wide">Sibe SI</h1>
-              <p className="text-xs text-muted-foreground">Data Intelligence Dashboard</p>
+              <h1 className="text-2xl md:text-4xl font-extralight tracking-wide">Scale with Data</h1>
+              <p className="text-xs text-muted-foreground">AI-Powered Ecommerce Intelligence</p>
             </div>
           </div>
 
           {/* Refresh Controls */}
           <div className="flex items-center gap-3">
             <Select value={timeframe} onValueChange={handleTimeframeChange}>
-              <SelectTrigger className="w-[140px] bg-background border-border/50">
+              <SelectTrigger className="w-[140px] bg-background border-border/50 touch-manipulation">
                 <SelectValue placeholder="Timeframe" />
               </SelectTrigger>
               <SelectContent>
@@ -179,7 +179,7 @@ const Dashboard = () => {
               size="sm"
               onClick={handleRefresh}
               disabled={refreshing}
-              className="gap-2"
+              className="gap-2 active:scale-95 transition-transform touch-manipulation"
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
               <span className="hidden sm:inline">Refresh</span>

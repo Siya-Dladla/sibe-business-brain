@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Safe area insets for native mobile */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
@@ -321,5 +329,43 @@ All colors MUST be HSL.
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
+  }
+
+  /* Safe area utilities for native mobile */
+  .safe-area-inset {
+    padding-top: var(--sat);
+    padding-right: var(--sar);
+    padding-bottom: var(--sab);
+    padding-left: var(--sal);
+  }
+
+  .pt-safe {
+    padding-top: max(0.5rem, var(--sat));
+  }
+
+  .pb-safe {
+    padding-bottom: max(0.75rem, var(--sab));
+  }
+
+  /* Mobile touch optimizations */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Ecommerce scaling gradients */
+  .scale-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(142 76% 36%));
+  }
+
+  .revenue-gradient {
+    background: linear-gradient(135deg, hsl(142 76% 36%), hsl(217 91% 60%));
+  }
+
+  /* Native app feel */
+  @supports (-webkit-touch-callout: none) {
+    .native-bounce {
+      -webkit-overflow-scrolling: touch;
+    }
   }
 }
