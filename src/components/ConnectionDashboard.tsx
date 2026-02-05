@@ -43,9 +43,11 @@ import {
   Workflow,
   Bot,
   ShoppingCart,
-  Activity
+  Activity,
+  Pencil
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import EditConnectionDialog from "@/components/EditConnectionDialog";
 
 interface APIConnection {
   id: string;
@@ -106,6 +108,11 @@ const ConnectionDashboard = () => {
   const [syncing, setSyncing] = useState<string | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [addType, setAddType] = useState<'api' | 'workflow' | 'agent'>('api');
+  
+  // Edit dialog state
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editType, setEditType] = useState<'api' | 'workflow' | 'agent'>('api');
+  const [editConnection, setEditConnection] = useState<any>(null);
   
   // Form states
   const [feedType, setFeedType] = useState("");
@@ -315,6 +322,12 @@ const ConnectionDashboard = () => {
       toast({ title: "Deleted", description: "Connection removed successfully" });
       loadAllConnections();
     }
+  };
+
+  const handleEdit = (type: 'api' | 'workflow' | 'agent', connection: any) => {
+    setEditType(type);
+    setEditConnection(connection);
+    setEditDialogOpen(true);
   };
 
   const getStatusIcon = (status: string) => {
@@ -685,6 +698,13 @@ const ConnectionDashboard = () => {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => handleEdit('api', conn)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleDelete('api', conn.id)}
                           className="text-destructive hover:text-destructive"
                         >
@@ -727,6 +747,13 @@ const ConnectionDashboard = () => {
                         <Badge variant="outline" className="text-xs">
                           {wf.status}
                         </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit('workflow', wf)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -775,6 +802,13 @@ const ConnectionDashboard = () => {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => handleEdit('agent', agent)}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleDelete('agent', agent.id)}
                           className="text-destructive hover:text-destructive"
                         >
@@ -789,6 +823,15 @@ const ConnectionDashboard = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Edit Connection Dialog */}
+      <EditConnectionDialog
+        type={editType}
+        connection={editConnection}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSaved={loadAllConnections}
+      />
     </div>
   );
 };

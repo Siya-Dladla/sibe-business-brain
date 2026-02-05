@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Database, Layers, Bot, FileText, Settings, LogOut } from "lucide-react";
+import { Database, Layers, FileText, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import HomeChat from "@/components/HomeChat";
@@ -16,7 +16,6 @@ const Index = () => {
   const menuItems = [
     { icon: Database, label: "Data", path: "/dashboard" },
     { icon: Layers, label: "Integrations", path: "/canvas" },
-    { icon: Bot, label: "AI Agents", path: "/employees" },
     { icon: FileText, label: "Reports", path: "/reports" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
