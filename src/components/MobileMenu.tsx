@@ -1,28 +1,40 @@
 import { useState } from "react";
-import { Menu, Home, Database, Layers, Bot, FileText, Settings, LogOut } from "lucide-react";
+import { Menu, Home, Database, Layers, FileText, Settings, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useFeedback } from "@/hooks/useFeedback";
+
 const MobileMenu = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const {
-    signOut,
-    user
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
+  const { signOut, user } = useAuth();
+  const { toast } = useToast();
+  const feedback = useFeedback();
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen) {
+      feedback.navigate();
+    }
+    setOpen(isOpen);
+  };
+
   const handleSignOut = async () => {
+    feedback.confirm();
     await signOut();
     toast({
       title: "Signed out",
       description: "You have been successfully signed out."
     });
     navigate("/auth");
+    setOpen(false);
+  };
+
+  const handleNavClick = () => {
+    feedback.light();
     setOpen(false);
   };
   const menuItems = [{
@@ -46,9 +58,13 @@ const MobileMenu = () => {
     label: "Settings",
     path: "/settings"
   }];
-  return <Sheet open={open} onOpenChange={setOpen}>
+  return (
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
-        <button className="glass-button p-3 rounded-lg hover-lift bg-primary-foreground active:scale-95 transition-transform touch-manipulation">
+        <button 
+          className="glass-button p-3 rounded-lg hover-lift bg-primary-foreground active:scale-95 transition-transform touch-manipulation"
+          onClick={() => feedback.light()}
+        >
           <Menu className="w-6 h-6 text-primary" />
         </button>
       </SheetTrigger>
@@ -64,7 +80,12 @@ const MobileMenu = () => {
               const isActive = location.pathname === item.path || 
                 (item.path === "/dashboard" && location.pathname === "/dashboard");
               return (
-                <Link key={index} to={item.path} onClick={() => setOpen(false)} className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group active:scale-[0.98] touch-manipulation ${isActive ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}>
+                <Link 
+                  key={index} 
+                  to={item.path} 
+                  onClick={handleNavClick} 
+                  className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group active:scale-[0.98] touch-manipulation ${isActive ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}
+                >
                   <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
                   <span className={`text-base font-light ${isActive ? "text-primary" : "text-foreground"}`}>{item.label}</span>
                 </Link>
@@ -73,10 +94,16 @@ const MobileMenu = () => {
           </nav>
 
           <div className="p-8 border-t border-primary/20 space-y-4 pb-safe">
-            {user && <Button onClick={handleSignOut} variant="outline" className="w-full glass-button justify-start text-primary border-primary/30 hover:bg-primary/10 active:scale-95 transition-transform touch-manipulation">
+            {user && (
+              <Button 
+                onClick={handleSignOut} 
+                variant="outline" 
+                className="w-full glass-button justify-start text-primary border-primary/30 hover:bg-primary/10 active:scale-95 transition-transform touch-manipulation"
+              >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
-              </Button>}
+              </Button>
+            )}
             <div>
               <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
               <p className="text-xs text-primary/50 mt-1">v6.0 Professional</p>
@@ -84,6 +111,8 @@ const MobileMenu = () => {
           </div>
         </div>
       </SheetContent>
-    </Sheet>;
+    </Sheet>
+  );
 };
+
 export default MobileMenu;
