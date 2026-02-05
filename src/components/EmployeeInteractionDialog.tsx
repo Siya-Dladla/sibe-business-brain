@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Send, Sparkles, Mic, MicOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useFeedback } from "@/hooks/useFeedback";
 
 interface AIEmployee {
   id: string;
@@ -33,6 +34,7 @@ const EmployeeInteractionDialog = ({ employee, open, onOpenChange }: EmployeeInt
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
+  const feedback = useFeedback();
 
   // Initialize Web Speech API
   useEffect(() => {
@@ -93,6 +95,7 @@ const EmployeeInteractionDialog = ({ employee, open, onOpenChange }: EmployeeInt
 
   const toggleVoiceInput = () => {
     if (!recognitionRef.current) {
+      feedback.warning();
       toast({
         title: "Voice Input Unavailable",
         description: "Your browser doesn't support voice input. Try Chrome or Edge.",
@@ -104,9 +107,11 @@ const EmployeeInteractionDialog = ({ employee, open, onOpenChange }: EmployeeInt
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
+      feedback.toggle();
     } else {
       recognitionRef.current.start();
       setIsListening(true);
+      feedback.toggle();
       toast({
         title: "Listening...",
         description: "Speak now. Click the mic button again to stop.",
@@ -116,6 +121,8 @@ const EmployeeInteractionDialog = ({ employee, open, onOpenChange }: EmployeeInt
 
   const sendMessage = async () => {
     if (!input.trim() || !employee) return;
+
+    feedback.messageSent();
 
     // Stop listening if active
     if (isListening && recognitionRef.current) {
@@ -138,11 +145,13 @@ const EmployeeInteractionDialog = ({ employee, open, onOpenChange }: EmployeeInt
 
       if (error) throw error;
 
+      feedback.messageReceived();
       setMessages(prev => [...prev, { 
         role: "assistant", 
         content: data.response || "I'm here to help with your business needs." 
       }]);
     } catch (error: any) {
+      feedback.error();
       toast({
         title: "Error",
         description: error.message,

@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Send, Loader2, Brain } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useFeedback } from "@/hooks/useFeedback";
+
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -19,9 +21,8 @@ const SibeChat = forwardRef((props, ref) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const feedback = useFeedback();
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth"
@@ -32,6 +33,9 @@ const SibeChat = forwardRef((props, ref) => {
   }, [messages]);
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
+    
+    feedback.messageSent();
+    
     const userMessage: Message = {
       role: "user",
       content: input,
@@ -41,19 +45,16 @@ const SibeChat = forwardRef((props, ref) => {
     setInput("");
     setIsLoading(true);
     try {
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke("sibe-chat", {
-        body: {
-          message: input
-        }
+      const { data, error } = await supabase.functions.invoke("sibe-chat", {
+        body: { message: input }
       });
       if (error) throw error;
       
       if (data.error) {
         throw new Error(data.error);
       }
+      
+      feedback.messageReceived();
       
       const assistantMessage: Message = {
         role: "assistant",
@@ -63,6 +64,7 @@ const SibeChat = forwardRef((props, ref) => {
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error: any) {
       console.error("Chat error:", error);
+      feedback.error();
       const errorMessage = error?.message || "Failed to connect with Sibe SI. Please try again.";
       toast({
         title: "Communication Error",
