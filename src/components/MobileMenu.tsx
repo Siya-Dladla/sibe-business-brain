@@ -38,10 +38,6 @@ const MobileMenu = () => {
     label: "Integrations",
     path: "/canvas"
   }, {
-    icon: Bot,
-    label: "AI Agents",
-    path: "/employees"
-  }, {
     icon: FileText,
     label: "Reports",
     path: "/reports"
