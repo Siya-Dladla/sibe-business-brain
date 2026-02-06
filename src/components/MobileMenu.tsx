@@ -23,7 +23,7 @@ const MobileMenu = () => {
   };
 
   const handleSignOut = async () => {
-    feedback.confirm();
+    feedback.impact();
     await signOut();
     toast({
       title: "Signed out",
@@ -34,7 +34,7 @@ const MobileMenu = () => {
   };
 
   const handleNavClick = () => {
-    feedback.light();
+    feedback.tap();
     setOpen(false);
   };
   const menuItems = [{
@@ -63,7 +63,7 @@ const MobileMenu = () => {
       <SheetTrigger asChild>
         <button 
           className="glass-button p-3 rounded-lg hover-lift bg-primary-foreground active:scale-95 transition-transform touch-manipulation"
-          onClick={() => feedback.light()}
+          onClick={() => feedback.tap()}
         >
           <Menu className="w-6 h-6 text-primary" />
         </button>

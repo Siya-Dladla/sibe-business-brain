@@ -1,93 +1,161 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHaptics } from './useHaptics';
 import { useSounds } from './useSounds';
 
-// Combined hook for synchronized haptic + sound feedback
+type SoundPack = 'ios' | 'minimal' | 'retro' | 'none';
+
+interface SoundSettings {
+  enabled: boolean;
+  soundPack: SoundPack;
+  volume: number;
+}
+
+// Local storage key for sound settings
+const STORAGE_KEY = 'sibe-sound-settings';
+
+const getStoredSettings = (): SoundSettings => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch {
+    // Fallback to defaults
+  }
+  return { enabled: true, soundPack: 'ios', volume: 0.5 };
+};
+
+/**
+ * Combined feedback hook for iOS-like interactions
+ * Provides synchronized sound and haptic feedback
+ */
 export const useFeedback = () => {
+  const [settings, setSettings] = useState<SoundSettings>(getStoredSettings);
+
+  // Listen for storage changes (from Settings page)
+  useEffect(() => {
+    const handleStorage = () => {
+      setSettings(getStoredSettings());
+    };
+    
+    // Custom event for same-tab updates
+    window.addEventListener('sound-settings-changed', handleStorage);
+    // Storage event for cross-tab
+    window.addEventListener('storage', handleStorage);
+    
+    return () => {
+      window.removeEventListener('sound-settings-changed', handleStorage);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
   const haptics = useHaptics();
-  const sounds = useSounds();
+  const sounds = useSounds(settings.soundPack, settings.volume);
 
-  // Light interaction - toggles, selections
-  const light = useCallback(async () => {
+  // Update sounds enabled state based on settings
+  useEffect(() => {
+    sounds.setEnabled(settings.enabled);
+  }, [settings.enabled, sounds]);
+
+  // Light tap - for small UI interactions
+  const tap = useCallback(() => {
+    haptics.lightTap();
     sounds.tap();
-    await haptics.lightTap();
   }, [haptics, sounds]);
 
-  // Button press
-  const buttonPress = useCallback(async () => {
+  // Medium feedback - for button presses
+  const button = useCallback(() => {
+    haptics.mediumTap();
     sounds.click();
-    await haptics.mediumTap();
   }, [haptics, sounds]);
 
-  // Success action
-  const success = useCallback(async () => {
-    sounds.success();
-    await haptics.success();
+  // Button press alias
+  const buttonPress = useCallback(() => {
+    haptics.mediumTap();
+    sounds.click();
   }, [haptics, sounds]);
 
-  // Error action
-  const error = useCallback(async () => {
-    sounds.error();
-    await haptics.error();
-  }, [haptics, sounds]);
-
-  // Warning
-  const warning = useCallback(async () => {
-    sounds.warning();
-    await haptics.warning();
-  }, [haptics, sounds]);
-
-  // Navigation
-  const navigate = useCallback(async () => {
-    sounds.swoosh();
-    await haptics.lightTap();
-  }, [haptics, sounds]);
-
-  // Toggle/switch
-  const toggle = useCallback(async () => {
+  // Toggle feedback - for switches
+  const toggle = useCallback(() => {
+    haptics.lightTap();
     sounds.pop();
-    await haptics.lightTap();
+  }, [haptics, sounds]);
+
+  // Selection feedback - for dropdowns, pickers
+  const select = useCallback(() => {
+    haptics.selectionChanged();
+    sounds.pop();
+  }, [haptics, sounds]);
+
+  // Light feedback - simple alias
+  const light = useCallback(() => {
+    haptics.lightTap();
+    sounds.tap();
+  }, [haptics, sounds]);
+
+  // Confirm feedback - for confirmations
+  const confirm = useCallback(() => {
+    haptics.heavyTap();
+    sounds.click();
+  }, [haptics, sounds]);
+
+  // Success feedback
+  const success = useCallback(() => {
+    haptics.success();
+    sounds.success();
+  }, [haptics, sounds]);
+
+  // Error feedback
+  const error = useCallback(() => {
+    haptics.error();
+    sounds.error();
+  }, [haptics, sounds]);
+
+  // Warning feedback
+  const warning = useCallback(() => {
+    haptics.warning();
+    sounds.warning();
+  }, [haptics, sounds]);
+
+  // Navigation feedback
+  const navigate = useCallback(() => {
+    haptics.lightTap();
+    sounds.swoosh();
+  }, [haptics, sounds]);
+
+  // Heavy impact - for confirmations
+  const impact = useCallback(() => {
+    haptics.heavyTap();
+    sounds.click();
   }, [haptics, sounds]);
 
   // Message sent
-  const messageSent = useCallback(async () => {
+  const messageSent = useCallback(() => {
+    haptics.mediumTap();
     sounds.messageSent();
-    await haptics.mediumTap();
   }, [haptics, sounds]);
 
   // Message received
-  const messageReceived = useCallback(async () => {
+  const messageReceived = useCallback(() => {
+    haptics.lightTap();
     sounds.messageReceived();
-    await haptics.lightTap();
-  }, [haptics, sounds]);
-
-  // Selection changed (picker, list)
-  const selectionChanged = useCallback(async () => {
-    sounds.tap();
-    await haptics.selectionChanged();
-  }, [haptics, sounds]);
-
-  // Heavy confirmation
-  const confirm = useCallback(async () => {
-    sounds.pop();
-    await haptics.heavyTap();
   }, [haptics, sounds]);
 
   return {
-    light,
+    tap,
+    button,
     buttonPress,
+    toggle,
+    select,
+    light,
+    confirm,
     success,
     error,
     warning,
     navigate,
-    toggle,
+    impact,
     messageSent,
     messageReceived,
-    selectionChanged,
-    confirm,
-    // Expose individual APIs for custom combinations
-    haptics,
-    sounds,
   };
 };
 

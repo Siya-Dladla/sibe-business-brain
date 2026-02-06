@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Headphones } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
+import { useSoundSettings, type SoundPack } from "@/contexts/SoundSettingsContext";
+import { useFeedback } from "@/hooks/useFeedback";
 
 const Settings = () => {
   const [loading, setLoading] = useState(false);
@@ -27,6 +31,8 @@ const Settings = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const { settings: soundSettings, setEnabled: setSoundEnabled, setSoundPack, setVolume } = useSoundSettings();
+  const feedback = useFeedback();
 
   useEffect(() => {
     fetchProfile();
@@ -159,6 +165,93 @@ const Settings = () => {
                   </Button>
                 </div>
               </div>
+            </div>
+          </Card>
+
+          {/* Sound & Haptics Settings */}
+          <Card className="glass-card p-8 border-border/20">
+            <div className="flex items-center gap-3 mb-6">
+              {soundSettings.enabled ? (
+                <Volume2 className="w-6 h-6 text-primary" />
+              ) : (
+                <VolumeX className="w-6 h-6 text-muted-foreground" />
+              )}
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Sound & Haptics</h2>
+            </div>
+
+            <div className="space-y-6">
+              {/* Sound Toggle */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="sound-enabled">Sound Effects</Label>
+                  <p className="text-sm text-muted-foreground">Enable UI sound feedback</p>
+                </div>
+                <Switch
+                  id="sound-enabled"
+                  checked={soundSettings.enabled}
+                  onCheckedChange={(checked) => {
+                    setSoundEnabled(checked);
+                    toast({
+                      title: checked ? "Sound Enabled" : "Sound Disabled",
+                      description: checked ? "UI sounds are now on" : "UI sounds are now off"
+                    });
+                  }}
+                />
+              </div>
+
+              {/* Sound Pack Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="sound-pack">Sound Pack</Label>
+                <Select 
+                  value={soundSettings.soundPack} 
+                  onValueChange={(value: SoundPack) => {
+                    setSoundPack(value);
+                    feedback.success();
+                    toast({
+                      title: "Sound Pack Changed",
+                      description: `Switched to ${value === 'ios' ? 'iOS' : value === 'minimal' ? 'Minimal' : value === 'retro' ? 'Retro' : 'None'} sound pack`
+                    });
+                  }}
+                  disabled={!soundSettings.enabled}
+                >
+                  <SelectTrigger className="glass-button h-12">
+                    <SelectValue placeholder="Select sound pack" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ios">iOS Classic</SelectItem>
+                    <SelectItem value="minimal">Minimal</SelectItem>
+                    <SelectItem value="retro">Retro 8-bit</SelectItem>
+                    <SelectItem value="none">None (Haptics only)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Volume Slider */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>Volume</Label>
+                  <span className="text-sm text-muted-foreground">{Math.round(soundSettings.volume * 100)}%</span>
+                </div>
+                <Slider
+                  value={[soundSettings.volume * 100]}
+                  onValueChange={([value]) => setVolume(value / 100)}
+                  max={100}
+                  step={5}
+                  disabled={!soundSettings.enabled || soundSettings.soundPack === 'none'}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Test Sound Button */}
+              <Button
+                variant="outline"
+                className="w-full glass-button"
+                onClick={() => feedback.success()}
+                disabled={!soundSettings.enabled || soundSettings.soundPack === 'none'}
+              >
+                <Volume2 className="w-4 h-4 mr-2" />
+                Test Sound
+              </Button>
             </div>
           </Card>
 
