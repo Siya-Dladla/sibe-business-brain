@@ -14,7 +14,8 @@ import {
   Database,
   Clock,
   Mail,
-  Plus
+  Plus,
+  Bot
 } from "lucide-react";
 
 interface AIEmployee {
@@ -42,6 +43,13 @@ const actions = [
   { id: 'send_alert', name: 'Send Alert', icon: Bell, description: 'Notify users' },
   { id: 'send_email', name: 'Send Email', icon: Mail, description: 'Email notifications' },
   { id: 'sync_data', name: 'Sync Data', icon: Database, description: 'Sync with APIs' },
+];
+
+// Built-in AI platforms that can be added to workflows
+const aiPlatforms = [
+  { id: 'claude', name: 'ClaudeBot', icon: Bot, color: 'from-orange-500 to-amber-500', description: 'Anthropic Claude AI' },
+  { id: 'openai', name: 'OpenAI GPT', icon: Bot, color: 'from-green-500 to-emerald-500', description: 'GPT-4 powered' },
+  { id: 'gemini', name: 'Gemini', icon: Bot, color: 'from-blue-500 to-cyan-500', description: 'Google Gemini AI' },
 ];
 
 const WorkflowToolbar = ({ aiEmployees, onAddNode }: WorkflowToolbarProps) => {
@@ -106,6 +114,27 @@ const WorkflowToolbar = ({ aiEmployees, onAddNode }: WorkflowToolbarProps) => {
               No AI employees yet. Create one first!
             </p>
           )}
+          
+          {/* Built-in AI Platforms */}
+          <div className="pt-2 space-y-2">
+            <p className="text-xs text-muted-foreground">External AI Platforms</p>
+            {aiPlatforms.map((platform) => (
+              <Button
+                key={platform.id}
+                variant="outline"
+                className="w-full justify-start h-auto p-3 hover:bg-primary/10 hover:border-primary/30"
+                onClick={() => onAddNode('ai_employee', { platformId: platform.id, platformName: platform.name })}
+              >
+                <div className={`p-1.5 rounded-lg bg-gradient-to-br ${platform.color} mr-3`}>
+                  <platform.icon className="w-4 h-4 text-white" />
+                </div>
+                <div className="text-left flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{platform.name}</p>
+                  <p className="text-xs text-muted-foreground">{platform.description}</p>
+                </div>
+              </Button>
+            ))}
+          </div>
         </div>
 
         <Separator />

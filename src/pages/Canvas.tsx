@@ -76,6 +76,17 @@ const INTEGRATIONS: Integration[] = [
     connected: false
   },
   {
+    id: 'claude',
+    name: 'Claude by Anthropic',
+    description: 'Build AI agents with Claude for safe, helpful, and honest AI interactions.',
+    category: 'agent',
+    icon: Bot,
+    color: 'from-orange-500 to-amber-500',
+    url: 'https://console.anthropic.com',
+    features: ['200K context', 'Vision capabilities', 'Tool use', 'Constitutional AI'],
+    connected: false
+  },
+  {
     id: 'langchain',
     name: 'LangChain',
     description: 'Framework for developing applications powered by language models.',

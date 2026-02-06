@@ -44,7 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
       if (haptic && !props.disabled) {
-        feedback.buttonPress();
+        feedback.button();
       }
       onClick?.(e);
     }, [haptic, onClick, feedback, props.disabled]);
