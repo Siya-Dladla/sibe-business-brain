@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { Badge } from "@/components/ui/badge";
+import ClawdBotStatus from "@/components/ClawdBotStatus";
 
 interface Message {
   role: "user" | "assistant";
@@ -1032,6 +1033,7 @@ const HomeChat = () => {
       >
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center px-4">
+            <ClawdBotStatus />
             <h2 className="text-xl md:text-3xl font-light text-foreground/90 mb-2 text-center">
               Operator Chat
             </h2>
