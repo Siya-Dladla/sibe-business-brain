@@ -347,6 +347,19 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
     };
   }
 
+  // Ask ClawdBot / ClaudeBot patterns
+  if (lowerMessage.includes('clawdbot') || lowerMessage.includes('claudebot') || lowerMessage.includes('claude bot') ||
+      lowerMessage.includes('ask claude') || lowerMessage.includes('tell claude') ||
+      lowerMessage.includes('clawdbot analyze') || lowerMessage.includes('clawdbot sync') ||
+      lowerMessage.includes('clawdbot connect')) {
+    const queryMatch = message.match(/(?:clawdbot|claudebot|claude\s*bot|ask\s+claude|tell\s+claude)\s*[,:]?\s*(.+)/i);
+    return {
+      isCommand: true,
+      commandType: 'clawdbot_action',
+      params: { query: queryMatch?.[1]?.trim() || message }
+    };
+  }
+
   // Check connected APIs / data sources patterns
   if (lowerMessage.includes('connected api') || lowerMessage.includes('api connection') ||
       lowerMessage.includes('data source') || lowerMessage.includes('data feed') ||
@@ -937,6 +950,104 @@ Provide a helpful, role-appropriate response.`;
             }
             break;
 
+          case 'clawdbot_action':
+            // ClawdBot: AI assistant that can access all connected APIs and perform tasks
+            const clawdQuery = params.query || message;
+            const clawdLower = clawdQuery.toLowerCase();
+            
+            // Fetch all connected APIs and agents for ClawdBot context
+            const [
+              { data: clawdConnections },
+              { data: clawdAgents },
+              { data: clawdWorkflows },
+              { data: clawdMetrics },
+              { data: clawdEmployees }
+            ] = await Promise.all([
+              supabase.from('api_connections').select('*').eq('user_id', userId),
+              supabase.from('connected_agents').select('*').eq('user_id', userId),
+              supabase.from('ai_workflows').select('*').eq('user_id', userId).limit(10),
+              supabase.from('business_metrics').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(20),
+              supabase.from('ai_employees').select('*').eq('user_id', userId)
+            ]);
+
+            // Build ClawdBot context with full API access
+            let clawdContext = `You are ClawdBot, an advanced AI operations agent integrated into the Sibe Command Centre. You have access to all connected APIs and can orchestrate tasks across the entire ecosystem.\n\n`;
+            clawdContext += `=== CONNECTED DATA SOURCES ===\n`;
+            if (clawdConnections && clawdConnections.length > 0) {
+              clawdConnections.forEach((c: any) => {
+                clawdContext += `- ${c.name} (${c.provider}): Status=${c.status}, Endpoint=${c.api_endpoint || 'N/A'}, Last Sync=${c.last_sync_at || 'Never'}\n`;
+              });
+            } else {
+              clawdContext += `No data sources connected yet.\n`;
+            }
+            
+            clawdContext += `\n=== CONNECTED AI AGENTS ===\n`;
+            if (clawdAgents && clawdAgents.length > 0) {
+              clawdAgents.forEach((a: any) => {
+                clawdContext += `- ${a.agent_name} (${a.platform}): Status=${a.status}, Calls=${a.call_count || 0}\n`;
+              });
+            } else {
+              clawdContext += `No external AI agents connected.\n`;
+            }
+            
+            clawdContext += `\n=== ACTIVE WORKFLOWS ===\n`;
+            if (clawdWorkflows && clawdWorkflows.length > 0) {
+              clawdWorkflows.forEach((w: any) => {
+                clawdContext += `- ${w.name} (${w.status}): Runs=${w.run_count || 0}\n`;
+              });
+            }
+            
+            clawdContext += `\n=== BUSINESS METRICS ===\n`;
+            if (clawdMetrics && clawdMetrics.length > 0) {
+              clawdMetrics.forEach((m: any) => {
+                clawdContext += `- ${m.metric_name}: ${m.value}${m.change_percentage ? ` (${m.change_percentage > 0 ? '+' : ''}${m.change_percentage}%)` : ''}\n`;
+              });
+            }
+            
+            clawdContext += `\n=== AI TEAM ===\n`;
+            if (clawdEmployees && clawdEmployees.length > 0) {
+              clawdEmployees.forEach((e: any) => {
+                clawdContext += `- ${e.name}: ${e.role} in ${e.department}\n`;
+              });
+            }
+            
+            clawdContext += `\nYou can: analyze data across all connections, suggest workflow optimizations, coordinate AI employees, trigger syncs, generate reports, and provide strategic recommendations. Be concise, action-oriented, and reference specific data when available. If the user asks you to connect to an API, guide them to the Data section to add the connection. Sign off responses with "— ClawdBot 🤖"`;
+
+            const clawdResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: 'google/gemini-2.5-flash',
+                messages: [
+                  { role: 'system', content: clawdContext },
+                  { role: 'user', content: clawdQuery }
+                ],
+              }),
+            });
+
+            if (clawdResponse.ok) {
+              const clawdData = await clawdResponse.json();
+              const clawdResult = clawdData.choices[0].message.content;
+              
+              commandResult = { 
+                type: 'info', 
+                success: true, 
+                data: { 
+                  response: clawdResult, 
+                  connections: clawdConnections?.length || 0,
+                  agents: clawdAgents?.length || 0,
+                  workflows: clawdWorkflows?.length || 0 
+                },
+                message: 'clawdbot_response' 
+              };
+            } else {
+              commandResult = { type: 'info', success: false, message: 'ClawdBot failed to process your request. Please try again.' };
+            }
+            break;
+
           case 'list_reports':
             const { data: reports } = await supabase
               .from('reports')
@@ -1253,7 +1364,10 @@ Provide a helpful, role-appropriate response.`;
     context += "- 'Hire an AI marketing analyst' to review campaigns\n";
     context += "- 'Ask my AI accountant about cash flow'\n";
     context += "- Connect external workflows (n8n, Make, Zapier) for automation\n";
-    context += "- Link AI agents from OpenAI/Claude for specialized tasks\n\n";
+    context += "- Link AI agents from OpenAI/Claude for specialized tasks\n";
+    context += "- 'ClawdBot analyze my data' - invoke ClawdBot for cross-API analysis\n";
+    context += "- 'ClawdBot sync APIs' - check all connections and sync status\n";
+    context += "- 'ClawdBot recommend strategies' - get AI-powered scaling advice\n\n";
     
     context += "📈 SCALING STRATEGIES:\n";
     context += "- 'How can I scale my store faster?'\n";

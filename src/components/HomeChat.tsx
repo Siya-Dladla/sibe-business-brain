@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, BarChart3, X, Mic, MicOff, History, Plus, Trash2, ChevronLeft, ChevronRight, Zap, Users, TrendingUp, PieChart, LineChart, Database, FileText, Globe, Link2 } from "lucide-react";
+import { Send, Loader2, BarChart3, X, Mic, MicOff, History, Plus, Trash2, ChevronLeft, ChevronRight, Zap, Users, TrendingUp, PieChart, LineChart, Database, FileText, Globe, Link2, Bot } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -854,22 +854,45 @@ const HomeChat = () => {
       );
     }
 
+    // ClawdBot response
+    if (result.type === 'info' && result.message === 'clawdbot_response' && result.data) {
+      return (
+        <div className="mt-3 p-3 bg-gradient-to-br from-orange-500/10 to-amber-500/10 rounded-lg border border-orange-500/20">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1 rounded-md bg-gradient-to-br from-orange-500 to-amber-500">
+              <Bot className="w-3 h-3 text-white" />
+            </div>
+            <span className="text-sm font-medium text-orange-400">ClawdBot</span>
+            <div className="flex items-center gap-1 ml-auto">
+              <Badge variant="outline" className="text-[10px] border-orange-500/30 text-orange-400">
+                {result.data.connections} APIs
+              </Badge>
+              <Badge variant="outline" className="text-[10px] border-orange-500/30 text-orange-400">
+                {result.data.workflows} Workflows
+              </Badge>
+            </div>
+          </div>
+          <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">{result.data.response}</p>
+        </div>
+      );
+    }
+
     return null;
   };
 
   const suggestedPrompts = isMobile 
     ? [
-        { text: "Scale my store", icon: <TrendingUp className="w-3 h-3" /> },
+        { text: "ClawdBot analyze my data", icon: <Bot className="w-3 h-3" /> },
         { text: "Top products", icon: <BarChart3 className="w-3 h-3" /> },
         { text: "Revenue trends", icon: <LineChart className="w-3 h-3" /> },
-        { text: "Sync data", icon: <Database className="w-3 h-3" /> }
+        { text: "ClawdBot sync APIs", icon: <Database className="w-3 h-3" /> }
       ]
     : [
-        { text: "How can I scale my ecommerce store faster?", icon: <TrendingUp className="w-4 h-4" /> },
+        { text: "ClawdBot analyze my business performance", icon: <Bot className="w-4 h-4" /> },
+        { text: "ClawdBot check all my connected APIs and sync status", icon: <Link2 className="w-4 h-4" /> },
         { text: "What are my top performing products this month?", icon: <BarChart3 className="w-4 h-4" /> },
         { text: "Show me customer acquisition trends", icon: <LineChart className="w-4 h-4" /> },
-        { text: "Sync all my data from Shopify and Meta", icon: <Database className="w-4 h-4" /> },
-        { text: "Analyze my ad spend ROI", icon: <PieChart className="w-4 h-4" /> }
+        { text: "ClawdBot recommend scaling strategies", icon: <TrendingUp className="w-4 h-4" /> }
       ];
 
   return (
