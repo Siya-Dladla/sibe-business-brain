@@ -233,11 +233,10 @@ serve(async (req) => {
     });
 
   } catch (error: unknown) {
-    console.error('Webhook error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[webhook-receiver] error:', error);
     return new Response(JSON.stringify({
       success: false,
-      error: errorMessage,
+      error: 'An internal error occurred',
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -32,8 +32,8 @@ serve(async (req) => {
 
     const { websiteUrl } = await req.json();
 
-    if (!websiteUrl) {
-      throw new Error('Website URL is required');
+    if (!websiteUrl || typeof websiteUrl !== 'string' || websiteUrl.length > 2048) {
+      throw new Error('A valid website URL is required');
     }
 
     // Validate URL to prevent SSRF attacks
@@ -70,9 +70,14 @@ serve(async (req) => {
           'User-Agent': 'Mozilla/5.0 (compatible; SibeSI/1.0; +https://sibe-si.com)'
         },
         signal: controller.signal,
-        redirect: 'follow',
+        redirect: 'manual',
       });
       clearTimeout(timeout);
+
+      // If redirect, reject — prevents SSRF via open redirect to private IPs
+      if ([301, 302, 303, 307, 308].includes(websiteResponse.status)) {
+        throw new Error('Redirects are not followed for security reasons');
+      }
       
       if (websiteResponse.ok) {
         websiteContent = await websiteResponse.text();
@@ -232,14 +237,16 @@ Be detailed, specific, and strategic. Focus on practical insights for scaling.`
       }
     );
   } catch (error) {
-    console.error('Error in analyze-website function:', error);
+    console.error('[analyze-website] error:', error);
+    const message = error instanceof Error ? error.message : '';
+    const isClientError = message.includes('URL') || message.includes('Unauthorized') || message.includes('required') || message.includes('Redirect');
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: isClientError ? message : 'An internal error occurred' 
       }),
       { 
-        status: 500,
+        status: isClientError ? 400 : 500,
         headers: { 
           ...corsHeaders, 
           'Content-Type': 'application/json' 

@@ -146,12 +146,14 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('[generate-insights] error:', error);
+    const message = error instanceof Error ? error.message : '';
+    const isClientError = message === 'Unauthorized' || message.includes('authorization');
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: isClientError ? message : 'An internal error occurred' }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400 
+        status: isClientError ? 400 : 500 
       }
     );
   }
