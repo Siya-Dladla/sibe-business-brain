@@ -36,16 +36,43 @@ serve(async (req) => {
       throw new Error('Website URL is required');
     }
 
+    // Validate URL to prevent SSRF attacks
+    const parsedUrl = new URL(websiteUrl);
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      throw new Error('Only HTTP and HTTPS URLs are allowed');
+    }
+    const privateIpPatterns = [
+      /^127\./,
+      /^10\./,
+      /^172\.(1[6-9]|2[0-9]|3[01])\./,
+      /^192\.168\./,
+      /^169\.254\./,
+      /^localhost$/i,
+      /^0\.0\.0\.0$/,
+      /^\[::1\]$/,
+      /^\[fc/i,
+      /^\[fd/i,
+      /^\[fe80:/i,
+    ];
+    if (privateIpPatterns.some(p => p.test(parsedUrl.hostname))) {
+      throw new Error('Private or internal URLs are not allowed');
+    }
+
     console.log('Fetching website:', websiteUrl);
 
     // Fetch the website content
     let websiteContent = '';
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
       const websiteResponse = await fetch(websiteUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; SibeSI/1.0; +https://sibe-si.com)'
-        }
+        },
+        signal: controller.signal,
+        redirect: 'follow',
       });
+      clearTimeout(timeout);
       
       if (websiteResponse.ok) {
         websiteContent = await websiteResponse.text();
