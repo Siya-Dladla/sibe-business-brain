@@ -149,9 +149,11 @@ Format as JSON with:
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error in generate-forecast function:', error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
-      status: 500,
+    console.error('[generate-forecast] error:', error);
+    const message = error instanceof Error ? error.message : '';
+    const isClientError = message === 'Unauthorized' || message.includes('required');
+    return new Response(JSON.stringify({ error: isClientError ? message : 'An internal error occurred' }), {
+      status: isClientError ? 400 : 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }

@@ -147,10 +147,12 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error executing workflow:', error);
+    console.error('[execute-workflow] error:', error);
+    const message = error instanceof Error ? error.message : '';
+    const isClientError = message === 'Unauthorized' || message.includes('not found');
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: isClientError ? message : 'An internal error occurred' }),
+      { status: isClientError ? 400 : 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
