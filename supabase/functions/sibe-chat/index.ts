@@ -443,6 +443,30 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
   return { isCommand: false, commandType: '', params: {} };
 }
 
+// Helper to get OpenClaw config or fallback to Lovable AI Gateway
+async function getAiConfig(supabase: any, userId: string | null, lovableApiKey: string) {
+  if (!userId) return { endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions', apiKey: lovableApiKey, isOpenClaw: false };
+  
+  const { data } = await supabase
+    .from('connected_agents')
+    .select('api_endpoint, api_key_encrypted')
+    .eq('user_id', userId)
+    .eq('platform', 'openclaw')
+    .eq('status', 'active')
+    .maybeSingle();
+  
+  if (data?.api_endpoint && data?.api_key_encrypted) {
+    // OpenClaw uses OpenAI-compatible API, append /chat/completions if needed
+    let endpoint = data.api_endpoint;
+    if (!endpoint.endsWith('/chat/completions')) {
+      endpoint = endpoint.replace(/\/$/, '') + '/chat/completions';
+    }
+    return { endpoint, apiKey: data.api_key_encrypted, isOpenClaw: true };
+  }
+  
+  return { endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions', apiKey: lovableApiKey, isOpenClaw: false };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -482,6 +506,9 @@ serve(async (req) => {
     
     // Create service client for database operations
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Get AI config (OpenClaw or fallback)
+    const aiConfig = await getAiConfig(supabase, userId, LOVABLE_API_KEY);
 
     // Parse for commands
     const { isCommand, commandType, params } = parseCommand(message);
@@ -533,14 +560,14 @@ Create a comprehensive report with:
 4. Recommendations
 5. Next Steps`;
 
-            const reportResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            const reportResponse = await fetch(aiConfig.endpoint, {
               method: 'POST',
               headers: {
-                'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                'Authorization': `Bearer ${aiConfig.apiKey}`,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                model: 'google/gemini-2.5-flash',
+                model: aiConfig.isOpenClaw ? 'default' : 'google/gemini-2.5-flash',
                 messages: [
                   { role: 'system', content: 'You are a professional business analyst creating executive reports.' },
                   { role: 'user', content: reportPrompt }
@@ -600,14 +627,14 @@ Provide predictions in this JSON format:
   "summary": "..."
 }`;
 
-            const forecastResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            const forecastResponse = await fetch(aiConfig.endpoint, {
               method: 'POST',
               headers: {
-                'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                'Authorization': `Bearer ${aiConfig.apiKey}`,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                model: 'google/gemini-2.5-flash',
+                model: aiConfig.isOpenClaw ? 'default' : 'google/gemini-2.5-flash',
                 messages: [
                   { role: 'system', content: 'You are a business forecasting expert. Return valid JSON only.' },
                   { role: 'user', content: forecastPrompt }
@@ -844,14 +871,14 @@ Your personality: ${employee.personality || 'Professional and helpful'}
 
 Provide a brief analysis and action plan.`;
 
-                const taskResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+                const taskResponse = await fetch(aiConfig.endpoint, {
                   method: 'POST',
                   headers: {
-                    'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                    'Authorization': `Bearer ${aiConfig.apiKey}`,
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
-                    model: 'google/gemini-2.5-flash',
+                    model: aiConfig.isOpenClaw ? 'default' : 'google/gemini-2.5-flash',
                     messages: [
                       { role: 'system', content: `You are ${employee.name}, an AI employee working as ${employee.role}.` },
                       { role: 'user', content: taskPrompt }
@@ -914,14 +941,14 @@ Business context: ${JSON.stringify(empMetrics || []).substring(0, 500)}
 
 Provide a helpful, role-appropriate response.`;
 
-                const askResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+                const askResponse = await fetch(aiConfig.endpoint, {
                   method: 'POST',
                   headers: {
-                    'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                    'Authorization': `Bearer ${aiConfig.apiKey}`,
                     'Content-Type': 'application/json',
                   },
                   body: JSON.stringify({
-                    model: 'google/gemini-2.5-flash',
+                    model: aiConfig.isOpenClaw ? 'default' : 'google/gemini-2.5-flash',
                     messages: [
                       { role: 'system', content: `You are ${employee.name}, an AI employee working as ${employee.role} in ${employee.department}. Stay in character.` },
                       { role: 'user', content: askPrompt }
@@ -1013,14 +1040,14 @@ Provide a helpful, role-appropriate response.`;
             
             clawdContext += `\nYou can: analyze data across all connections, suggest workflow optimizations, coordinate AI employees, trigger syncs, generate reports, and provide strategic recommendations. Be concise, action-oriented, and reference specific data when available. If the user asks you to connect to an API, guide them to the Data section to add the connection. Sign off responses with "— ClawdBot 🤖"`;
 
-            const clawdResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+            const clawdResponse = await fetch(aiConfig.endpoint, {
               method: 'POST',
               headers: {
-                'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+                'Authorization': `Bearer ${aiConfig.apiKey}`,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                model: 'google/gemini-2.5-flash',
+                model: aiConfig.isOpenClaw ? 'default' : 'google/gemini-2.5-flash',
                 messages: [
                   { role: 'system', content: clawdContext },
                   { role: 'user', content: clawdQuery }
@@ -1460,16 +1487,16 @@ Provide a helpful, role-appropriate response.`;
 
     context += "RESPONSE STYLE: Be concise and focus on ecommerce growth. Provide actionable insights. When suggesting improvements, be specific about expected impact (e.g., '15-20% lift in conversion'). Guide users to scale their online stores through data-driven decisions. Note that third-party integrations may have additional costs.";
 
-    console.log('Calling Lovable AI Gateway with enhanced context');
+    console.log(`Calling AI via ${aiConfig.isOpenClaw ? 'OpenClaw' : 'Lovable AI Gateway'}`);
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch(aiConfig.endpoint, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${aiConfig.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: aiConfig.isOpenClaw ? 'default' : 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: context },
           { role: 'user', content: message }

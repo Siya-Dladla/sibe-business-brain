@@ -7,6 +7,22 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function getAiConfig(supabase: any, userId: string, lovableApiKey: string) {
+  const { data } = await supabase
+    .from('connected_agents')
+    .select('api_endpoint, api_key_encrypted')
+    .eq('user_id', userId)
+    .eq('platform', 'openclaw')
+    .eq('status', 'active')
+    .maybeSingle();
+  if (data?.api_endpoint && data?.api_key_encrypted) {
+    let endpoint = data.api_endpoint;
+    if (!endpoint.endsWith('/chat/completions')) endpoint = endpoint.replace(/\/$/, '') + '/chat/completions';
+    return { endpoint, apiKey: data.api_key_encrypted, isOpenClaw: true };
+  }
+  return { endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions', apiKey: lovableApiKey, isOpenClaw: false };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -69,16 +85,17 @@ Format as JSON with:
   "summary": "..."
 }`;
 
-    console.log('Calling Lovable AI Gateway');
+    const aiConfig = await getAiConfig(supabase, user.id, LOVABLE_API_KEY);
+    console.log(`Calling AI via ${aiConfig.isOpenClaw ? 'OpenClaw' : 'Lovable AI Gateway'}`);
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch(aiConfig.endpoint, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${aiConfig.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: aiConfig.isOpenClaw ? 'default' : 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: 'You are an expert business analyst specializing in forecasting and strategic planning. Always respond with valid JSON.' },
           { role: 'user', content: prompt }
