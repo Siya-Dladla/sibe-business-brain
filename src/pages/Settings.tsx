@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX } from "lucide-react";
+import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX, Eye, EyeOff } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,8 @@ import { useFeedback } from "@/hooks/useFeedback";
 const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [savingAi, setSavingAi] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
   const [profile, setProfile] = useState({
     email: "",
     full_name: ""
@@ -28,6 +30,10 @@ const Settings = () => {
     anthropic: "",
     gemini: ""
   });
+  const [openclawConfig, setOpenclawConfig] = useState({
+    endpoint: "",
+    apiKey: ""
+  });
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
@@ -36,6 +42,7 @@ const Settings = () => {
 
   useEffect(() => {
     fetchProfile();
+    fetchAiConfig();
   }, []);
 
   const fetchProfile = async () => {
@@ -103,6 +110,87 @@ const Settings = () => {
         description: error.message,
         variant: "destructive"
       });
+    }
+  };
+
+  const fetchAiConfig = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("connected_agents")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("platform", "openclaw")
+        .maybeSingle();
+      if (data) {
+        setAiEngine("openclaw");
+        setOpenclawConfig({
+          endpoint: data.api_endpoint || "",
+          apiKey: data.api_key_encrypted || ""
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching AI config:", error);
+    }
+  };
+
+  const saveAiSettings = async () => {
+    setSavingAi(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      if (aiEngine === "openclaw") {
+        if (!openclawConfig.endpoint || !openclawConfig.apiKey) {
+          toast({ title: "Missing Fields", description: "Please enter both endpoint and API key", variant: "destructive" });
+          setSavingAi(false);
+          return;
+        }
+        // Check if record exists
+        const { data: existing } = await supabase
+          .from("connected_agents")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("platform", "openclaw")
+          .maybeSingle();
+
+        if (existing) {
+          const { error } = await supabase
+            .from("connected_agents")
+            .update({
+              api_endpoint: openclawConfig.endpoint,
+              api_key_encrypted: openclawConfig.apiKey,
+              status: "active"
+            })
+            .eq("id", existing.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from("connected_agents")
+            .insert({
+              user_id: user.id,
+              platform: "openclaw",
+              agent_name: "OpenClaw Engine",
+              api_endpoint: openclawConfig.endpoint,
+              api_key_encrypted: openclawConfig.apiKey,
+              status: "active"
+            });
+          if (error) throw error;
+        }
+      } else {
+        // If switching away from openclaw, deactivate it
+        await supabase
+          .from("connected_agents")
+          .update({ status: "inactive" })
+          .eq("platform", "openclaw");
+      }
+
+      toast({ title: "Settings Saved", description: "Your AI engine preferences have been updated" });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setSavingAi(false);
     }
   };
 
@@ -321,7 +409,8 @@ const Settings = () => {
                     <SelectValue placeholder="Select AI provider" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="lovable-ai">Lovable AI (Recommended)</SelectItem>
+                    <SelectItem value="lovable-ai">Lovable AI (Default)</SelectItem>
+                    <SelectItem value="openclaw">OpenClaw (Primary Engine)</SelectItem>
                     <SelectItem value="openai">OpenAI</SelectItem>
                     <SelectItem value="anthropic">Anthropic Claude</SelectItem>
                     <SelectItem value="gemini">Google Gemini</SelectItem>
@@ -329,7 +418,48 @@ const Settings = () => {
                 </Select>
               </div>
 
-              {aiEngine !== "lovable-ai" && (
+              {aiEngine === "openclaw" && (
+                <div className="space-y-4 pt-4 border-t border-border/30">
+                  <p className="text-sm text-muted-foreground">
+                    Configure your OpenClaw API credentials. All AI operations will route through your OpenClaw endpoint.
+                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="openclaw-endpoint">API Endpoint URL</Label>
+                    <Input
+                      id="openclaw-endpoint"
+                      type="url"
+                      value={openclawConfig.endpoint}
+                      onChange={e => setOpenclawConfig({ ...openclawConfig, endpoint: e.target.value })}
+                      placeholder="https://api.openclaw.ai/v1"
+                      className="glass-button h-12 font-mono"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="openclaw-key">API Key</Label>
+                    <div className="relative">
+                      <Input
+                        id="openclaw-key"
+                        type={showApiKey ? "text" : "password"}
+                        value={openclawConfig.apiKey}
+                        onChange={e => setOpenclawConfig({ ...openclawConfig, apiKey: e.target.value })}
+                        placeholder="oc-..."
+                        className="glass-button h-12 font-mono pr-12"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                      >
+                        {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {aiEngine !== "lovable-ai" && aiEngine !== "openclaw" && (
                 <div className="space-y-4 pt-4 border-t border-border/30">
                   <p className="text-sm text-muted-foreground">
                     Enter your API key for {aiEngine === "openai" ? "OpenAI" : aiEngine === "anthropic" ? "Anthropic" : "Google Gemini"}
@@ -349,16 +479,21 @@ const Settings = () => {
               )}
 
               <Button
-                onClick={() => {
-                  toast({
-                    title: "Settings Saved",
-                    description: "Your AI engine preferences have been updated"
-                  });
-                }}
+                onClick={saveAiSettings}
+                disabled={savingAi}
                 className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                <Save className="w-4 h-4 mr-2" />
-                Save AI Settings
+                {savingAi ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
+                    Saving...
+                  </div>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save AI Settings
+                  </>
+                )}
               </Button>
             </div>
           </Card>
