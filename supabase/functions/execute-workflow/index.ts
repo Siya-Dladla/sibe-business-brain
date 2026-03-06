@@ -61,6 +61,9 @@ serve(async (req) => {
       throw new Error('Workflow not found');
     }
 
+    // Get AI config for this user
+    const aiConfig = await getAiConfig(supabase, user.id, LOVABLE_API_KEY);
+
     // Create a workflow run record
     const { data: run, error: runError } = await supabase
       .from('workflow_runs')
@@ -108,7 +111,7 @@ serve(async (req) => {
             for (const actionNode of actionNodes) {
               const actionResult = await executeAction(
                 supabase,
-                LOVABLE_API_KEY,
+                aiConfig,
                 user.id,
                 employee,
                 actionNode.config.actionType,
@@ -205,7 +208,7 @@ function buildEmployeeContext(employee: any, metrics: any[], plans: any[]) {
 
 async function executeAction(
   supabase: any,
-  apiKey: string,
+  aiConfig: { endpoint: string; apiKey: string; isOpenClaw: boolean },
   userId: string,
   employee: any,
   actionType: string,
@@ -221,14 +224,14 @@ async function executeAction(
 
   const prompt = actionPrompts[actionType] || 'Analyze the data and provide insights.';
 
-  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+  const response = await fetch(aiConfig.endpoint, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      'Authorization': `Bearer ${aiConfig.apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'google/gemini-3-flash-preview',
+      model: aiConfig.isOpenClaw ? 'default' : 'google/gemini-3-flash-preview',
       messages: [
         { role: 'system', content: context },
         { role: 'user', content: prompt }
