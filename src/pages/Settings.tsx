@@ -205,8 +205,6 @@ const Settings = () => {
 
   return (
     <AppLayout>
-      <div className="p-6 md:p-8 space-y-6">
-
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
