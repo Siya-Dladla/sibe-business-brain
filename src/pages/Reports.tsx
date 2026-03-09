@@ -146,9 +146,7 @@ const Reports = () => {
     }));
   }, []);
   return <AppLayout>
-      <div className="p-6 md:p-8 space-y-6">
-
-      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
+      <div className="container mx-auto px-6 py-8">
         <div className="mb-10 flex items-center justify-between">
           <div>
             <h1 className="text-5xl font-extralight mb-3 tracking-wide">Reports & Insights</h1>
