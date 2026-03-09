@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AppLayout } from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -203,12 +204,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-card">
-        <MobileMenu />
-        <div className="text-xs text-muted-foreground">System Settings</div>
-      </div>
-
+    <AppLayout>
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
@@ -694,7 +690,7 @@ const Settings = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

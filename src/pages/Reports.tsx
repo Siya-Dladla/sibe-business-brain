@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -144,13 +145,8 @@ const Reports = () => {
       periodEnd: dates.end
     }));
   }, []);
-  return <div className="min-h-screen bg-background grid-bg">
-      <div className="p-6 flex items-center justify-between border-b border-border/50 bg-primary-foreground">
-        <MobileMenu />
-        <div className="text-xs text-muted-foreground">Reports & Insights</div>
-      </div>
-
-      <div className="container mx-auto px-6 py-8 bg-primary-foreground">
+  return <AppLayout>
+      <div className="container mx-auto px-6 py-8">
         <div className="mb-10 flex items-center justify-between">
           <div>
             <h1 className="text-5xl font-extralight mb-3 tracking-wide">Reports & Insights</h1>
@@ -285,6 +281,6 @@ const Reports = () => {
             </DialogContent>
           </Dialog>}
       </div>
-    </div>;
+    </AppLayout>;
 };
 export default Reports;
