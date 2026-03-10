@@ -40,10 +40,13 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border/50">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="p-4">
         <Link to="/" className="flex items-center gap-3">
-          <Brain className="w-7 h-7 text-foreground shrink-0" />
+          <div className="relative w-7 h-7 shrink-0 rounded-full flex items-center justify-center arc-gradient" 
+               style={{ boxShadow: "0 0 12px hsla(190, 95%, 50%, 0.3)" }}>
+            <Brain className="w-4 h-4 text-primary-foreground" />
+          </div>
           <span className="text-lg font-semibold tracking-widest text-foreground group-data-[collapsible=icon]:hidden">
             SIBE
           </span>
@@ -60,6 +63,7 @@ export function AppSidebar() {
                     asChild
                     isActive={isActive(item.url)}
                     tooltip={item.title}
+                    className={isActive(item.url) ? "text-accent-foreground bg-accent border-l-2 border-primary" : ""}
                   >
                     <Link to={item.url}>
                       <item.icon className="w-4 h-4" />
