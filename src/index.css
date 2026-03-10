@@ -10,133 +10,131 @@
   --sal: env(safe-area-inset-left, 0px);
 }
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root,
   .dark {
-    /* SIBE SI Design System - Clean Monochrome (Dark) */
-    --background: 0 0% 0%; /* Pure black */
-    --foreground: 0 0% 100%; /* Pure white */
+    /* SIBE Jarvis Design System - Vibrant Cyan HUD */
+    --background: 220 20% 4%;
+    --foreground: 200 20% 95%;
 
-    --card: 0 0% 6%; /* Very dark gray for cards */
-    --card-foreground: 0 0% 100%;
+    --card: 220 20% 7%;
+    --card-foreground: 200 20% 95%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 220 20% 8%;
+    --popover-foreground: 200 20% 95%;
 
-    --primary: 0 0% 100%; /* White as primary */
-    --primary-foreground: 0 0% 0%;
+    --primary: 190 95% 50%;
+    --primary-foreground: 220 20% 4%;
 
-    --secondary: 0 0% 15%; /* Dark gray */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 15% 14%;
+    --secondary-foreground: 200 20% 90%;
 
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 220 15% 12%;
+    --muted-foreground: 200 10% 55%;
 
-    --accent: 0 0% 20%; /* Medium gray accent */
-    --accent-foreground: 0 0% 100%;
+    --accent: 190 60% 20%;
+    --accent-foreground: 190 95% 70%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 10%;
-    --ring: 0 0% 50%;
+    --border: 200 15% 16%;
+    --input: 220 15% 10%;
+    --ring: 190 95% 50%;
 
     --radius: 0.5rem;
 
-    /* Sidebar colors */
-    --sidebar-background: 0 0% 4%;
-    --sidebar-foreground: 0 0% 85%;
-    --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 0 0% 12%;
-    --sidebar-accent-foreground: 0 0% 85%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 0 0% 50%;
+    /* Sidebar - Jarvis HUD */
+    --sidebar-background: 220 25% 5%;
+    --sidebar-foreground: 200 15% 60%;
+    --sidebar-primary: 190 95% 50%;
+    --sidebar-primary-foreground: 220 20% 4%;
+    --sidebar-accent: 190 40% 12%;
+    --sidebar-accent-foreground: 190 80% 70%;
+    --sidebar-border: 200 20% 12%;
+    --sidebar-ring: 190 95% 50%;
 
-    /* Monochrome palette */
-    --gray-light: 0 0% 70%;
-    --gray-medium: 0 0% 40%;
-    --gray-dark: 0 0% 20%;
+    /* Jarvis palette */
+    --jarvis-cyan: 190 95% 50%;
+    --jarvis-blue: 210 90% 55%;
+    --jarvis-glow: 190 100% 60%;
+    --jarvis-warm: 35 90% 55%;
+    --jarvis-success: 160 80% 45%;
+    --jarvis-danger: 0 75% 55%;
     
     /* Professional effects */
-    --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-    --gradient-subtle: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
-    --shadow-subtle: 0 2px 8px rgba(0,0,0,0.6);
-    --shadow-strong: 0 8px 32px rgba(255, 255, 255, 0.05);
-    --glow-primary: 0 0 20px rgba(255, 255, 255, 0.1);
+    --gradient-card: linear-gradient(135deg, hsla(190, 80%, 50%, 0.06), hsla(210, 80%, 50%, 0.02));
+    --gradient-subtle: linear-gradient(180deg, hsla(190, 80%, 50%, 0.04), transparent);
+    --shadow-subtle: 0 2px 12px hsla(190, 80%, 50%, 0.08);
+    --shadow-strong: 0 8px 32px hsla(190, 80%, 50%, 0.12);
+    --glow-primary: 0 0 20px hsla(190, 95%, 50%, 0.25);
+    --glow-strong: 0 0 40px hsla(190, 95%, 50%, 0.35);
     
-    /* Subtle shimmer effect */
     --shimmer-gradient: linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(255, 255, 255, 0.1) 100%
+      hsla(190, 80%, 50%, 0.1) 0%,
+      hsla(210, 80%, 50%, 0.05) 50%,
+      hsla(190, 80%, 50%, 0.1) 100%
     );
   }
 
   .light {
-    /* SIBE SI Design System - Clean Light Theme */
-    --background: 0 0% 98%; /* Off-white */
-    --foreground: 0 0% 8%; /* Near black text */
+    --background: 210 20% 97%;
+    --foreground: 220 20% 10%;
 
-    --card: 0 0% 100%; /* Pure white cards */
-    --card-foreground: 0 0% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover-foreground: 220 20% 10%;
 
-    --primary: 0 0% 12%; /* Dark primary */
+    --primary: 190 85% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 92%; /* Light gray */
-    --secondary-foreground: 0 0% 12%;
+    --secondary: 210 15% 92%;
+    --secondary-foreground: 220 20% 15%;
 
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 210 15% 94%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 0 0% 88%; /* Light gray accent */
-    --accent-foreground: 0 0% 12%;
+    --accent: 190 40% 90%;
+    --accent-foreground: 190 85% 30%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 85%;
-    --input: 0 0% 95%;
-    --ring: 0 0% 50%;
+    --border: 210 15% 85%;
+    --input: 210 15% 95%;
+    --ring: 190 85% 40%;
 
-    /* Sidebar colors - Light */
-    --sidebar-background: 0 0% 97%;
-    --sidebar-foreground: 0 0% 25%;
-    --sidebar-primary: 0 0% 12%;
+    --sidebar-background: 210 20% 97%;
+    --sidebar-foreground: 220 15% 30%;
+    --sidebar-primary: 190 85% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 92%;
-    --sidebar-accent-foreground: 0 0% 25%;
-    --sidebar-border: 0 0% 88%;
-    --sidebar-ring: 0 0% 50%;
+    --sidebar-accent: 190 30% 92%;
+    --sidebar-accent-foreground: 190 85% 30%;
+    --sidebar-border: 210 15% 88%;
+    --sidebar-ring: 190 85% 40%;
 
-    /* Monochrome palette - Light */
-    --gray-light: 0 0% 30%;
-    --gray-medium: 0 0% 50%;
-    --gray-dark: 0 0% 75%;
+    --jarvis-cyan: 190 85% 40%;
+    --jarvis-blue: 210 80% 45%;
+    --jarvis-glow: 190 90% 50%;
+    --jarvis-warm: 35 80% 50%;
+    --jarvis-success: 160 70% 40%;
+    --jarvis-danger: 0 65% 50%;
+
+    --gradient-card: linear-gradient(135deg, hsla(190, 60%, 50%, 0.05), hsla(210, 60%, 50%, 0.02));
+    --gradient-subtle: linear-gradient(180deg, hsla(190, 60%, 50%, 0.03), transparent);
+    --shadow-subtle: 0 2px 12px hsla(190, 60%, 50%, 0.06);
+    --shadow-strong: 0 8px 32px hsla(190, 60%, 50%, 0.1);
+    --glow-primary: 0 0 20px hsla(190, 85%, 40%, 0.15);
+    --glow-strong: 0 0 40px hsla(190, 85%, 40%, 0.25);
     
-    /* Professional effects - Light */
-    --gradient-card: linear-gradient(135deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.01));
-    --gradient-subtle: linear-gradient(180deg, rgba(0, 0, 0, 0.01), transparent);
-    --shadow-subtle: 0 2px 8px rgba(0,0,0,0.08);
-    --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.1);
-    --glow-primary: 0 0 20px rgba(0, 0, 0, 0.08);
-    
-    /* Subtle shimmer effect - Light */
     --shimmer-gradient: linear-gradient(
       135deg,
-      rgba(0, 0, 0, 0.04) 0%,
-      rgba(0, 0, 0, 0.02) 50%,
-      rgba(0, 0, 0, 0.04) 100%
+      hsla(190, 60%, 50%, 0.06) 0%,
+      hsla(210, 60%, 50%, 0.03) 50%,
+      hsla(190, 60%, 50%, 0.06) 100%
     );
   }
 }
@@ -151,79 +149,41 @@ All colors MUST be HSL.
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  /* Glassmorphism utilities - Dark theme */
-  .dark .glass-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: var(--shadow-subtle);
-  }
-
-  .dark .glass-button {
-    background: rgba(255,255,255,0.04);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.15);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .dark .glass-button:hover {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.3);
-    box-shadow: var(--glow-primary);
-    transform: translateY(-1px);
-  }
-
-  /* Glassmorphism utilities - Light theme */
-  .light .glass-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(0,0,0,0.08);
-    box-shadow: var(--shadow-subtle);
-  }
-
-  .light .glass-button {
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0,0,0,0.1);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .light .glass-button:hover {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.2);
-    box-shadow: var(--glow-primary);
-    transform: translateY(-1px);
-  }
-
-  /* Fallback for when no theme class is set */
+  /* Jarvis glass cards */
   .glass-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    background: var(--gradient-card);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid hsla(190, 80%, 50%, 0.1);
     box-shadow: var(--shadow-subtle);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    border-color: hsla(190, 80%, 50%, 0.2);
+    box-shadow: var(--shadow-strong);
   }
 
   .glass-button {
-    background: rgba(255,255,255,0.04);
+    background: hsla(190, 80%, 50%, 0.06);
     backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid hsla(190, 80%, 50%, 0.15);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-button:hover {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.3);
+    background: hsla(190, 80%, 50%, 0.12);
+    border-color: hsla(190, 80%, 50%, 0.3);
     box-shadow: var(--glow-primary);
     transform: translateY(-1px);
   }
 
-  /* Professional effects */
+  /* Jarvis glow effects */
   .glow-text {
-    text-shadow: 0 0 30px rgba(255,255,255,0.3);
+    text-shadow: 0 0 30px hsla(190, 95%, 50%, 0.4);
   }
 
   .glow-border {
-    box-shadow: 0 0 20px rgba(255,255,255,0.1), inset 0 0 10px rgba(255,255,255,0.05);
+    box-shadow: 0 0 20px hsla(190, 95%, 50%, 0.15), inset 0 0 10px hsla(190, 95%, 50%, 0.05);
   }
 
   .hover-lift {
@@ -235,20 +195,31 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-strong);
   }
 
-  /* Animations */
+  /* Jarvis HUD scan line */
+  @keyframes hud-scan {
+    0% { transform: translateY(-100%); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: translateY(100%); opacity: 0; }
+  }
+
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-20px); }
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
-    50% { box-shadow: 0 0 40px hsl(var(--primary) / 0.6); }
+    0%, 100% { box-shadow: 0 0 20px hsla(190, 95%, 50%, 0.3); }
+    50% { box-shadow: 0 0 40px hsla(190, 95%, 50%, 0.6); }
   }
 
   @keyframes shimmer {
     0% { background-position: -1000px 0; }
     100% { background-position: 1000px 0; }
+  }
+
+  @keyframes arc-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
   }
 
   .animate-float {
@@ -259,76 +230,16 @@ All colors MUST be HSL.
     animation: pulse-glow 2s ease-in-out infinite;
   }
 
-  /* Grid background - Dark */
-  .dark .grid-bg {
-    background-image: 
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
+  .animate-arc-pulse {
+    animation: arc-pulse 3s ease-in-out infinite;
   }
 
-  /* Grid background - Light */
-  .light .grid-bg {
-    background-image: 
-      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
-    background-size: 50px 50px;
-  }
-
-  /* Fallback grid background */
+  /* Grid background - HUD style */
   .grid-bg {
     background-image: 
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      linear-gradient(hsla(190, 80%, 50%, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsla(190, 80%, 50%, 0.04) 1px, transparent 1px);
     background-size: 50px 50px;
-  }
-
-  /* Holographic effect */
-  @keyframes holographic-rotate {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  .holographic-card {
-    position: relative;
-    background: linear-gradient(
-      135deg,
-      rgba(0, 255, 255, 0.1) 0%,
-      rgba(128, 0, 255, 0.1) 25%,
-      rgba(255, 0, 255, 0.1) 50%,
-      rgba(255, 0, 0, 0.1) 75%,
-      rgba(255, 255, 0, 0.1) 100%
-    );
-    background-size: 200% 200%;
-    animation: holographic-rotate 3s ease infinite;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-  }
-
-  .holographic-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: inherit;
-    padding: 2px;
-    background: var(--holographic-gradient);
-    background-size: 200% 200%;
-    animation: holographic-rotate 3s ease infinite;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
   }
 
   /* Safe area utilities for native mobile */
@@ -347,22 +258,20 @@ All colors MUST be HSL.
     padding-bottom: max(0.75rem, var(--sab));
   }
 
-  /* Mobile touch optimizations */
   .touch-manipulation {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Ecommerce scaling gradients */
-  .scale-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(142 76% 36%));
+  /* Jarvis arc reactor gradient */
+  .arc-gradient {
+    background: linear-gradient(135deg, hsl(var(--jarvis-cyan)), hsl(var(--jarvis-blue)));
   }
 
   .revenue-gradient {
-    background: linear-gradient(135deg, hsl(142 76% 36%), hsl(217 91% 60%));
+    background: linear-gradient(135deg, hsl(var(--jarvis-success)), hsl(var(--jarvis-cyan)));
   }
 
-  /* Native app feel */
   @supports (-webkit-touch-callout: none) {
     .native-bounce {
       -webkit-overflow-scrolling: touch;

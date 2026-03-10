@@ -15,13 +15,15 @@ const SibeLogo = ({ className, size = "md" }: SibeLogoProps) => {
   return (
     <div
       className={cn(
-        "relative rounded-full bg-gradient-to-br from-primary via-primary/80 to-primary/60 flex items-center justify-center shadow-lg",
+        "relative rounded-full bg-gradient-to-br from-primary via-accent to-primary/60 flex items-center justify-center",
         sizeClasses[size],
         className
       )}
+      style={{ boxShadow: "0 0 20px hsla(190, 95%, 50%, 0.3), 0 0 40px hsla(190, 95%, 50%, 0.1)" }}
     >
-      {/* Outer glow ring */}
-      <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse" />
+      {/* Arc reactor ring */}
+      <div className="absolute inset-0 rounded-full border border-primary/30 animate-arc-pulse" />
+      <div className="absolute inset-[3px] rounded-full border border-primary/20" />
       
       {/* Inner content - S logo */}
       <div className="relative z-10 flex items-center justify-center">
@@ -35,13 +37,15 @@ const SibeLogo = ({ className, size = "md" }: SibeLogoProps) => {
         </span>
       </div>
       
-      {/* AI indicator dot */}
+      {/* AI status dot */}
       <div className={cn(
-        "absolute bg-green-400 rounded-full border-2 border-background animate-pulse",
+        "absolute bg-primary rounded-full border-2 border-background",
         size === "sm" && "w-2 h-2 -bottom-0.5 -right-0.5",
         size === "md" && "w-3 h-3 -bottom-0.5 -right-0.5",
         size === "lg" && "w-4 h-4 bottom-0 right-0"
-      )} />
+      )}
+        style={{ boxShadow: "0 0 8px hsla(190, 95%, 50%, 0.5)" }}
+      />
     </div>
   );
 };
