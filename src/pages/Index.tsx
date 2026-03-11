@@ -89,7 +89,7 @@ const Index = () => {
       {/* Footer - Hidden on mobile for more space */}
       <footer className="hidden md:flex shrink-0 p-3 border-t border-border items-center justify-center bg-background pb-safe">
         <p className="text-[10px] text-muted-foreground/50">
-          © 2025 SGD Business Analysis & Projects | Synthetic Intelligence Business Engine
+          © 2025 SGD Business Analysis & Projects | Sibe — Powered by OpenClaw Agentic AI
         </p>
       </footer>
     </div>

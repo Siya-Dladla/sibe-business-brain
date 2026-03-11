@@ -155,7 +155,7 @@ const Dashboard = () => {
             <Brain className="w-8 h-8 md:w-10 md:h-10 text-primary animate-pulse" />
             <div>
               <h1 className="text-2xl md:text-4xl font-extralight tracking-wide">Scale with Data</h1>
-              <p className="text-xs text-muted-foreground">AI-Powered Ecommerce Intelligence</p>
+              <p className="text-xs text-muted-foreground">Sibe Analytics • Powered by OpenClaw</p>
             </div>
           </div>
 

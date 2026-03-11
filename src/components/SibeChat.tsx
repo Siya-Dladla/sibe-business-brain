@@ -15,7 +15,7 @@ interface Message {
 const SibeChat = forwardRef((props, ref) => {
   const [messages, setMessages] = useState<Message[]>([{
     role: "assistant",
-    content: "Hello! I'm Sibe SI, your synthetic business intelligence partner. I've analyzed your business data and I'm ready to provide strategic insights. How can I help you today?",
+    content: "Hello! I'm Sibe, your agentic AI business intelligence partner powered by OpenClaw. I've analyzed your business data and I'm ready to provide strategic insights. How can I help you today?",
     timestamp: new Date()
   }]);
   const [input, setInput] = useState("");

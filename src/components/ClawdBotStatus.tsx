@@ -92,7 +92,10 @@ const ClawdBotStatus = () => {
               <Bot className="w-4 h-4 text-white" />
             </div>
             <div>
-              <span className="text-sm font-medium text-foreground">ClawdBot</span>
+              <div>
+                <span className="text-sm font-medium text-foreground">OpenClaw Agent</span>
+                <span className="text-[9px] text-muted-foreground/60 ml-1">via ClawdBot</span>
+              </div>
               <div className="flex items-center gap-1.5">
                 <div className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-400 animate-pulse" : "bg-muted-foreground/40"}`} />
                 <span className="text-[10px] text-muted-foreground">

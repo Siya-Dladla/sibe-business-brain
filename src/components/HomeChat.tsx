@@ -1137,7 +1137,7 @@ const HomeChat = () => {
           </div>
         </div>
         <p className={`text-center text-muted-foreground/50 mt-2 ${isMobile ? 'text-[9px]' : 'text-[10px] mt-3'}`}>
-          {isListening ? "🎙️ Listening..." : "Sibe SI • Integration & Data Hub"}
+          {isListening ? "🎙️ Listening..." : "Sibe • Powered by OpenClaw"}
         </p>
       </div>
     </div>
