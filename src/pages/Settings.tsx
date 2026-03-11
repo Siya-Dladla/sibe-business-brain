@@ -418,7 +418,7 @@ const Settings = () => {
               {aiEngine === "openclaw" && (
                 <div className="space-y-4 pt-4 border-t border-border/30">
                   <p className="text-sm text-muted-foreground">
-                    Configure your OpenClaw API credentials. All AI operations will route through your OpenClaw endpoint.
+                    OpenClaw is an open-source agentic AI framework. Connect your self-hosted or cloud instance to power all Sibe AI operations — agents, automation, and multi-channel routing.
                   </p>
                   <div className="space-y-2">
                     <Label htmlFor="openclaw-endpoint">API Endpoint URL</Label>
@@ -427,7 +427,7 @@ const Settings = () => {
                       type="url"
                       value={openclawConfig.endpoint}
                       onChange={e => setOpenclawConfig({ ...openclawConfig, endpoint: e.target.value })}
-                      placeholder="https://api.openclaw.ai/v1"
+                      placeholder="https://your-instance.clawcloud.sh/api"
                       className="glass-button h-12 font-mono"
                     />
                   </div>
@@ -456,19 +456,19 @@ const Settings = () => {
                 </div>
               )}
 
-              {aiEngine !== "lovable-ai" && aiEngine !== "openclaw" && (
+              {aiEngine === "anthropic" && (
                 <div className="space-y-4 pt-4 border-t border-border/30">
                   <p className="text-sm text-muted-foreground">
-                    Enter your API key for {aiEngine === "openai" ? "OpenAI" : aiEngine === "anthropic" ? "Anthropic" : "Google Gemini"}
+                    Enter your Anthropic API key to use Claude as the AI provider.
                   </p>
                   <div className="space-y-2">
-                    <Label htmlFor={`${aiEngine}-key`}>API Key</Label>
+                    <Label htmlFor="anthropic-key">API Key</Label>
                     <Input
-                      id={`${aiEngine}-key`}
+                      id="anthropic-key"
                       type="password"
-                      value={apiKeys[aiEngine as keyof typeof apiKeys]}
-                      onChange={e => setApiKeys({ ...apiKeys, [aiEngine]: e.target.value })}
-                      placeholder="sk-..."
+                      value={apiKeys.anthropic}
+                      onChange={e => setApiKeys({ ...apiKeys, anthropic: e.target.value })}
+                      placeholder="sk-ant-..."
                       className="glass-button h-12 font-mono"
                     />
                   </div>
