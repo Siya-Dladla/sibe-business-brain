@@ -409,11 +409,8 @@ const Settings = () => {
                     <SelectValue placeholder="Select AI provider" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="lovable-ai">Lovable AI (Default)</SelectItem>
-                    <SelectItem value="openclaw">OpenClaw (Primary Engine)</SelectItem>
-                    <SelectItem value="openai">OpenAI</SelectItem>
+                    <SelectItem value="openclaw">OpenClaw (Agentic AI Engine)</SelectItem>
                     <SelectItem value="anthropic">Anthropic Claude</SelectItem>
-                    <SelectItem value="gemini">Google Gemini</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
