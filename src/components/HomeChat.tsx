@@ -1034,11 +1034,12 @@ const HomeChat = () => {
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center px-4">
             <ClawdBotStatus />
-            <h2 className="text-xl md:text-3xl font-light text-foreground/90 mb-2 text-center">
-              Operator Chat
+            <h2 className="text-xl md:text-3xl font-light text-foreground/90 mb-1 text-center">
+              Sibe Command Centre
             </h2>
+            <p className="text-[10px] text-primary/60 mb-2 text-center tracking-wider uppercase">Powered by OpenClaw Agentic AI</p>
             <p className="text-xs md:text-sm text-muted-foreground mb-6 md:mb-8 text-center max-w-md">
-              Manage integrations, sync data, visualize analytics, and control your e-commerce ecosystem
+              Your agentic AI operator — manage integrations, sync data, visualize analytics, and scale your e-commerce business
             </p>
             <div className={`grid gap-2 md:gap-3 w-full max-w-lg ${isMobile ? 'grid-cols-2' : 'grid-cols-2'}`}>
               {suggestedPrompts.map((prompt, i) => (
