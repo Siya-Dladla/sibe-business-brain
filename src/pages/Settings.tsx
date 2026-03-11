@@ -24,7 +24,7 @@ const Settings = () => {
     email: "",
     full_name: ""
   });
-  const [aiEngine, setAiEngine] = useState("lovable-ai");
+  const [aiEngine, setAiEngine] = useState("openclaw");
   const [apiKeys, setApiKeys] = useState({
     openai: "",
     anthropic: "",
