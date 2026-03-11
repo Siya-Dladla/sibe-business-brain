@@ -95,9 +95,9 @@ const SibeChat = forwardRef((props, ref) => {
         </div>
         <div>
           <h3 className="text-xl md:text-2xl font-extralight tracking-wide bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Ask Sibe SI
+            Ask Sibe
           </h3>
-          <p className="text-xs md:text-sm text-muted-foreground font-light">Your AI Business Intelligence Partner</p>
+          <p className="text-xs md:text-sm text-muted-foreground font-light">Powered by OpenClaw Agentic AI</p>
         </div>
       </div>
 
