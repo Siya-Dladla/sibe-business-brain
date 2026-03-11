@@ -48,10 +48,6 @@ const MobileMenu = () => {
     label: "Data",
     path: "/dashboard"
   }, {
-    icon: Layers,
-    label: "Integrations",
-    path: "/canvas"
-  }, {
     icon: FileText,
     label: "Reports",
     path: "/reports"
