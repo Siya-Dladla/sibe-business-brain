@@ -900,8 +900,8 @@ const HomeChat = () => {
     <div className="relative flex flex-col h-full w-full bg-background overflow-hidden">
       {/* Watermark Logo */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <div className="text-[25vw] md:text-[20vw] font-extralight tracking-wider text-foreground/[0.02] select-none">
-          Sibe
+        <div className="text-[20vw] md:text-[15vw] font-extralight tracking-wider text-foreground/[0.02] select-none">
+          OpenClaw
         </div>
       </div>
 
@@ -1034,11 +1034,12 @@ const HomeChat = () => {
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center px-4">
             <ClawdBotStatus />
-            <h2 className="text-xl md:text-3xl font-light text-foreground/90 mb-2 text-center">
-              Operator Chat
+            <h2 className="text-xl md:text-3xl font-light text-foreground/90 mb-1 text-center">
+              Sibe Command Centre
             </h2>
+            <p className="text-[10px] text-primary/60 mb-2 text-center tracking-wider uppercase">Powered by OpenClaw Agentic AI</p>
             <p className="text-xs md:text-sm text-muted-foreground mb-6 md:mb-8 text-center max-w-md">
-              Manage integrations, sync data, visualize analytics, and control your e-commerce ecosystem
+              Your agentic AI operator — manage integrations, sync data, visualize analytics, and scale your e-commerce business
             </p>
             <div className={`grid gap-2 md:gap-3 w-full max-w-lg ${isMobile ? 'grid-cols-2' : 'grid-cols-2'}`}>
               {suggestedPrompts.map((prompt, i) => (
@@ -1136,7 +1137,7 @@ const HomeChat = () => {
           </div>
         </div>
         <p className={`text-center text-muted-foreground/50 mt-2 ${isMobile ? 'text-[9px]' : 'text-[10px] mt-3'}`}>
-          {isListening ? "🎙️ Listening..." : "Sibe SI • Integration & Data Hub"}
+          {isListening ? "🎙️ Listening..." : "Sibe • Powered by OpenClaw"}
         </p>
       </div>
     </div>

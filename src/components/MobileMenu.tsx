@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useFeedback } from "@/hooks/useFeedback";
+import SibeLogo from "@/components/SibeLogo";
 
 const MobileMenu = () => {
   const [open, setOpen] = useState(false);
@@ -37,6 +38,7 @@ const MobileMenu = () => {
     feedback.tap();
     setOpen(false);
   };
+
   const menuItems = [{
     icon: Home,
     label: "Command Centre",
@@ -58,6 +60,7 @@ const MobileMenu = () => {
     label: "Settings",
     path: "/settings"
   }];
+
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
@@ -71,8 +74,14 @@ const MobileMenu = () => {
       <SheetContent side="left" className="bg-background border-primary/20 p-0 w-[300px] backdrop-blur-xl safe-area-inset">
         <div className="flex flex-col h-full">
           <div className="p-8 border-b border-primary/20 pt-safe">
-            <h2 className="text-3xl font-extralight tracking-wider mb-1">SIBE</h2>
-            <p className="text-xs text-primary font-light">AI Ecommerce Scaling</p>
+            <div className="flex items-center gap-3 mb-2">
+              <SibeLogo size="sm" />
+              <div>
+                <h2 className="text-2xl font-extralight tracking-wider">SIBE</h2>
+                <p className="text-[10px] text-muted-foreground font-light">Powered by OpenClaw</p>
+              </div>
+            </div>
+            <p className="text-xs text-primary font-light mt-1">Agentic AI for Ecommerce</p>
           </div>
           
           <nav className="flex-1 py-6 native-bounce overflow-y-auto">
@@ -106,7 +115,7 @@ const MobileMenu = () => {
             )}
             <div>
               <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
-              <p className="text-xs text-primary/50 mt-1">v6.0 Professional</p>
+              <p className="text-xs text-primary/50 mt-1">Sibe v6.0 • Powered by OpenClaw</p>
             </div>
           </div>
         </div>
