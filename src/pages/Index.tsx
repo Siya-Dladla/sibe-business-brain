@@ -15,7 +15,6 @@ const Index = () => {
   
   const menuItems = [
     { icon: Database, label: "Data", path: "/dashboard" },
-    { icon: Layers, label: "Integrations", path: "/canvas" },
     { icon: FileText, label: "Reports", path: "/reports" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];

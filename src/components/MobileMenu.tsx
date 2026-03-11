@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Home, Database, Layers, FileText, Settings, LogOut } from "lucide-react";
+import { Menu, Home, Database, FileText, Settings, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
