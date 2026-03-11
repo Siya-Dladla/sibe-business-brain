@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Database, Layers, FileText, Settings, LogOut } from "lucide-react";
+import { Database, FileText, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import HomeChat from "@/components/HomeChat";
