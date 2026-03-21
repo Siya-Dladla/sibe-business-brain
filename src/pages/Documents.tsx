@@ -62,7 +62,7 @@ const Documents = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <DocumentUpload onUploadComplete={fetchDocuments} />
+          <DocumentUpload onUploadSuccess={fetchDocuments} />
           <WebsiteAnalyzer onAnalysisComplete={fetchDocuments} />
         </div>
 

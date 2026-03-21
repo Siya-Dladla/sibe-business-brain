@@ -49,7 +49,7 @@ const Intelligence = () => {
         {/* Split layout: Upload + Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="space-y-6">
-            <DocumentUpload onUploadComplete={fetchData} />
+            <DocumentUpload onUploadSuccess={fetchData} />
             
             {/* Data Sources Summary */}
             <Card className="glass-card p-6 border-border/20">

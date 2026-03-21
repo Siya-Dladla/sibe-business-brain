@@ -9,6 +9,10 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
+import Intelligence from "./pages/Intelligence";
+import Analytics from "./pages/Analytics";
+import Documents from "./pages/Documents";
+import Automation from "./pages/Automation";
 import Meeting from "./pages/Meeting";
 import Reports from "./pages/Reports";
 import Forecasting from "./pages/Forecasting";
@@ -32,6 +36,10 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+              <Route path="/intelligence" element={<ProtectedRoute><Intelligence /></ProtectedRoute>} />
+              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+              <Route path="/automation" element={<ProtectedRoute><Automation /></ProtectedRoute>} />
               <Route path="/canvas" element={<ProtectedRoute><Canvas /></ProtectedRoute>} />
               <Route path="/meeting" element={<ProtectedRoute><Meeting /></ProtectedRoute>} />
               <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
