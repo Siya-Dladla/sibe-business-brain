@@ -109,7 +109,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are Sibe SI, an expert business analyst. Analyze the website and provide:
+            content: `You are Sibe AI, an expert business analyst. Analyze the website and provide:
 1. Business model and revenue streams
 2. Target audience and market positioning
 3. Current strengths and weaknesses

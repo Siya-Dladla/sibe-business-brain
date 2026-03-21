@@ -146,7 +146,7 @@ serve(async (req) => {
         user_id: user.id,
         business_plan_id: businessPlanId,
         insight_type: 'analysis',
-        title: 'Sibe SI Learning: Business Model Analysis',
+        title: 'Sibe AI Learning: Business Model Analysis',
         content: analysis
       });
 

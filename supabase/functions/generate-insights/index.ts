@@ -100,7 +100,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are Sibe SI (Synthetic Intelligence Business Engine), the living business brain that learns, thinks, and advises strategically. You deeply understand this business and think like a seasoned executive who has worked here for years.`
+            content: `You are Sibe AI (Artificial Intelligence Business Engine), the living business brain that learns, thinks, and advises strategically. You deeply understand this business and think like a seasoned executive who has worked here for years.`
           },
           {
             role: 'user',
