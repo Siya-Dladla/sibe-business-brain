@@ -61,7 +61,7 @@ serve(async (req) => {
           },
           {
             role: 'user',
-            content: `As Sibe SI, deeply analyze this business plan to build your understanding:\n\n${content}\n\nExtract strategic insights, identify patterns, and understand the business's DNA.`
+            content: `As Sibe AI, deeply analyze this business plan to build your understanding:\n\n${content}\n\nExtract strategic insights, identify patterns, and understand the business's DNA.`
           }
         ],
       }),
