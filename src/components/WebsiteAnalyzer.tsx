@@ -192,7 +192,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
 
             <div className="p-4 border border-primary/10 rounded-lg bg-primary-foreground">
               <p className="text-sm text-muted-foreground font-light">
-                <strong className="text-primary">What Sibe SI will analyze:</strong>
+                <strong className="text-primary">What Sibe AI will analyze:</strong>
               </p>
               <ul className="mt-2 space-y-1 text-xs text-muted-foreground font-light">
                 <li className="flex items-center gap-2">
