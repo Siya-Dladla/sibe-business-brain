@@ -91,7 +91,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
         setExistingAnalysis({ website_url: finalUrl, created_at: new Date().toISOString() });
         toast({
           title: "Analysis Complete!",
-          description: "Your website has been analyzed by Sibe SI"
+          description: "Your website has been analyzed by Sibe AI"
         });
         onAnalysisComplete?.();
       } else {
