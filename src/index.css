@@ -17,7 +17,7 @@ All colors MUST be HSL.
 @layer base {
   :root,
   .dark {
-    /* SIBE SI Design System - Clean Monochrome (Dark) */
+    /* SIBE AI Design System - Clean Monochrome (Dark) */
     --background: 0 0% 0%; /* Pure black */
     --foreground: 0 0% 100%; /* Pure white */
 
@@ -80,7 +80,7 @@ All colors MUST be HSL.
   }
 
   .light {
-    /* SIBE SI Design System - Clean Light Theme */
+    /* SIBE AI Design System - Clean Light Theme */
     --background: 0 0% 98%; /* Off-white */
     --foreground: 0 0% 8%; /* Near black text */
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Home, Database, FileText, Settings, LogOut } from "lucide-react";
+import { Menu, Home, LayoutDashboard, Bot, Brain, BarChart3, FileText, Zap, Settings, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -44,13 +44,29 @@ const MobileMenu = () => {
     label: "Command Centre",
     path: "/"
   }, {
-    icon: Database,
-    label: "Data",
+    icon: LayoutDashboard,
+    label: "Dashboard",
     path: "/dashboard"
   }, {
+    icon: Bot,
+    label: "AI Agents",
+    path: "/employees"
+  }, {
+    icon: Brain,
+    label: "Business Intelligence",
+    path: "/intelligence"
+  }, {
+    icon: BarChart3,
+    label: "Analytics",
+    path: "/analytics"
+  }, {
     icon: FileText,
-    label: "Reports",
-    path: "/reports"
+    label: "Documents",
+    path: "/documents"
+  }, {
+    icon: Zap,
+    label: "Automation",
+    path: "/automation"
   }, {
     icon: Settings,
     label: "Settings",
@@ -73,17 +89,16 @@ const MobileMenu = () => {
             <div className="flex items-center gap-3 mb-2">
               <SibeLogo size="sm" />
               <div>
-                <h2 className="text-2xl font-extralight tracking-wider">SIBE</h2>
+                <h2 className="text-2xl font-extralight tracking-wider">SIBE AI</h2>
                 <p className="text-[10px] text-muted-foreground font-light">Powered by OpenClaw</p>
               </div>
             </div>
-            <p className="text-xs text-primary font-light mt-1">Agentic AI for Ecommerce</p>
+            <p className="text-xs text-primary font-light mt-1">Intelligent Business Assistant</p>
           </div>
           
           <nav className="flex-1 py-6 native-bounce overflow-y-auto">
             {menuItems.map((item, index) => {
-              const isActive = location.pathname === item.path || 
-                (item.path === "/dashboard" && location.pathname === "/dashboard");
+              const isActive = location.pathname === item.path;
               return (
                 <Link 
                   key={index} 
@@ -111,7 +126,7 @@ const MobileMenu = () => {
             )}
             <div>
               <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
-              <p className="text-xs text-primary/50 mt-1">Sibe v6.0 • Powered by OpenClaw</p>
+              <p className="text-xs text-primary/50 mt-1">Sibe AI v6.0 • Powered by OpenClaw</p>
             </div>
           </div>
         </div>

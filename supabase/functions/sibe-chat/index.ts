@@ -1371,7 +1371,7 @@ Provide a helpful, role-appropriate response.`;
     }
 
     // Build enhanced context for AI - Ecommerce Scaling Focus
-    let context = "You are Sibe SI (Synthetic Intelligence Business Engine), an AI-powered ecommerce scaling platform. You help online store owners grow their business using data, AI insights, and automation.\n\n";
+    let context = "You are Sibe AI (Artificial Intelligence Business Engine), an AI-powered ecommerce scaling platform powered by OpenClaw. You help online store owners grow their business using data, AI insights, and automation.\n\n";
     
     // Enhanced command capabilities - Ecommerce Focus
     context += "=== YOUR ECOMMERCE SCALING CAPABILITIES ===\n\n";

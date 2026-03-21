@@ -91,7 +91,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
         setExistingAnalysis({ website_url: finalUrl, created_at: new Date().toISOString() });
         toast({
           title: "Analysis Complete!",
-          description: "Your website has been analyzed by Sibe SI"
+          description: "Your website has been analyzed by Sibe AI"
         });
         onAnalysisComplete?.();
       } else {
@@ -123,7 +123,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
           <div>
             <h3 className="text-xl font-extralight">Business Website Analyzer</h3>
             <p className="text-xs text-muted-foreground font-light">
-              Let Sibe SI analyze your business and unlock scaling strategies
+              Let Sibe AI analyze your business and unlock scaling strategies
             </p>
           </div>
         </div>
@@ -154,7 +154,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
         <div>
           <h3 className="text-xl font-extralight">Business Website Analyzer</h3>
           <p className="text-xs text-muted-foreground font-light">
-            Let Sibe SI analyze your business and unlock scaling strategies
+            Let Sibe AI analyze your business and unlock scaling strategies
           </p>
         </div>
       </div>
@@ -192,7 +192,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
 
             <div className="p-4 border border-primary/10 rounded-lg bg-primary-foreground">
               <p className="text-sm text-muted-foreground font-light">
-                <strong className="text-primary">What Sibe SI will analyze:</strong>
+                <strong className="text-primary">What Sibe AI will analyze:</strong>
               </p>
               <ul className="mt-2 space-y-1 text-xs text-muted-foreground font-light">
                 <li className="flex items-center gap-2">
@@ -257,7 +257,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
 
                 <div className="pt-3 border-t border-border/30">
                   <p className="text-xs text-primary font-light">
-                    ✓ Your business data has been loaded into Sibe SI
+                    ✓ Your business data has been loaded into Sibe AI
                   </p>
                   <p className="text-xs text-muted-foreground font-light mt-1">
                     Explore AI Employees, Business Insights, and more features to scale your business

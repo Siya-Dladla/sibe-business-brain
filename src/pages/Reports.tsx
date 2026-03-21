@@ -231,7 +231,7 @@ const Reports = () => {
             <FileText className="w-20 h-20 text-primary mb-8 opacity-50 animate-pulse-glow" />
             <h2 className="text-3xl font-extralight mb-4 text-primary">No Reports Yet</h2>
             <p className="text-muted-foreground text-center max-w-lg font-light leading-relaxed mb-8">
-              Generate your first AI-powered business report. SIBE analyzes all your data to create
+              Generate your first AI-powered business report. Sibe AI analyzes all your data to create
               comprehensive insights and strategic recommendations.
             </p>
           </Card> : <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

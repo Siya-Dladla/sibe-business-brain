@@ -15,7 +15,7 @@ interface Message {
 const SibeChat = forwardRef((props, ref) => {
   const [messages, setMessages] = useState<Message[]>([{
     role: "assistant",
-    content: "Hello! I'm Sibe, your agentic AI business intelligence partner powered by OpenClaw. I've analyzed your business data and I'm ready to provide strategic insights. How can I help you today?",
+    content: "Hello! I'm Sibe AI, your agentic AI business intelligence partner powered by OpenClaw. I've analyzed your business data and I'm ready to provide strategic insights. How can I help you today?",
     timestamp: new Date()
   }]);
   const [input, setInput] = useState("");
@@ -65,7 +65,7 @@ const SibeChat = forwardRef((props, ref) => {
     } catch (error: any) {
       console.error("Chat error:", error);
       feedback.error();
-      const errorMessage = error?.message || "Failed to connect with Sibe SI. Please try again.";
+      const errorMessage = error?.message || "Failed to connect with Sibe AI. Please try again.";
       toast({
         title: "Communication Error",
         description: errorMessage,

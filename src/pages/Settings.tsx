@@ -212,7 +212,7 @@ const Settings = () => {
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
-          <p className="text-primary text-lg font-light">Configure your SIBE platform & integrations</p>
+          <p className="text-primary text-lg font-light">Configure your Sibe AI platform & integrations</p>
         </div>
 
         <div className="space-y-6">
@@ -646,7 +646,7 @@ const Settings = () => {
             <div className="space-y-4 text-sm">
               <div className="flex justify-between py-3 border-b border-border/30">
                 <span className="text-muted-foreground font-light">Platform Version</span>
-                <span className="text-primary font-light">SIBE v6.0</span>
+                <span className="text-primary font-light">Sibe AI v6.0</span>
               </div>
 
               <div className="flex justify-between py-3 border-b border-border/30">
@@ -680,7 +680,7 @@ const Settings = () => {
 
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground font-light">
-                Sign out from your SIBE account. You can sign back in at any time.
+                Sign out from your Sibe AI account. You can sign back in at any time.
               </p>
 
               <Button onClick={handleSignOut} variant="outline" className="glass-button border-destructive/30 text-destructive hover:bg-destructive/10 h-11 px-8">

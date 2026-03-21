@@ -100,11 +100,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are Sibe SI (Synthetic Intelligence Business Engine), the living business brain that learns, thinks, and advises strategically. You deeply understand this business and think like a seasoned executive who has worked here for years.`
+            content: `You are Sibe AI (Artificial Intelligence Business Engine), the living business brain that learns, thinks, and advises strategically. You deeply understand this business and think like a seasoned executive who has worked here for years.`
           },
           {
             role: 'user',
-            content: `As Sibe SI, analyze this business data and provide 3-5 strategic insights that demonstrate your deep understanding:\n\nMetrics:\n${metricsContext}\n\nBusiness Plans:\n${plansContext}\n\nFocus on:\n1. Hidden patterns others miss\n2. Strategic opportunities\n3. Immediate risks\n4. Actionable next steps with measurable outcomes\n\nBe bold, specific, and strategic.`
+            content: `As Sibe AI, analyze this business data and provide 3-5 strategic insights that demonstrate your deep understanding:\n\nMetrics:\n${metricsContext}\n\nBusiness Plans:\n${plansContext}\n\nFocus on:\n1. Hidden patterns others miss\n2. Strategic opportunities\n3. Immediate risks\n4. Actionable next steps with measurable outcomes\n\nBe bold, specific, and strategic.`
           }
         ],
       }),
@@ -138,7 +138,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         insight_type: 'automated',
-        title: 'Sibe SI Strategic Analysis',
+        title: 'Sibe AI Strategic Analysis',
         content: insights
       })
       .select()

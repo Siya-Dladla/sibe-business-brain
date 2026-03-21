@@ -50,7 +50,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are Sibe SI (Synthetic Intelligence Business Engine), analyzing a business to build your synthetic understanding. You need to deeply understand:
+            content: `You are Sibe AI (Artificial Intelligence Business Engine), analyzing a business to build your understanding. You need to deeply understand:
             1. Core business model and value proposition
             2. Strategic objectives and success metrics  
             3. Market positioning and competitive dynamics
@@ -61,7 +61,7 @@ serve(async (req) => {
           },
           {
             role: 'user',
-            content: `As Sibe SI, deeply analyze this business plan to build your understanding:\n\n${content}\n\nExtract strategic insights, identify patterns, and understand the business's DNA.`
+            content: `As Sibe AI, deeply analyze this business plan to build your understanding:\n\n${content}\n\nExtract strategic insights, identify patterns, and understand the business's DNA.`
           }
         ],
       }),
@@ -146,7 +146,7 @@ serve(async (req) => {
         user_id: user.id,
         business_plan_id: businessPlanId,
         insight_type: 'analysis',
-        title: 'Sibe SI Learning: Business Model Analysis',
+        title: 'Sibe AI Learning: Business Model Analysis',
         content: analysis
       });
 
