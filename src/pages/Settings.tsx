@@ -646,7 +646,7 @@ const Settings = () => {
             <div className="space-y-4 text-sm">
               <div className="flex justify-between py-3 border-b border-border/30">
                 <span className="text-muted-foreground font-light">Platform Version</span>
-                <span className="text-primary font-light">SIBE v6.0</span>
+                <span className="text-primary font-light">Sibe AI v6.0</span>
               </div>
 
               <div className="flex justify-between py-3 border-b border-border/30">
