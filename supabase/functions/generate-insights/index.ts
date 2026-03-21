@@ -138,7 +138,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         insight_type: 'automated',
-        title: 'Sibe SI Strategic Analysis',
+        title: 'Sibe AI Strategic Analysis',
         content: insights
       })
       .select()
