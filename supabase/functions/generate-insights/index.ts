@@ -104,7 +104,7 @@ serve(async (req) => {
           },
           {
             role: 'user',
-            content: `As Sibe SI, analyze this business data and provide 3-5 strategic insights that demonstrate your deep understanding:\n\nMetrics:\n${metricsContext}\n\nBusiness Plans:\n${plansContext}\n\nFocus on:\n1. Hidden patterns others miss\n2. Strategic opportunities\n3. Immediate risks\n4. Actionable next steps with measurable outcomes\n\nBe bold, specific, and strategic.`
+            content: `As Sibe AI, analyze this business data and provide 3-5 strategic insights that demonstrate your deep understanding:\n\nMetrics:\n${metricsContext}\n\nBusiness Plans:\n${plansContext}\n\nFocus on:\n1. Hidden patterns others miss\n2. Strategic opportunities\n3. Immediate risks\n4. Actionable next steps with measurable outcomes\n\nBe bold, specific, and strategic.`
           }
         ],
       }),
