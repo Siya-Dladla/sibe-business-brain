@@ -31,7 +31,7 @@ const QuickActions = ({
   return <Card className="glass-card p-4 md:p-6 bg-primary-foreground">
       <div className="flex items-center gap-3 mb-4">
         <Sparkles className="w-5 h-5 text-primary" />
-        <h3 className="text-base md:text-lg font-extralight">Ask Sibe SI</h3>
+        <h3 className="text-base md:text-lg font-extralight">Ask Sibe AI</h3>
       </div>
       
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">

@@ -65,7 +65,7 @@ const SibeChat = forwardRef((props, ref) => {
     } catch (error: any) {
       console.error("Chat error:", error);
       feedback.error();
-      const errorMessage = error?.message || "Failed to connect with Sibe SI. Please try again.";
+      const errorMessage = error?.message || "Failed to connect with Sibe AI. Please try again.";
       toast({
         title: "Communication Error",
         description: errorMessage,

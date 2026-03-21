@@ -680,7 +680,7 @@ const Settings = () => {
 
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground font-light">
-                Sign out from your SIBE account. You can sign back in at any time.
+                Sign out from your Sibe AI account. You can sign back in at any time.
               </p>
 
               <Button onClick={handleSignOut} variant="outline" className="glass-button border-destructive/30 text-destructive hover:bg-destructive/10 h-11 px-8">
