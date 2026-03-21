@@ -154,7 +154,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
         <div>
           <h3 className="text-xl font-extralight">Business Website Analyzer</h3>
           <p className="text-xs text-muted-foreground font-light">
-            Let Sibe SI analyze your business and unlock scaling strategies
+            Let Sibe AI analyze your business and unlock scaling strategies
           </p>
         </div>
       </div>
