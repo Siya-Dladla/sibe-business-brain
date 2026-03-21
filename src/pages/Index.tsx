@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Database, FileText, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Bot, Brain, BarChart3, FileText, Zap, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import HomeChat from "@/components/HomeChat";
@@ -14,8 +14,12 @@ const Index = () => {
   const { toast } = useToast();
   
   const menuItems = [
-    { icon: Database, label: "Data", path: "/dashboard" },
-    { icon: FileText, label: "Reports", path: "/reports" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+    { icon: Bot, label: "Agents", path: "/employees" },
+    { icon: Brain, label: "Intel", path: "/intelligence" },
+    { icon: BarChart3, label: "Analytics", path: "/analytics" },
+    { icon: FileText, label: "Docs", path: "/documents" },
+    { icon: Zap, label: "Automation", path: "/automation" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
 
@@ -30,13 +34,13 @@ const Index = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col overflow-hidden safe-area-inset">
-      {/* Header - Mobile optimized */}
+      {/* Header */}
       <header className="shrink-0 px-3 py-2 md:p-4 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-50 pt-safe">
         <div className="flex items-center gap-2">
           <MobileMenu />
           {!isMobile && (
             <div className="flex items-center gap-2 ml-2">
-              <span className="text-lg font-light tracking-wider text-foreground">SIBE</span>
+              <span className="text-lg font-light tracking-wider text-foreground">SIBE AI</span>
               <span className="text-[10px] text-muted-foreground/60 hidden md:inline">Powered by OpenClaw</span>
             </div>
           )}
@@ -85,10 +89,10 @@ const Index = () => {
         <HomeChat />
       </main>
 
-      {/* Footer - Hidden on mobile for more space */}
+      {/* Footer */}
       <footer className="hidden md:flex shrink-0 p-3 border-t border-border items-center justify-center bg-background pb-safe">
         <p className="text-[10px] text-muted-foreground/50">
-          © 2025 SGD Business Analysis & Projects | Sibe — Powered by OpenClaw Agentic AI
+          © 2025 SGD Business Analysis & Projects | Sibe AI — Powered by OpenClaw Agentic AI
         </p>
       </footer>
     </div>
