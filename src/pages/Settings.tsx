@@ -212,7 +212,7 @@ const Settings = () => {
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
-          <p className="text-primary text-lg font-light">Configure your SIBE platform & integrations</p>
+          <p className="text-primary text-lg font-light">Configure your Sibe AI platform & integrations</p>
         </div>
 
         <div className="space-y-6">
