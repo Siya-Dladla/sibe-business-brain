@@ -257,7 +257,7 @@ const WebsiteAnalyzer = ({ onAnalysisComplete }: WebsiteAnalyzerProps) => {
 
                 <div className="pt-3 border-t border-border/30">
                   <p className="text-xs text-primary font-light">
-                    ✓ Your business data has been loaded into Sibe SI
+                    ✓ Your business data has been loaded into Sibe AI
                   </p>
                   <p className="text-xs text-muted-foreground font-light mt-1">
                     Explore AI Employees, Business Insights, and more features to scale your business

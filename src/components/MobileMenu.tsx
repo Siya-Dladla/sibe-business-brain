@@ -111,7 +111,7 @@ const MobileMenu = () => {
             )}
             <div>
               <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
-              <p className="text-xs text-primary/50 mt-1">Sibe v6.0 • Powered by OpenClaw</p>
+              <p className="text-xs text-primary/50 mt-1">Sibe AI v6.0 • Powered by OpenClaw</p>
             </div>
           </div>
         </div>
