@@ -160,7 +160,7 @@ const DocumentUpload = ({ onUploadSuccess }: DocumentUploadProps) => {
       <div className="flex items-center gap-3 mb-6">
         <FileText className="w-6 h-6 text-primary" />
         <div>
-          <h3 className="text-xl font-extralight">Feed Sibe SI</h3>
+          <h3 className="text-xl font-extralight">Feed Sibe AI</h3>
           <p className="text-xs text-muted-foreground font-light">Upload business data to teach your AI brain</p>
         </div>
       </div>
