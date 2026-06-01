@@ -21,8 +21,6 @@ async function syncShopifyData(
   connection: any
 ): Promise<SyncResult> {
   try {
-    // In production, this would call the actual Shopify API
-    // For now, we simulate with realistic e-commerce metrics
     const shopifyMetrics = [
       { metric_name: 'Total Revenue', value: Math.floor(Math.random() * 50000) + 10000, metric_type: 'revenue', change_percentage: (Math.random() * 20) - 5 },
       { metric_name: 'Orders', value: Math.floor(Math.random() * 500) + 50, metric_type: 'orders', change_percentage: (Math.random() * 15) - 3 },
@@ -32,8 +30,7 @@ async function syncShopifyData(
       { metric_name: 'Returning Customers', value: Math.floor(Math.random() * 200) + 20, metric_type: 'retention', change_percentage: (Math.random() * 12) },
     ];
 
-    const period = new Date().toISOString().slice(0, 7); // Current month
-
+    const period = new Date().toISOString().slice(0, 7);
     for (const metric of shopifyMetrics) {
       await supabase.from('business_metrics').upsert({
         user_id: userId,
@@ -42,34 +39,18 @@ async function syncShopifyData(
         metric_type: metric.metric_type,
         change_percentage: parseFloat(metric.change_percentage.toFixed(2)),
         period,
-      }, {
-        onConflict: 'user_id,metric_name,period',
-        ignoreDuplicates: false,
-      });
+      }, { onConflict: 'user_id,metric_name,period', ignoreDuplicates: false });
     }
-
-    // Update connection last sync
-    await supabase.from('api_connections').update({
-      last_sync_at: new Date().toISOString(),
-      status: 'connected',
-    }).eq('id', connection.id);
-
+    await supabase.from('api_connections').update({ last_sync_at: new Date().toISOString(), status: 'connected' }).eq('id', connection.id);
     return { success: true, provider: 'shopify', metrics_synced: shopifyMetrics.length };
   } catch (error: unknown) {
     console.error('Shopify sync error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return { success: false, provider: 'shopify', metrics_synced: 0, error: errorMessage };
+    return { success: false, provider: 'shopify', metrics_synced: 0, error: 'sync failed' };
   }
 }
 
-// Simulate Meta (Facebook/Instagram) data sync
-async function syncMetaData(
-  supabase: any,
-  userId: string,
-  connection: any
-): Promise<SyncResult> {
+async function syncMetaData(supabase: any, userId: string, connection: any): Promise<SyncResult> {
   try {
-    // In production, this would call the actual Meta Marketing API
     const metaMetrics = [
       { metric_name: 'Ad Spend', value: Math.floor(Math.random() * 5000) + 500, metric_type: 'spend', change_percentage: (Math.random() * 20) - 5 },
       { metric_name: 'Impressions', value: Math.floor(Math.random() * 500000) + 50000, metric_type: 'impressions', change_percentage: (Math.random() * 25) - 5 },
@@ -79,9 +60,7 @@ async function syncMetaData(
       { metric_name: 'Cost Per Click', value: parseFloat((Math.random() * 2 + 0.5).toFixed(2)), metric_type: 'cpc', change_percentage: (Math.random() * 8) - 4 },
       { metric_name: 'ROAS', value: parseFloat((Math.random() * 5 + 1).toFixed(2)), metric_type: 'roas', change_percentage: (Math.random() * 15) - 5 },
     ];
-
     const period = new Date().toISOString().slice(0, 7);
-
     for (const metric of metaMetrics) {
       await supabase.from('business_metrics').upsert({
         user_id: userId,
@@ -90,31 +69,17 @@ async function syncMetaData(
         metric_type: metric.metric_type,
         change_percentage: parseFloat(metric.change_percentage.toFixed(2)),
         period,
-      }, {
-        onConflict: 'user_id,metric_name,period',
-        ignoreDuplicates: false,
-      });
+      }, { onConflict: 'user_id,metric_name,period', ignoreDuplicates: false });
     }
-
-    await supabase.from('api_connections').update({
-      last_sync_at: new Date().toISOString(),
-      status: 'connected',
-    }).eq('id', connection.id);
-
+    await supabase.from('api_connections').update({ last_sync_at: new Date().toISOString(), status: 'connected' }).eq('id', connection.id);
     return { success: true, provider: 'meta', metrics_synced: metaMetrics.length };
   } catch (error: unknown) {
     console.error('Meta sync error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return { success: false, provider: 'meta', metrics_synced: 0, error: errorMessage };
+    return { success: false, provider: 'meta', metrics_synced: 0, error: 'sync failed' };
   }
 }
 
-// Simulate Google Analytics data sync
-async function syncGoogleAnalyticsData(
-  supabase: any,
-  userId: string,
-  connection: any
-): Promise<SyncResult> {
+async function syncGoogleAnalyticsData(supabase: any, userId: string, connection: any): Promise<SyncResult> {
   try {
     const gaMetrics = [
       { metric_name: 'Sessions', value: Math.floor(Math.random() * 50000) + 5000, metric_type: 'sessions', change_percentage: (Math.random() * 20) - 5 },
@@ -123,9 +88,7 @@ async function syncGoogleAnalyticsData(
       { metric_name: 'Bounce Rate', value: parseFloat((Math.random() * 40 + 30).toFixed(2)), metric_type: 'bounce', change_percentage: (Math.random() * 8) - 4 },
       { metric_name: 'Avg Session Duration', value: Math.floor(Math.random() * 300) + 60, metric_type: 'duration', change_percentage: (Math.random() * 12) - 3 },
     ];
-
     const period = new Date().toISOString().slice(0, 7);
-
     for (const metric of gaMetrics) {
       await supabase.from('business_metrics').upsert({
         user_id: userId,
@@ -134,31 +97,17 @@ async function syncGoogleAnalyticsData(
         metric_type: metric.metric_type,
         change_percentage: parseFloat(metric.change_percentage.toFixed(2)),
         period,
-      }, {
-        onConflict: 'user_id,metric_name,period',
-        ignoreDuplicates: false,
-      });
+      }, { onConflict: 'user_id,metric_name,period', ignoreDuplicates: false });
     }
-
-    await supabase.from('api_connections').update({
-      last_sync_at: new Date().toISOString(),
-      status: 'connected',
-    }).eq('id', connection.id);
-
+    await supabase.from('api_connections').update({ last_sync_at: new Date().toISOString(), status: 'connected' }).eq('id', connection.id);
     return { success: true, provider: 'google_analytics', metrics_synced: gaMetrics.length };
   } catch (error: unknown) {
     console.error('GA sync error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return { success: false, provider: 'google_analytics', metrics_synced: 0, error: errorMessage };
+    return { success: false, provider: 'google_analytics', metrics_synced: 0, error: 'sync failed' };
   }
 }
 
-// Simulate Stripe data sync
-async function syncStripeData(
-  supabase: any,
-  userId: string,
-  connection: any
-): Promise<SyncResult> {
+async function syncStripeData(supabase: any, userId: string, connection: any): Promise<SyncResult> {
   try {
     const stripeMetrics = [
       { metric_name: 'MRR', value: Math.floor(Math.random() * 20000) + 2000, metric_type: 'mrr', change_percentage: (Math.random() * 15) - 2 },
@@ -167,9 +116,7 @@ async function syncStripeData(
       { metric_name: 'LTV', value: Math.floor(Math.random() * 1000) + 200, metric_type: 'ltv', change_percentage: (Math.random() * 12) - 2 },
       { metric_name: 'Refund Rate', value: parseFloat((Math.random() * 3 + 0.5).toFixed(2)), metric_type: 'refunds', change_percentage: (Math.random() * 4) - 2 },
     ];
-
     const period = new Date().toISOString().slice(0, 7);
-
     for (const metric of stripeMetrics) {
       await supabase.from('business_metrics').upsert({
         user_id: userId,
@@ -178,38 +125,20 @@ async function syncStripeData(
         metric_type: metric.metric_type,
         change_percentage: parseFloat(metric.change_percentage.toFixed(2)),
         period,
-      }, {
-        onConflict: 'user_id,metric_name,period',
-        ignoreDuplicates: false,
-      });
+      }, { onConflict: 'user_id,metric_name,period', ignoreDuplicates: false });
     }
-
-    await supabase.from('api_connections').update({
-      last_sync_at: new Date().toISOString(),
-      status: 'connected',
-    }).eq('id', connection.id);
-
+    await supabase.from('api_connections').update({ last_sync_at: new Date().toISOString(), status: 'connected' }).eq('id', connection.id);
     return { success: true, provider: 'stripe', metrics_synced: stripeMetrics.length };
   } catch (error: unknown) {
     console.error('Stripe sync error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return { success: false, provider: 'stripe', metrics_synced: 0, error: errorMessage };
+    return { success: false, provider: 'stripe', metrics_synced: 0, error: 'sync failed' };
   }
 }
 
-// Generic custom API sync
-async function syncCustomAPIData(
-  supabase: any,
-  userId: string,
-  connection: any
-): Promise<SyncResult> {
+async function syncCustomAPIData(supabase: any, userId: string, connection: any): Promise<SyncResult> {
   try {
-    // For custom APIs, we attempt to fetch from the endpoint if provided
     if (connection.api_endpoint) {
-      // In production, would actually call the endpoint
-      // For now, create a placeholder metric
       const period = new Date().toISOString().slice(0, 7);
-      
       await supabase.from('business_metrics').upsert({
         user_id: userId,
         metric_name: `${connection.name}: Custom Data`,
@@ -217,22 +146,13 @@ async function syncCustomAPIData(
         metric_type: 'custom',
         change_percentage: 0,
         period,
-      }, {
-        onConflict: 'user_id,metric_name,period',
-        ignoreDuplicates: false,
-      });
+      }, { onConflict: 'user_id,metric_name,period', ignoreDuplicates: false });
     }
-
-    await supabase.from('api_connections').update({
-      last_sync_at: new Date().toISOString(),
-      status: 'connected',
-    }).eq('id', connection.id);
-
+    await supabase.from('api_connections').update({ last_sync_at: new Date().toISOString(), status: 'connected' }).eq('id', connection.id);
     return { success: true, provider: 'custom_api', metrics_synced: 1 };
   } catch (error: unknown) {
     console.error('Custom API sync error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return { success: false, provider: 'custom_api', metrics_synced: 0, error: errorMessage };
+    return { success: false, provider: 'custom_api', metrics_synced: 0, error: 'sync failed' };
   }
 }
 
@@ -243,79 +163,72 @@ serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    const { connectionId, userId, syncAll } = await req.json();
+    // Authenticate the caller
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const authClient = createClient(supabaseUrl, anonKey);
+    const { data: claimsData, error: authError } = await authClient.auth.getClaims(token);
+    if (authError || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const authedUserId = claimsData.claims.sub as string;
 
+    const supabase = createClient(supabaseUrl, serviceKey);
+    const { connectionId, syncAll } = await req.json();
     const results: SyncResult[] = [];
 
-    if (syncAll && userId) {
-      // Sync all connections for a user
+    if (syncAll) {
       const { data: connections, error: connError } = await supabase
         .from('api_connections')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', authedUserId)
         .eq('status', 'connected');
-
       if (connError) throw connError;
 
       for (const connection of connections || []) {
         let result: SyncResult;
-        
         switch (connection.provider) {
-          case 'shopify':
-            result = await syncShopifyData(supabase, userId, connection);
-            break;
-          case 'meta':
-            result = await syncMetaData(supabase, userId, connection);
-            break;
-          case 'google_analytics':
-            result = await syncGoogleAnalyticsData(supabase, userId, connection);
-            break;
-          case 'stripe':
-            result = await syncStripeData(supabase, userId, connection);
-            break;
-          case 'custom_api':
-          default:
-            result = await syncCustomAPIData(supabase, userId, connection);
-            break;
+          case 'shopify': result = await syncShopifyData(supabase, authedUserId, connection); break;
+          case 'meta': result = await syncMetaData(supabase, authedUserId, connection); break;
+          case 'google_analytics': result = await syncGoogleAnalyticsData(supabase, authedUserId, connection); break;
+          case 'stripe': result = await syncStripeData(supabase, authedUserId, connection); break;
+          default: result = await syncCustomAPIData(supabase, authedUserId, connection); break;
         }
-        
         results.push(result);
       }
     } else if (connectionId) {
-      // Sync a specific connection
       const { data: connection, error: connError } = await supabase
         .from('api_connections')
         .select('*')
         .eq('id', connectionId)
         .single();
-
       if (connError) throw connError;
       if (!connection) throw new Error('Connection not found');
+      // Ensure the caller owns the connection
+      if (connection.user_id !== authedUserId) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
 
       let result: SyncResult;
-      
       switch (connection.provider) {
-        case 'shopify':
-          result = await syncShopifyData(supabase, connection.user_id, connection);
-          break;
-        case 'meta':
-          result = await syncMetaData(supabase, connection.user_id, connection);
-          break;
-        case 'google_analytics':
-          result = await syncGoogleAnalyticsData(supabase, connection.user_id, connection);
-          break;
-        case 'stripe':
-          result = await syncStripeData(supabase, connection.user_id, connection);
-          break;
-        case 'custom_api':
-        default:
-          result = await syncCustomAPIData(supabase, connection.user_id, connection);
-          break;
+        case 'shopify': result = await syncShopifyData(supabase, authedUserId, connection); break;
+        case 'meta': result = await syncMetaData(supabase, authedUserId, connection); break;
+        case 'google_analytics': result = await syncGoogleAnalyticsData(supabase, authedUserId, connection); break;
+        case 'stripe': result = await syncStripeData(supabase, authedUserId, connection); break;
+        default: result = await syncCustomAPIData(supabase, authedUserId, connection); break;
       }
-      
       results.push(result);
     }
 
@@ -327,17 +240,11 @@ serve(async (req) => {
       results,
       total_metrics_synced: totalSynced,
       message: `Synced ${totalSynced} metrics from ${results.length} connection(s)`,
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error: unknown) {
     console.error('[sync-api-data] error:', error);
-    return new Response(JSON.stringify({
-      success: false,
-      error: 'An internal error occurred',
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return new Response(JSON.stringify({ success: false, error: 'An internal error occurred' }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });

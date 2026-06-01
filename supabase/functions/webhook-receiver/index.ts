@@ -22,11 +22,18 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const expectedSecret = Deno.env.get('WEBHOOK_SECRET');
+
+    // Validate shared webhook secret to prevent unauthenticated writes
+    const incomingSecret = req.headers.get('x-webhook-secret');
+    if (!expectedSecret || !incomingSecret || incomingSecret !== expectedSecret) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get webhook secret from header for validation
-    const webhookSecret = req.headers.get('x-webhook-secret');
-    
     const payload: WebhookPayload = await req.json();
     const { action, data, source } = payload;
 
