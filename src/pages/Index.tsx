@@ -94,7 +94,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="hidden md:flex shrink-0 p-3 border-t border-border items-center justify-center bg-background pb-safe">
         <p className="text-[10px] text-muted-foreground/50">
-          © 2025 SGD Business Analysis & Projects | Sibe AI — Powered by OpenClaw Agentic AI
+          © 2025 SGD Business Analysis & Projects | Sibe AI — Autonomous Business Operating System
         </p>
       </footer>
     </div>
