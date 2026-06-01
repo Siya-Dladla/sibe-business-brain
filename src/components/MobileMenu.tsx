@@ -76,7 +76,7 @@ const MobileMenu = () => {
                 <p className="text-[10px] text-muted-foreground font-light">Powered by OpenClaw</p>
               </div>
             </div>
-            <p className="text-xs text-primary font-light mt-1">Intelligent Business Assistant</p>
+            <p className="text-xs text-primary font-light mt-1">Autonomous Business Operating System</p>
           </div>
           
           <nav className="flex-1 py-6 native-bounce overflow-y-auto">
