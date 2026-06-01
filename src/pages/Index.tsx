@@ -43,7 +43,7 @@ const Index = () => {
           {!isMobile && (
             <div className="flex items-center gap-2 ml-2">
               <span className="text-lg font-light tracking-wider text-foreground">SIBE AI</span>
-              <span className="text-[10px] text-muted-foreground/60 hidden md:inline">Powered by OpenClaw</span>
+              <span className="text-[10px] text-muted-foreground/60 hidden md:inline">Autonomous Business OS</span>
             </div>
           )}
         </div>
