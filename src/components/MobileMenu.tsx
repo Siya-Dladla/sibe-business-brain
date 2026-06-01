@@ -39,39 +39,22 @@ const MobileMenu = () => {
     setOpen(false);
   };
 
-  const menuItems = [{
-    icon: Home,
-    label: "Command Centre",
-    path: "/"
-  }, {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    path: "/dashboard"
-  }, {
-    icon: Bot,
-    label: "AI Agents",
-    path: "/employees"
-  }, {
-    icon: Brain,
-    label: "Business Intelligence",
-    path: "/intelligence"
-  }, {
-    icon: BarChart3,
-    label: "Analytics",
-    path: "/analytics"
-  }, {
-    icon: FileText,
-    label: "Documents",
-    path: "/documents"
-  }, {
-    icon: Zap,
-    label: "Automation",
-    path: "/automation"
-  }, {
-    icon: Settings,
-    label: "Settings",
-    path: "/settings"
-  }];
+  const menuItems = [
+    { icon: Home, label: "Command Centre", path: "/" },
+    { icon: Sparkles, label: "Executive Briefing", path: "/briefing" },
+    { icon: Network, label: "Business Brain", path: "/understanding" },
+    { icon: LayoutDashboard, label: "Health Monitor", path: "/dashboard" },
+    { icon: Brain, label: "Intelligence", path: "/intelligence" },
+    { icon: Lightbulb, label: "Recommendations", path: "/recommendations" },
+    { icon: Zap, label: "Autonomous Execution", path: "/automation" },
+    { icon: TrendingUp, label: "Predictions", path: "/forecasting" },
+    { icon: Cpu, label: "Industry Brains", path: "/industries" },
+    { icon: Bot, label: "AI Agents", path: "/employees" },
+    { icon: BarChart3, label: "Analytics", path: "/analytics" },
+    { icon: FileText, label: "Documents", path: "/documents" },
+    { icon: Tag, label: "Pricing", path: "/pricing" },
+    { icon: Settings, label: "Settings", path: "/settings" },
+  ];
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
