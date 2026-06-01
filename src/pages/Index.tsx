@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Bot, Brain, BarChart3, FileText, Zap, Settings, LogOut } from "lucide-react";
+import { Sparkles, Network, LayoutDashboard, Lightbulb, Zap, TrendingUp, Cpu, Settings, LogOut, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
 import HomeChat from "@/components/HomeChat";
@@ -14,12 +14,14 @@ const Index = () => {
   const { toast } = useToast();
   
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-    { icon: Bot, label: "Agents", path: "/employees" },
-    { icon: Brain, label: "Intel", path: "/intelligence" },
-    { icon: BarChart3, label: "Analytics", path: "/analytics" },
-    { icon: FileText, label: "Docs", path: "/documents" },
-    { icon: Zap, label: "Automation", path: "/automation" },
+    { icon: Sparkles, label: "Briefing", path: "/briefing" },
+    { icon: Network, label: "Brain", path: "/understanding" },
+    { icon: LayoutDashboard, label: "Monitor", path: "/dashboard" },
+    { icon: Lightbulb, label: "Actions", path: "/recommendations" },
+    { icon: Zap, label: "Execute", path: "/automation" },
+    { icon: TrendingUp, label: "Predict", path: "/forecasting" },
+    { icon: Cpu, label: "Industries", path: "/industries" },
+    { icon: Tag, label: "Pricing", path: "/pricing" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ];
 
@@ -41,7 +43,7 @@ const Index = () => {
           {!isMobile && (
             <div className="flex items-center gap-2 ml-2">
               <span className="text-lg font-light tracking-wider text-foreground">SIBE AI</span>
-              <span className="text-[10px] text-muted-foreground/60 hidden md:inline">Powered by OpenClaw</span>
+              <span className="text-[10px] text-muted-foreground/60 hidden md:inline">Autonomous Business OS</span>
             </div>
           )}
         </div>
@@ -92,7 +94,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="hidden md:flex shrink-0 p-3 border-t border-border items-center justify-center bg-background pb-safe">
         <p className="text-[10px] text-muted-foreground/50">
-          © 2025 SGD Business Analysis & Projects | Sibe AI — Powered by OpenClaw Agentic AI
+          © 2025 SGD Business Analysis & Projects | Sibe AI — Autonomous Business Operating System
         </p>
       </footer>
     </div>

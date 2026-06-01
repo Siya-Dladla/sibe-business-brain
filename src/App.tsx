@@ -16,6 +16,11 @@ import Automation from "./pages/Automation";
 import Meeting from "./pages/Meeting";
 import Reports from "./pages/Reports";
 import Forecasting from "./pages/Forecasting";
+import Briefing from "./pages/Briefing";
+import Understanding from "./pages/Understanding";
+import Recommendations from "./pages/Recommendations";
+import Industries from "./pages/Industries";
+import Pricing from "./pages/Pricing";
 import Canvas from "./pages/Canvas";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -44,6 +49,11 @@ const App = () => (
               <Route path="/meeting" element={<ProtectedRoute><Meeting /></ProtectedRoute>} />
               <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
               <Route path="/forecasting" element={<ProtectedRoute><Forecasting /></ProtectedRoute>} />
+              <Route path="/briefing" element={<ProtectedRoute><Briefing /></ProtectedRoute>} />
+              <Route path="/understanding" element={<ProtectedRoute><Understanding /></ProtectedRoute>} />
+              <Route path="/recommendations" element={<ProtectedRoute><Recommendations /></ProtectedRoute>} />
+              <Route path="/industries" element={<ProtectedRoute><Industries /></ProtectedRoute>} />
+              <Route path="/pricing" element={<Pricing />} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Home, LayoutDashboard, Bot, Brain, BarChart3, FileText, Zap, Settings, LogOut } from "lucide-react";
+import { Menu, Home, LayoutDashboard, Bot, Brain, BarChart3, FileText, Zap, Settings, LogOut, Sparkles, Lightbulb, Network, TrendingUp, Cpu, Tag } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -39,39 +39,22 @@ const MobileMenu = () => {
     setOpen(false);
   };
 
-  const menuItems = [{
-    icon: Home,
-    label: "Command Centre",
-    path: "/"
-  }, {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    path: "/dashboard"
-  }, {
-    icon: Bot,
-    label: "AI Agents",
-    path: "/employees"
-  }, {
-    icon: Brain,
-    label: "Business Intelligence",
-    path: "/intelligence"
-  }, {
-    icon: BarChart3,
-    label: "Analytics",
-    path: "/analytics"
-  }, {
-    icon: FileText,
-    label: "Documents",
-    path: "/documents"
-  }, {
-    icon: Zap,
-    label: "Automation",
-    path: "/automation"
-  }, {
-    icon: Settings,
-    label: "Settings",
-    path: "/settings"
-  }];
+  const menuItems = [
+    { icon: Home, label: "Command Centre", path: "/" },
+    { icon: Sparkles, label: "Executive Briefing", path: "/briefing" },
+    { icon: Network, label: "Business Brain", path: "/understanding" },
+    { icon: LayoutDashboard, label: "Health Monitor", path: "/dashboard" },
+    { icon: Brain, label: "Intelligence", path: "/intelligence" },
+    { icon: Lightbulb, label: "Recommendations", path: "/recommendations" },
+    { icon: Zap, label: "Autonomous Execution", path: "/automation" },
+    { icon: TrendingUp, label: "Predictions", path: "/forecasting" },
+    { icon: Cpu, label: "Industry Brains", path: "/industries" },
+    { icon: Bot, label: "AI Agents", path: "/employees" },
+    { icon: BarChart3, label: "Analytics", path: "/analytics" },
+    { icon: FileText, label: "Documents", path: "/documents" },
+    { icon: Tag, label: "Pricing", path: "/pricing" },
+    { icon: Settings, label: "Settings", path: "/settings" },
+  ];
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
@@ -93,7 +76,7 @@ const MobileMenu = () => {
                 <p className="text-[10px] text-muted-foreground font-light">Powered by OpenClaw</p>
               </div>
             </div>
-            <p className="text-xs text-primary font-light mt-1">Intelligent Business Assistant</p>
+            <p className="text-xs text-primary font-light mt-1">Autonomous Business Operating System</p>
           </div>
           
           <nav className="flex-1 py-6 native-bounce overflow-y-auto">
