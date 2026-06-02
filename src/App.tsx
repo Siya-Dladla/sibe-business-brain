@@ -7,21 +7,14 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { SoundSettingsProvider } from "@/contexts/SoundSettingsContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import Employees from "./pages/Employees";
-import Intelligence from "./pages/Intelligence";
-import Analytics from "./pages/Analytics";
-import Documents from "./pages/Documents";
-import Automation from "./pages/Automation";
-import Meeting from "./pages/Meeting";
-import Reports from "./pages/Reports";
-import Forecasting from "./pages/Forecasting";
-import Briefing from "./pages/Briefing";
-import Understanding from "./pages/Understanding";
-import Recommendations from "./pages/Recommendations";
-import Industries from "./pages/Industries";
-import Pricing from "./pages/Pricing";
-import Canvas from "./pages/Canvas";
+import Reality from "./pages/Reality";
+import Cognitive from "./pages/Cognitive";
+import Agents from "./pages/Agents";
+import Swarm from "./pages/Swarm";
+import Observation from "./pages/Observation";
+import Memory from "./pages/Memory";
+import Execution from "./pages/Execution";
+import Evolution from "./pages/Evolution";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -39,21 +32,14 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
-              <Route path="/intelligence" element={<ProtectedRoute><Intelligence /></ProtectedRoute>} />
-              <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-              <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-              <Route path="/automation" element={<ProtectedRoute><Automation /></ProtectedRoute>} />
-              <Route path="/canvas" element={<ProtectedRoute><Canvas /></ProtectedRoute>} />
-              <Route path="/meeting" element={<ProtectedRoute><Meeting /></ProtectedRoute>} />
-              <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-              <Route path="/forecasting" element={<ProtectedRoute><Forecasting /></ProtectedRoute>} />
-              <Route path="/briefing" element={<ProtectedRoute><Briefing /></ProtectedRoute>} />
-              <Route path="/understanding" element={<ProtectedRoute><Understanding /></ProtectedRoute>} />
-              <Route path="/recommendations" element={<ProtectedRoute><Recommendations /></ProtectedRoute>} />
-              <Route path="/industries" element={<ProtectedRoute><Industries /></ProtectedRoute>} />
-              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/reality" element={<ProtectedRoute><Reality /></ProtectedRoute>} />
+              <Route path="/cognitive" element={<ProtectedRoute><Cognitive /></ProtectedRoute>} />
+              <Route path="/agents" element={<ProtectedRoute><Agents /></ProtectedRoute>} />
+              <Route path="/swarm" element={<ProtectedRoute><Swarm /></ProtectedRoute>} />
+              <Route path="/observation" element={<ProtectedRoute><Observation /></ProtectedRoute>} />
+              <Route path="/memory" element={<ProtectedRoute><Memory /></ProtectedRoute>} />
+              <Route path="/execution" element={<ProtectedRoute><Execution /></ProtectedRoute>} />
+              <Route path="/evolution" element={<ProtectedRoute><Evolution /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

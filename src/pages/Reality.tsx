@@ -14,10 +14,14 @@ const Reality = () => {
     (async () => {
       const tables = ["contacts", "tasks", "invoices", "ai_employees", "business_metrics", "api_connections", "ai_workflows"];
       const results = await Promise.all(
-        tables.map((t) =>
-          supabase.from(t as any).select("id", { count: "exact", head: true }).eq("user_id", user.id).then(r => ({ t, c: r.count ?? 0 }))
-            .catch(() => ({ t, c: 0 }))
-        )
+        tables.map(async (t) => {
+          try {
+            const r = await supabase.from(t as any).select("id", { count: "exact", head: true }).eq("user_id", user.id);
+            return { t, c: r.count ?? 0 };
+          } catch {
+            return { t, c: 0 };
+          }
+        })
       );
       const map: Record<string, number> = {};
       results.forEach((r) => { map[r.t] = r.c; });
