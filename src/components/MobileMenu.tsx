@@ -1,12 +1,28 @@
-import { useState } from "react";
-import { Menu, Home, LayoutDashboard, Bot, Brain, BarChart3, FileText, Zap, Settings, LogOut, Sparkles, Lightbulb, Network, TrendingUp, Cpu, Tag } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useFeedback } from "@/hooks/useFeedback";
 import SibeLogo from "@/components/SibeLogo";
+import {
+  Menu, Home, Network, Brain, Bot, Workflow, Eye, BookOpen,
+  Zap, TrendingUp, Settings, LogOut,
+} from "lucide-react";
+
+export const AX_NAV = [
+  { icon: Home, label: "Command", path: "/", layer: 0 },
+  { icon: Network, label: "Reality", path: "/reality", layer: 1 },
+  { icon: Brain, label: "Cognitive", path: "/cognitive", layer: 2 },
+  { icon: Bot, label: "Agents", path: "/agents", layer: 3 },
+  { icon: Workflow, label: "Swarm", path: "/swarm", layer: 4 },
+  { icon: Eye, label: "Observation", path: "/observation", layer: 5 },
+  { icon: BookOpen, label: "Memory", path: "/memory", layer: 6 },
+  { icon: Zap, label: "Execution", path: "/execution", layer: 7 },
+  { icon: TrendingUp, label: "Evolution", path: "/evolution", layer: 8 },
+  { icon: Settings, label: "Settings", path: "/settings", layer: 9 },
+];
 
 const MobileMenu = () => {
   const [open, setOpen] = useState(false);
@@ -16,50 +32,18 @@ const MobileMenu = () => {
   const { toast } = useToast();
   const feedback = useFeedback();
 
-  const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen) {
-      feedback.navigate();
-    }
-    setOpen(isOpen);
-  };
-
   const handleSignOut = async () => {
     feedback.impact();
     await signOut();
-    toast({
-      title: "Signed out",
-      description: "You have been successfully signed out."
-    });
+    toast({ title: "Signed out" });
     navigate("/auth");
     setOpen(false);
   };
 
-  const handleNavClick = () => {
-    feedback.tap();
-    setOpen(false);
-  };
-
-  const menuItems = [
-    { icon: Home, label: "Command Centre", path: "/" },
-    { icon: Sparkles, label: "Executive Briefing", path: "/briefing" },
-    { icon: Network, label: "Business Brain", path: "/understanding" },
-    { icon: LayoutDashboard, label: "Health Monitor", path: "/dashboard" },
-    { icon: Brain, label: "Intelligence", path: "/intelligence" },
-    { icon: Lightbulb, label: "Recommendations", path: "/recommendations" },
-    { icon: Zap, label: "Autonomous Execution", path: "/automation" },
-    { icon: TrendingUp, label: "Predictions", path: "/forecasting" },
-    { icon: Cpu, label: "Industry Brains", path: "/industries" },
-    { icon: Bot, label: "AI Agents", path: "/employees" },
-    { icon: BarChart3, label: "Analytics", path: "/analytics" },
-    { icon: FileText, label: "Documents", path: "/documents" },
-    { icon: Tag, label: "Pricing", path: "/pricing" },
-    { icon: Settings, label: "Settings", path: "/settings" },
-  ];
-
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={(v) => { if (v) feedback.navigate(); setOpen(v); }}>
       <SheetTrigger asChild>
-        <button 
+        <button
           className="glass-button p-3 rounded-lg hover-lift bg-primary-foreground active:scale-95 transition-transform touch-manipulation"
           onClick={() => feedback.tap()}
         >
@@ -72,25 +56,32 @@ const MobileMenu = () => {
             <div className="flex items-center gap-3 mb-2">
               <SibeLogo size="sm" />
               <div>
-                <h2 className="text-2xl font-extralight tracking-wider">SIBE AI</h2>
-                <p className="text-[10px] text-muted-foreground font-light">Powered by OpenClaw</p>
+                <h2 className="text-2xl font-extralight tracking-wider">SIBE AX</h2>
+                <p className="text-[10px] text-muted-foreground font-light">Agent Experience OS</p>
               </div>
             </div>
-            <p className="text-xs text-primary font-light mt-1">Autonomous Business Operating System</p>
+            <p className="text-xs text-primary font-light mt-1">Living Business Intelligence Organism</p>
           </div>
-          
-          <nav className="flex-1 py-6 native-bounce overflow-y-auto">
-            {menuItems.map((item, index) => {
+
+          <nav className="flex-1 py-4 native-bounce overflow-y-auto">
+            {AX_NAV.map((item, i) => {
               const isActive = location.pathname === item.path;
               return (
-                <Link 
-                  key={index} 
-                  to={item.path} 
-                  onClick={handleNavClick} 
-                  className={`flex items-center gap-4 px-8 py-4 hover:bg-primary/5 transition-all duration-200 group active:scale-[0.98] touch-manipulation ${isActive ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}
+                <Link
+                  key={i}
+                  to={item.path}
+                  onClick={() => { feedback.tap(); setOpen(false); }}
+                  className={`flex items-center gap-4 px-8 py-3 hover:bg-primary/5 transition-all duration-200 group active:scale-[0.98] touch-manipulation ${isActive ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}
                 >
                   <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className={`text-base font-light ${isActive ? "text-primary" : "text-foreground"}`}>{item.label}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-light ${isActive ? "text-primary" : "text-foreground"}`}>{item.label}</span>
+                      {item.layer > 0 && item.layer < 9 && (
+                        <span className="text-[9px] text-muted-foreground/50">L{item.layer}</span>
+                      )}
+                    </div>
+                  </div>
                 </Link>
               );
             })}
@@ -98,18 +89,13 @@ const MobileMenu = () => {
 
           <div className="p-8 border-t border-primary/20 space-y-4 pb-safe">
             {user && (
-              <Button 
-                onClick={handleSignOut} 
-                variant="outline" 
-                className="w-full glass-button justify-start text-primary border-primary/30 hover:bg-primary/10 active:scale-95 transition-transform touch-manipulation"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
+              <Button onClick={handleSignOut} variant="outline" className="w-full glass-button justify-start text-primary border-primary/30 hover:bg-primary/10 active:scale-95 transition-transform touch-manipulation">
+                <LogOut className="w-4 h-4 mr-2" /> Sign Out
               </Button>
             )}
             <div>
               <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
-              <p className="text-xs text-primary/50 mt-1">Sibe AI v6.0 • Powered by OpenClaw</p>
+              <p className="text-xs text-primary/50 mt-1">SIBE AX v7.0 · Agent-Native</p>
             </div>
           </div>
         </div>

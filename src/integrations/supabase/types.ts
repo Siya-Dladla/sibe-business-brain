@@ -266,6 +266,220 @@ export type Database = {
         }
         Relationships: []
       }
+      ax_actions: {
+        Row: {
+          action_type: string
+          agent_id: string | null
+          created_at: string
+          description: string
+          id: string
+          intent_id: string | null
+          payload: Json
+          result: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          agent_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          intent_id?: string | null
+          payload?: Json
+          result?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          agent_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          intent_id?: string | null
+          payload?: Json
+          result?: Json | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ax_actions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "ax_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ax_agents: {
+        Row: {
+          action_count: number
+          agent_type: string
+          capabilities: Json
+          created_at: string
+          id: string
+          last_active_at: string | null
+          name: string
+          reasoning_count: number
+          role: string
+          status: string
+          system_prompt: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_count?: number
+          agent_type: string
+          capabilities?: Json
+          created_at?: string
+          id?: string
+          last_active_at?: string | null
+          name: string
+          reasoning_count?: number
+          role: string
+          status?: string
+          system_prompt: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_count?: number
+          agent_type?: string
+          capabilities?: Json
+          created_at?: string
+          id?: string
+          last_active_at?: string | null
+          name?: string
+          reasoning_count?: number
+          role?: string
+          status?: string
+          system_prompt?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ax_intents: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          dispatched_agents: string[] | null
+          id: string
+          intent: string
+          reasoning: string | null
+          result: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          dispatched_agents?: string[] | null
+          id?: string
+          intent: string
+          reasoning?: string | null
+          result?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          dispatched_agents?: string[] | null
+          id?: string
+          intent?: string
+          reasoning?: string | null
+          result?: Json | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ax_memory: {
+        Row: {
+          agent_id: string | null
+          content: string
+          context: Json
+          created_at: string
+          id: string
+          importance: number
+          linked_memory_ids: string[] | null
+          memory_type: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          agent_id?: string | null
+          content: string
+          context?: Json
+          created_at?: string
+          id?: string
+          importance?: number
+          linked_memory_ids?: string[] | null
+          memory_type: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          agent_id?: string | null
+          content?: string
+          context?: Json
+          created_at?: string
+          id?: string
+          importance?: number
+          linked_memory_ids?: string[] | null
+          memory_type?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ax_memory_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "ax_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ax_signals: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          processed: boolean
+          signal_type: string
+          source: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          processed?: boolean
+          signal_type: string
+          source: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          processed?: boolean
+          signal_type?: string
+          source?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       business_metrics: {
         Row: {
           business_plan_id: string | null
@@ -1238,7 +1452,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      seed_ax_agents: { Args: { _user_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
