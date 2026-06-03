@@ -168,7 +168,7 @@ ${(signals ?? []).map(s => `- [${s.source}/${s.signal_type}] ${s.title}: ${s.con
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: "google/gemini-2.5-flash",
           messages,
           tools,
           tool_choice: { type: "function", function: { name: "agent_response" } },
