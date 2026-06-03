@@ -31,6 +31,8 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/index" element={<Index />} />
+              <Route path="/home" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/reality" element={<ProtectedRoute><Reality /></ProtectedRoute>} />
               <Route path="/cognitive" element={<ProtectedRoute><Cognitive /></ProtectedRoute>} />
