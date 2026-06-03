@@ -17,6 +17,7 @@ import Execution from "./pages/Execution";
 import Evolution from "./pages/Evolution";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Pricing from "./pages/Pricing";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
