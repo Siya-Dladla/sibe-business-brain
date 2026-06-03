@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSoundSettings, type SoundPack } from "@/contexts/SoundSettingsContext";
 import { useFeedback } from "@/hooks/useFeedback";
+import AXEngineKeys from "@/components/AXEngineKeys";
 
 const Settings = () => {
   const [loading, setLoading] = useState(false);
@@ -494,6 +495,8 @@ const Settings = () => {
               </Button>
             </div>
           </Card>
+
+          <AXEngineKeys />
 
           {/* Subscription & Billing */}
           <Card className="glass-card p-8 border-border/20">
