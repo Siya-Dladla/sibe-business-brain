@@ -496,6 +496,8 @@ const Settings = () => {
             </div>
           </Card>
 
+          <AXEngineKeys />
+
           {/* Subscription & Billing */}
           <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
