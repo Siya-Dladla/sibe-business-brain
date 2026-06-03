@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Sparkles, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MobileMenu from "@/components/MobileMenu";
@@ -62,16 +62,7 @@ const Index = () => {
         {user ? (
           <AXCommandCenter />
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-            <Sparkles className="w-12 h-12 text-primary mb-4 animate-pulse" />
-            <h1 className="text-3xl md:text-5xl font-extralight tracking-wide mb-3">SIBE AX</h1>
-            <p className="text-sm text-muted-foreground max-w-md mb-6 font-light">
-              The Agent Experience Operating System. Sign in to direct the swarm.
-            </p>
-            <Link to="/auth">
-              <Button>Sign In</Button>
-            </Link>
-          </div>
+          <Navigate to="/auth" replace />
         )}
       </main>
 

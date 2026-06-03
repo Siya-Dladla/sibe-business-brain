@@ -125,13 +125,13 @@ const Auth = () => {
                   <div className="h-px w-16 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent"></div>
                 </div>
               </div>
-              <div className="absolute -top-3 -right-5 text-xl font-extralight text-primary tracking-widest">SI</div>
+              <div className="absolute -top-3 -right-5 text-xl font-extralight text-primary tracking-widest">AX</div>
               <div className="absolute inset-0 rounded-full border border-primary/10 animate-pulse-glow"></div>
             </div>
           </div>
           <div>
             <CardTitle className="text-2xl font-extralight tracking-wide text-primary mb-2">
-              Synthetic Intelligence Business Engine
+              Agent Experience Operating System
             </CardTitle>
             
           </div>
