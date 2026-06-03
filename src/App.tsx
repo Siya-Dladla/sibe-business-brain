@@ -43,6 +43,22 @@ const App = () => (
               <Route path="/execution" element={<ProtectedRoute><Execution /></ProtectedRoute>} />
               <Route path="/evolution" element={<ProtectedRoute><Evolution /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+              {/* Legacy redirects → AX layers */}
+              <Route path="/dashboard" element={<Navigate to="/reality" replace />} />
+              <Route path="/analytics" element={<Navigate to="/observation" replace />} />
+              <Route path="/intelligence" element={<Navigate to="/cognitive" replace />} />
+              <Route path="/employees" element={<Navigate to="/agents" replace />} />
+              <Route path="/automation" element={<Navigate to="/swarm" replace />} />
+              <Route path="/documents" element={<Navigate to="/memory" replace />} />
+              <Route path="/forecasting" element={<Navigate to="/evolution" replace />} />
+              <Route path="/recommendations" element={<Navigate to="/cognitive" replace />} />
+              <Route path="/reports" element={<Navigate to="/observation" replace />} />
+              <Route path="/understanding" element={<Navigate to="/cognitive" replace />} />
+              <Route path="/briefing" element={<Navigate to="/" replace />} />
+              <Route path="/canvas" element={<Navigate to="/swarm" replace />} />
+              <Route path="/meeting" element={<Navigate to="/execution" replace />} />
+              <Route path="/industries" element={<Navigate to="/" replace />} />
+              <Route path="/pricing" element={<Navigate to="/settings" replace />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
