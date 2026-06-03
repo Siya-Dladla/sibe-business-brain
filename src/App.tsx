@@ -59,7 +59,7 @@ const App = () => (
               <Route path="/canvas" element={<Navigate to="/swarm" replace />} />
               <Route path="/meeting" element={<Navigate to="/execution" replace />} />
               <Route path="/industries" element={<Navigate to="/" replace />} />
-              <Route path="/pricing" element={<Navigate to="/settings" replace />} />
+              <Route path="/pricing" element={<Pricing />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
