@@ -40,7 +40,7 @@ const Reality = () => {
   ];
 
   return (
-    <AXLayerShell icon={Network} title="Reality Layer" subtitle="Living business knowledge graph" layerLabel="Layer 1 · Reality">
+    <AXLayerShell icon={Network} title="Brain Graph" subtitle="Living business knowledge graph" layerLabel="Brain Graph">
       <Card className="glass-card p-5 border-border/30 mb-6">
         <p className="text-sm font-light text-muted-foreground">
           Every entity in your business — customers, jobs, invoices, agents, signals — connected in a single living graph.

@@ -7,21 +7,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useFeedback } from "@/hooks/useFeedback";
 import SibeLogo from "@/components/SibeLogo";
 import {
-  Menu, Home, Network, Brain, Bot, Workflow, Eye, BookOpen,
-  Zap, TrendingUp, Settings, LogOut,
+  Menu, Home, Network, Brain, Bot, Settings, LogOut,
 } from "lucide-react";
 
 export const AX_NAV = [
-  { icon: Home, label: "Command", path: "/", layer: 0 },
-  { icon: Network, label: "Reality", path: "/reality", layer: 1 },
-  { icon: Brain, label: "Cognitive", path: "/cognitive", layer: 2 },
-  { icon: Bot, label: "Agents", path: "/agents", layer: 3 },
-  { icon: Workflow, label: "Swarm", path: "/swarm", layer: 4 },
-  { icon: Eye, label: "Observation", path: "/observation", layer: 5 },
-  { icon: BookOpen, label: "Memory", path: "/memory", layer: 6 },
-  { icon: Zap, label: "Execution", path: "/execution", layer: 7 },
-  { icon: TrendingUp, label: "Evolution", path: "/evolution", layer: 8 },
-  { icon: Settings, label: "Settings", path: "/settings", layer: 9 },
+  { icon: Home, label: "Command", path: "/" },
+  { icon: Network, label: "Brain Graph", path: "/reality" },
+  { icon: Brain, label: "Brain", path: "/brain" },
+  { icon: Bot, label: "Agents", path: "/agents" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
 const MobileMenu = () => {
@@ -74,14 +68,7 @@ const MobileMenu = () => {
                   className={`flex items-center gap-4 px-8 py-3 hover:bg-primary/5 transition-all duration-200 group active:scale-[0.98] touch-manipulation ${isActive ? "bg-primary/10 border-l-2 border-primary" : "border-l-2 border-transparent"}`}
                 >
                   <item.icon className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-sm font-light ${isActive ? "text-primary" : "text-foreground"}`}>{item.label}</span>
-                      {item.layer > 0 && item.layer < 9 && (
-                        <span className="text-[9px] text-muted-foreground/50">L{item.layer}</span>
-                      )}
-                    </div>
-                  </div>
+                  <span className={`text-sm font-light ${isActive ? "text-primary" : "text-foreground"}`}>{item.label}</span>
                 </Link>
               );
             })}

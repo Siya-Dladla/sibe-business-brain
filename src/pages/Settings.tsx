@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX, Eye, EyeOff } from "lucide-react";
+import { Settings as SettingsIcon, User, LogOut, Save, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX, Eye, EyeOff, KeyRound, Cpu } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,24 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSoundSettings, type SoundPack } from "@/contexts/SoundSettingsContext";
 import { useFeedback } from "@/hooks/useFeedback";
-import AXEngineKeys from "@/components/AXEngineKeys";
+
+const AI_PROVIDERS = [
+  { id: "claude", label: "Claude", placeholder: "sk-ant-...", hint: "Anthropic Claude" },
+  { id: "gemini", label: "Gemini", placeholder: "AIza...", hint: "Google Gemini" },
+  { id: "openai", label: "OpenAI", placeholder: "sk-...", hint: "OpenAI GPT" },
+] as const;
+
+const AX_ENGINES = [
+  { id: "claude", label: "Claude API", placeholder: "sk-ant-..." },
+  { id: "obsidian", label: "Obsidian API", placeholder: "obs_..." },
+  { id: "hermes", label: "Hermes API", placeholder: "hms_..." },
+  { id: "mirofish", label: "MiroFish API", placeholder: "mf_..." },
+  { id: "openclaw", label: "OpenClaw API", placeholder: "oc_..." },
+] as const;
+
+const AX_KEYS_STORAGE = "ax_engine_keys_v1";
+const AI_PROVIDER_STORAGE = "ai_provider_config_v1";
+
 
 const Settings = () => {
   const [loading, setLoading] = useState(false);
@@ -25,16 +42,12 @@ const Settings = () => {
     email: "",
     full_name: ""
   });
-  const [aiEngine, setAiEngine] = useState("openclaw");
-  const [apiKeys, setApiKeys] = useState({
-    openai: "",
-    anthropic: "",
-    gemini: ""
-  });
-  const [openclawConfig, setOpenclawConfig] = useState({
-    endpoint: "",
-    apiKey: ""
-  });
+  const [platformPanel, setPlatformPanel] = useState<"overview" | "ax_keys" | "ai_engine">("overview");
+  const [aiProvider, setAiProvider] = useState<"claude" | "gemini" | "openai">("claude");
+  const [aiProviderKey, setAiProviderKey] = useState("");
+  const [showAiKey, setShowAiKey] = useState(false);
+  const [axKeys, setAxKeys] = useState<Record<string, string>>({});
+  const [reveal, setReveal] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
@@ -43,8 +56,18 @@ const Settings = () => {
 
   useEffect(() => {
     fetchProfile();
-    fetchAiConfig();
+    try {
+      const raw = localStorage.getItem(AX_KEYS_STORAGE);
+      if (raw) setAxKeys(JSON.parse(raw));
+      const rawAi = localStorage.getItem(AI_PROVIDER_STORAGE);
+      if (rawAi) {
+        const p = JSON.parse(rawAi);
+        if (p.provider) setAiProvider(p.provider);
+        if (p.key) setAiProviderKey(p.key);
+      }
+    } catch {}
   }, []);
+
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -114,86 +137,21 @@ const Settings = () => {
     }
   };
 
-  const fetchAiConfig = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from("connected_agents")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("platform", "openclaw")
-        .maybeSingle();
-      if (data) {
-        setAiEngine("openclaw");
-        setOpenclawConfig({
-          endpoint: data.api_endpoint || "",
-          apiKey: data.api_key_encrypted || ""
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching AI config:", error);
-    }
+  const saveAxKeys = () => {
+    localStorage.setItem(AX_KEYS_STORAGE, JSON.stringify(axKeys));
+    toast({ title: "Engine keys saved", description: "Stored securely on this device." });
   };
 
-  const saveAiSettings = async () => {
+  const saveAiProvider = () => {
     setSavingAi(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      if (aiEngine === "openclaw") {
-        if (!openclawConfig.endpoint || !openclawConfig.apiKey) {
-          toast({ title: "Missing Fields", description: "Please enter both endpoint and API key", variant: "destructive" });
-          setSavingAi(false);
-          return;
-        }
-        // Check if record exists
-        const { data: existing } = await supabase
-          .from("connected_agents")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("platform", "openclaw")
-          .maybeSingle();
-
-        if (existing) {
-          const { error } = await supabase
-            .from("connected_agents")
-            .update({
-              api_endpoint: openclawConfig.endpoint,
-              api_key_encrypted: openclawConfig.apiKey,
-              status: "active"
-            })
-            .eq("id", existing.id);
-          if (error) throw error;
-        } else {
-          const { error } = await supabase
-            .from("connected_agents")
-            .insert({
-              user_id: user.id,
-              platform: "openclaw",
-              agent_name: "OpenClaw Engine",
-              api_endpoint: openclawConfig.endpoint,
-              api_key_encrypted: openclawConfig.apiKey,
-              status: "active"
-            });
-          if (error) throw error;
-        }
-      } else {
-        // If switching away from openclaw, deactivate it
-        await supabase
-          .from("connected_agents")
-          .update({ status: "inactive" })
-          .eq("platform", "openclaw");
-      }
-
-      toast({ title: "Settings Saved", description: "Your AI engine preferences have been updated" });
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      localStorage.setItem(AI_PROVIDER_STORAGE, JSON.stringify({ provider: aiProvider, key: aiProviderKey }));
+      toast({ title: "AI engine saved", description: `${aiProvider.toUpperCase()} configured.` });
     } finally {
       setSavingAi(false);
     }
   };
+
 
   const handleThemeChange = (newTheme: string) => {
     setTheme(newTheme as "dark" | "light");
@@ -395,109 +353,6 @@ const Settings = () => {
             )}
           </Card>
 
-          {/* AI Engine Configuration */}
-          <Card className="glass-card p-8 border-border/20">
-            <div className="flex items-center gap-3 mb-6">
-              <Cpu className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide text-foreground">AI Engine</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="ai-engine">Select AI Provider</Label>
-                <Select value={aiEngine} onValueChange={setAiEngine}>
-                  <SelectTrigger className="glass-button h-12">
-                    <SelectValue placeholder="Select AI provider" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="openclaw">OpenClaw (Agentic AI Engine)</SelectItem>
-                    <SelectItem value="anthropic">Anthropic Claude</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {aiEngine === "openclaw" && (
-                <div className="space-y-4 pt-4 border-t border-border/30">
-                  <p className="text-sm text-muted-foreground">
-                    OpenClaw is an open-source agentic AI framework. Connect your self-hosted or cloud instance to power all Sibe AI operations — agents, automation, and multi-channel routing.
-                  </p>
-                  <div className="space-y-2">
-                    <Label htmlFor="openclaw-endpoint">API Endpoint URL</Label>
-                    <Input
-                      id="openclaw-endpoint"
-                      type="url"
-                      value={openclawConfig.endpoint}
-                      onChange={e => setOpenclawConfig({ ...openclawConfig, endpoint: e.target.value })}
-                      placeholder="https://your-instance.clawcloud.sh/api"
-                      className="glass-button h-12 font-mono"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="openclaw-key">API Key</Label>
-                    <div className="relative">
-                      <Input
-                        id="openclaw-key"
-                        type={showApiKey ? "text" : "password"}
-                        value={openclawConfig.apiKey}
-                        onChange={e => setOpenclawConfig({ ...openclawConfig, apiKey: e.target.value })}
-                        placeholder="oc-..."
-                        className="glass-button h-12 font-mono pr-12"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                        onClick={() => setShowApiKey(!showApiKey)}
-                      >
-                        {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {aiEngine === "anthropic" && (
-                <div className="space-y-4 pt-4 border-t border-border/30">
-                  <p className="text-sm text-muted-foreground">
-                    Enter your Anthropic API key to use Claude as the AI provider.
-                  </p>
-                  <div className="space-y-2">
-                    <Label htmlFor="anthropic-key">API Key</Label>
-                    <Input
-                      id="anthropic-key"
-                      type="password"
-                      value={apiKeys.anthropic}
-                      onChange={e => setApiKeys({ ...apiKeys, anthropic: e.target.value })}
-                      placeholder="sk-ant-..."
-                      className="glass-button h-12 font-mono"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <Button
-                onClick={saveAiSettings}
-                disabled={savingAi}
-                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                {savingAi ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
-                    Saving...
-                  </div>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save AI Settings
-                  </>
-                )}
-              </Button>
-            </div>
-          </Card>
-
-          <AXEngineKeys />
-
           {/* Subscription & Billing */}
           <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
@@ -639,40 +494,124 @@ const Settings = () => {
             </div>
           </Card>
 
-          {/* Platform Information */}
+          {/* Platform Information (with dropdown menu) */}
           <Card className="glass-card p-8 border-border/20">
-            <div className="flex items-center gap-3 mb-6">
-              <SettingsIcon className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Platform Information</h2>
+            <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+              <div className="flex items-center gap-3">
+                <SettingsIcon className="w-6 h-6 text-primary" />
+                <h2 className="text-2xl font-extralight tracking-wide text-foreground">Platform Information</h2>
+              </div>
+              <Select value={platformPanel} onValueChange={(v: any) => setPlatformPanel(v)}>
+                <SelectTrigger className="glass-button h-10 w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="overview">Overview</SelectItem>
+                  <SelectItem value="ax_keys">AX Engine Keys</SelectItem>
+                  <SelectItem value="ai_engine">AI Engine</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between py-3 border-b border-border/30">
-                <span className="text-muted-foreground font-light">Platform Version</span>
-                <span className="text-primary font-light">Sibe AI v6.0</span>
+            {platformPanel === "overview" && (
+              <div className="space-y-4 text-sm">
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Platform Version</span>
+                  <span className="text-primary font-light">SIBE AX v7.0</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">AI Engine</span>
+                  <span className="text-primary font-light capitalize">{aiProvider}</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Backend</span>
+                  <span className="text-primary font-light">Lovable Cloud</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Theme</span>
+                  <span className="text-primary font-light capitalize">{theme}</span>
+                </div>
+                <div className="flex justify-between py-3">
+                  <span className="text-muted-foreground font-light">Status</span>
+                  <span className="font-light text-green-500">● Active</span>
+                </div>
               </div>
+            )}
 
-              <div className="flex justify-between py-3 border-b border-border/30">
-                <span className="text-muted-foreground font-light">AI Engine</span>
-                <span className="text-primary font-light capitalize">{aiEngine.replace('-', ' ')}</span>
+            {platformPanel === "ax_keys" && (
+              <div className="space-y-5">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground font-light">
+                  <KeyRound className="w-4 h-4 text-primary" />
+                  Plug your own API keys into the SIBE AX organism. Stored locally on this device.
+                </div>
+                {AX_ENGINES.map((e) => (
+                  <div key={e.id} className="space-y-2">
+                    <Label htmlFor={`ax-${e.id}`}>{e.label}</Label>
+                    <div className="relative">
+                      <Input
+                        id={`ax-${e.id}`}
+                        type={reveal[e.id] ? "text" : "password"}
+                        value={axKeys[e.id] ?? ""}
+                        onChange={(ev) => setAxKeys({ ...axKeys, [e.id]: ev.target.value })}
+                        placeholder={e.placeholder}
+                        className="glass-button h-12 font-mono pr-12"
+                      />
+                      <Button type="button" variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                        onClick={() => setReveal({ ...reveal, [e.id]: !reveal[e.id] })}>
+                        {reveal[e.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <Button onClick={saveAxKeys} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Save className="w-4 h-4 mr-2" /> Save Engine Keys
+                </Button>
               </div>
+            )}
 
-              <div className="flex justify-between py-3 border-b border-border/30">
-                <span className="text-muted-foreground font-light">Backend</span>
-                <span className="text-primary font-light">Lovable Cloud</span>
+            {platformPanel === "ai_engine" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground font-light">
+                  <Cpu className="w-4 h-4 text-primary" />
+                  Choose the AI engine that powers reasoning across your platform.
+                </div>
+                <div className="space-y-2">
+                  <Label>AI Provider</Label>
+                  <Select value={aiProvider} onValueChange={(v: any) => setAiProvider(v)}>
+                    <SelectTrigger className="glass-button h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {AI_PROVIDERS.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.label} — {p.hint}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ai-provider-key">{AI_PROVIDERS.find(p => p.id === aiProvider)?.label} API Key</Label>
+                  <div className="relative">
+                    <Input
+                      id="ai-provider-key"
+                      type={showAiKey ? "text" : "password"}
+                      value={aiProviderKey}
+                      onChange={(e) => setAiProviderKey(e.target.value)}
+                      placeholder={AI_PROVIDERS.find(p => p.id === aiProvider)?.placeholder}
+                      className="glass-button h-12 font-mono pr-12"
+                    />
+                    <Button type="button" variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                      onClick={() => setShowAiKey(!showAiKey)}>
+                      {showAiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <Button onClick={saveAiProvider} disabled={savingAi} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Save className="w-4 h-4 mr-2" /> Save AI Engine
+                </Button>
               </div>
-
-              <div className="flex justify-between py-3 border-b border-border/30">
-                <span className="text-muted-foreground font-light">Theme</span>
-                <span className="text-primary font-light capitalize">{theme}</span>
-              </div>
-
-              <div className="flex justify-between py-3">
-                <span className="text-muted-foreground font-light">Status</span>
-                <span className="font-light text-green-500">● Active</span>
-              </div>
-            </div>
+            )}
           </Card>
+
 
           {/* Account Actions */}
           <Card className="glass-card p-8 border-border/20">
