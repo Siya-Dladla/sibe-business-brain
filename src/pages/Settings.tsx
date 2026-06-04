@@ -42,16 +42,12 @@ const Settings = () => {
     email: "",
     full_name: ""
   });
-  const [aiEngine, setAiEngine] = useState("openclaw");
-  const [apiKeys, setApiKeys] = useState({
-    openai: "",
-    anthropic: "",
-    gemini: ""
-  });
-  const [openclawConfig, setOpenclawConfig] = useState({
-    endpoint: "",
-    apiKey: ""
-  });
+  const [platformPanel, setPlatformPanel] = useState<"overview" | "ax_keys" | "ai_engine">("overview");
+  const [aiProvider, setAiProvider] = useState<"claude" | "gemini" | "openai">("claude");
+  const [aiProviderKey, setAiProviderKey] = useState("");
+  const [showAiKey, setShowAiKey] = useState(false);
+  const [axKeys, setAxKeys] = useState<Record<string, string>>({});
+  const [reveal, setReveal] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
@@ -60,8 +56,18 @@ const Settings = () => {
 
   useEffect(() => {
     fetchProfile();
-    fetchAiConfig();
+    try {
+      const raw = localStorage.getItem(AX_KEYS_STORAGE);
+      if (raw) setAxKeys(JSON.parse(raw));
+      const rawAi = localStorage.getItem(AI_PROVIDER_STORAGE);
+      if (rawAi) {
+        const p = JSON.parse(rawAi);
+        if (p.provider) setAiProvider(p.provider);
+        if (p.key) setAiProviderKey(p.key);
+      }
+    } catch {}
   }, []);
+
 
   const fetchProfile = async () => {
     setLoading(true);
