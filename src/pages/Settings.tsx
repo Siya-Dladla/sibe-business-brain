@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Settings as SettingsIcon, User, LogOut, Save, Cpu, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX, Eye, EyeOff } from "lucide-react";
+import { Settings as SettingsIcon, User, LogOut, Save, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX, Eye, EyeOff, KeyRound, Cpu } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,7 +14,24 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSoundSettings, type SoundPack } from "@/contexts/SoundSettingsContext";
 import { useFeedback } from "@/hooks/useFeedback";
-import AXEngineKeys from "@/components/AXEngineKeys";
+
+const AI_PROVIDERS = [
+  { id: "claude", label: "Claude", placeholder: "sk-ant-...", hint: "Anthropic Claude" },
+  { id: "gemini", label: "Gemini", placeholder: "AIza...", hint: "Google Gemini" },
+  { id: "openai", label: "OpenAI", placeholder: "sk-...", hint: "OpenAI GPT" },
+] as const;
+
+const AX_ENGINES = [
+  { id: "claude", label: "Claude API", placeholder: "sk-ant-..." },
+  { id: "obsidian", label: "Obsidian API", placeholder: "obs_..." },
+  { id: "hermes", label: "Hermes API", placeholder: "hms_..." },
+  { id: "mirofish", label: "MiroFish API", placeholder: "mf_..." },
+  { id: "openclaw", label: "OpenClaw API", placeholder: "oc_..." },
+] as const;
+
+const AX_KEYS_STORAGE = "ax_engine_keys_v1";
+const AI_PROVIDER_STORAGE = "ai_provider_config_v1";
+
 
 const Settings = () => {
   const [loading, setLoading] = useState(false);
