@@ -494,40 +494,124 @@ const Settings = () => {
             </div>
           </Card>
 
-          {/* Platform Information */}
+          {/* Platform Information (with dropdown menu) */}
           <Card className="glass-card p-8 border-border/20">
-            <div className="flex items-center gap-3 mb-6">
-              <SettingsIcon className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Platform Information</h2>
+            <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+              <div className="flex items-center gap-3">
+                <SettingsIcon className="w-6 h-6 text-primary" />
+                <h2 className="text-2xl font-extralight tracking-wide text-foreground">Platform Information</h2>
+              </div>
+              <Select value={platformPanel} onValueChange={(v: any) => setPlatformPanel(v)}>
+                <SelectTrigger className="glass-button h-10 w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="overview">Overview</SelectItem>
+                  <SelectItem value="ax_keys">AX Engine Keys</SelectItem>
+                  <SelectItem value="ai_engine">AI Engine</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-4 text-sm">
-              <div className="flex justify-between py-3 border-b border-border/30">
-                <span className="text-muted-foreground font-light">Platform Version</span>
-                <span className="text-primary font-light">Sibe AI v6.0</span>
+            {platformPanel === "overview" && (
+              <div className="space-y-4 text-sm">
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Platform Version</span>
+                  <span className="text-primary font-light">SIBE AX v7.0</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">AI Engine</span>
+                  <span className="text-primary font-light capitalize">{aiProvider}</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Backend</span>
+                  <span className="text-primary font-light">Lovable Cloud</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Theme</span>
+                  <span className="text-primary font-light capitalize">{theme}</span>
+                </div>
+                <div className="flex justify-between py-3">
+                  <span className="text-muted-foreground font-light">Status</span>
+                  <span className="font-light text-green-500">● Active</span>
+                </div>
               </div>
+            )}
 
-              <div className="flex justify-between py-3 border-b border-border/30">
-                <span className="text-muted-foreground font-light">AI Engine</span>
-                <span className="text-primary font-light capitalize">{aiEngine.replace('-', ' ')}</span>
+            {platformPanel === "ax_keys" && (
+              <div className="space-y-5">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground font-light">
+                  <KeyRound className="w-4 h-4 text-primary" />
+                  Plug your own API keys into the SIBE AX organism. Stored locally on this device.
+                </div>
+                {AX_ENGINES.map((e) => (
+                  <div key={e.id} className="space-y-2">
+                    <Label htmlFor={`ax-${e.id}`}>{e.label}</Label>
+                    <div className="relative">
+                      <Input
+                        id={`ax-${e.id}`}
+                        type={reveal[e.id] ? "text" : "password"}
+                        value={axKeys[e.id] ?? ""}
+                        onChange={(ev) => setAxKeys({ ...axKeys, [e.id]: ev.target.value })}
+                        placeholder={e.placeholder}
+                        className="glass-button h-12 font-mono pr-12"
+                      />
+                      <Button type="button" variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                        onClick={() => setReveal({ ...reveal, [e.id]: !reveal[e.id] })}>
+                        {reveal[e.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <Button onClick={saveAxKeys} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Save className="w-4 h-4 mr-2" /> Save Engine Keys
+                </Button>
               </div>
+            )}
 
-              <div className="flex justify-between py-3 border-b border-border/30">
-                <span className="text-muted-foreground font-light">Backend</span>
-                <span className="text-primary font-light">Lovable Cloud</span>
+            {platformPanel === "ai_engine" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground font-light">
+                  <Cpu className="w-4 h-4 text-primary" />
+                  Choose the AI engine that powers reasoning across your platform.
+                </div>
+                <div className="space-y-2">
+                  <Label>AI Provider</Label>
+                  <Select value={aiProvider} onValueChange={(v: any) => setAiProvider(v)}>
+                    <SelectTrigger className="glass-button h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {AI_PROVIDERS.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.label} — {p.hint}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ai-provider-key">{AI_PROVIDERS.find(p => p.id === aiProvider)?.label} API Key</Label>
+                  <div className="relative">
+                    <Input
+                      id="ai-provider-key"
+                      type={showAiKey ? "text" : "password"}
+                      value={aiProviderKey}
+                      onChange={(e) => setAiProviderKey(e.target.value)}
+                      placeholder={AI_PROVIDERS.find(p => p.id === aiProvider)?.placeholder}
+                      className="glass-button h-12 font-mono pr-12"
+                    />
+                    <Button type="button" variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                      onClick={() => setShowAiKey(!showAiKey)}>
+                      {showAiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <Button onClick={saveAiProvider} disabled={savingAi} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Save className="w-4 h-4 mr-2" /> Save AI Engine
+                </Button>
               </div>
-
-              <div className="flex justify-between py-3 border-b border-border/30">
-                <span className="text-muted-foreground font-light">Theme</span>
-                <span className="text-primary font-light capitalize">{theme}</span>
-              </div>
-
-              <div className="flex justify-between py-3">
-                <span className="text-muted-foreground font-light">Status</span>
-                <span className="font-light text-green-500">● Active</span>
-              </div>
-            </div>
+            )}
           </Card>
+
 
           {/* Account Actions */}
           <Card className="glass-card p-8 border-border/20">
