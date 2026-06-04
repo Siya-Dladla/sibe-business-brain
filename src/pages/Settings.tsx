@@ -137,86 +137,21 @@ const Settings = () => {
     }
   };
 
-  const fetchAiConfig = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from("connected_agents")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("platform", "openclaw")
-        .maybeSingle();
-      if (data) {
-        setAiEngine("openclaw");
-        setOpenclawConfig({
-          endpoint: data.api_endpoint || "",
-          apiKey: data.api_key_encrypted || ""
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching AI config:", error);
-    }
+  const saveAxKeys = () => {
+    localStorage.setItem(AX_KEYS_STORAGE, JSON.stringify(axKeys));
+    toast({ title: "Engine keys saved", description: "Stored securely on this device." });
   };
 
-  const saveAiSettings = async () => {
+  const saveAiProvider = () => {
     setSavingAi(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      if (aiEngine === "openclaw") {
-        if (!openclawConfig.endpoint || !openclawConfig.apiKey) {
-          toast({ title: "Missing Fields", description: "Please enter both endpoint and API key", variant: "destructive" });
-          setSavingAi(false);
-          return;
-        }
-        // Check if record exists
-        const { data: existing } = await supabase
-          .from("connected_agents")
-          .select("id")
-          .eq("user_id", user.id)
-          .eq("platform", "openclaw")
-          .maybeSingle();
-
-        if (existing) {
-          const { error } = await supabase
-            .from("connected_agents")
-            .update({
-              api_endpoint: openclawConfig.endpoint,
-              api_key_encrypted: openclawConfig.apiKey,
-              status: "active"
-            })
-            .eq("id", existing.id);
-          if (error) throw error;
-        } else {
-          const { error } = await supabase
-            .from("connected_agents")
-            .insert({
-              user_id: user.id,
-              platform: "openclaw",
-              agent_name: "OpenClaw Engine",
-              api_endpoint: openclawConfig.endpoint,
-              api_key_encrypted: openclawConfig.apiKey,
-              status: "active"
-            });
-          if (error) throw error;
-        }
-      } else {
-        // If switching away from openclaw, deactivate it
-        await supabase
-          .from("connected_agents")
-          .update({ status: "inactive" })
-          .eq("platform", "openclaw");
-      }
-
-      toast({ title: "Settings Saved", description: "Your AI engine preferences have been updated" });
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      localStorage.setItem(AI_PROVIDER_STORAGE, JSON.stringify({ provider: aiProvider, key: aiProviderKey }));
+      toast({ title: "AI engine saved", description: `${aiProvider.toUpperCase()} configured.` });
     } finally {
       setSavingAi(false);
     }
   };
+
 
   const handleThemeChange = (newTheme: string) => {
     setTheme(newTheme as "dark" | "light");
