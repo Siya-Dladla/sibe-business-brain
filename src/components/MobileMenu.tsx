@@ -50,11 +50,11 @@ const MobileMenu = () => {
             <div className="flex items-center gap-3 mb-2">
               <SibeLogo size="sm" />
               <div>
-                <h2 className="text-2xl font-extralight tracking-wider">SIBE AX</h2>
-                <p className="text-[10px] text-muted-foreground font-light">Agent Experience OS</p>
+                <h2 className="text-2xl font-extralight tracking-wider">iSiba AX</h2>
+                <p className="text-[10px] text-muted-foreground font-light">light as a feather</p>
               </div>
             </div>
-            <p className="text-xs text-primary font-light mt-1">Living Business Intelligence Organism</p>
+            <p className="text-xs text-primary font-light mt-1">light as a feather</p>
           </div>
 
           <nav className="flex-1 py-4 native-bounce overflow-y-auto">
@@ -82,7 +82,7 @@ const MobileMenu = () => {
             )}
             <div>
               <p className="text-xs text-muted-foreground font-light">© 2025 SGD Business Analysis</p>
-              <p className="text-xs text-primary/50 mt-1">SIBE AX v7.0 · Agent-Native</p>
+              <p className="text-xs text-primary/50 mt-1">iSiba AX V1.0 · light as a feather</p>
             </div>
           </div>
         </div>

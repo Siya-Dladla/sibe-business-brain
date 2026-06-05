@@ -87,7 +87,7 @@ const AXCommandCenter = () => {
       {/* Hero */}
       <div className="text-center mb-8">
         <Badge variant="outline" className="border-primary/30 text-primary text-[10px] mb-4">
-          SIBE AX · Agent Experience OS
+          iSiba AX · light as a feather
         </Badge>
         <h1 className="text-3xl md:text-5xl font-extralight tracking-wide mb-3">
           Direct the swarm.
