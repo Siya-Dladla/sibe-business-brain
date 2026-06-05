@@ -561,6 +561,50 @@ const Settings = () => {
                 </Button>
               </div>
             )}
+
+            {platformPanel === "backend" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground font-light">
+                  <KeyRound className="w-4 h-4 text-primary" />
+                  Connect a backend database for your AX agents to read & write.
+                </div>
+                <div className="space-y-2">
+                  <Label>Backend Provider</Label>
+                  <Select value={backendProvider} onValueChange={(v: any) => setBackendProvider(v)}>
+                    <SelectTrigger className="glass-button h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BACKEND_PROVIDERS.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.label} — {p.hint}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="backend-conn">
+                    {BACKEND_PROVIDERS.find(p => p.id === backendProvider)?.label} Connection String / URL
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="backend-conn"
+                      type={showBackend ? "text" : "password"}
+                      value={backendConn}
+                      onChange={(e) => setBackendConn(e.target.value)}
+                      placeholder={BACKEND_PROVIDERS.find(p => p.id === backendProvider)?.placeholder}
+                      className="glass-button h-12 font-mono pr-12"
+                    />
+                    <Button type="button" variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                      onClick={() => setShowBackend(!showBackend)}>
+                      {showBackend ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <Button onClick={saveBackend} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Save className="w-4 h-4 mr-2" /> Save Backend Connection
+                </Button>
+              </div>
+            )}
           </Card>
 
 
