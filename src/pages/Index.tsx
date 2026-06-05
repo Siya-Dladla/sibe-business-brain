@@ -28,8 +28,8 @@ const Index = () => {
           <MobileMenu />
           {!isMobile && (
             <div className="flex items-center gap-2 ml-2">
-              <span className="text-lg font-light tracking-wider text-foreground">SIBE AX</span>
-              <span className="text-[10px] text-muted-foreground/60 hidden md:inline">Agent Experience OS</span>
+              <span className="text-lg font-light tracking-wider text-foreground">iSiba AX</span>
+              <span className="text-[10px] text-muted-foreground/60 hidden md:inline">light as a feather</span>
             </div>
           )}
         </div>
@@ -68,7 +68,7 @@ const Index = () => {
 
       <footer className="hidden md:flex shrink-0 p-3 border-t border-border items-center justify-center bg-background pb-safe">
         <p className="text-[10px] text-muted-foreground/50">
-          © 2025 SGD Business Analysis | SIBE AX · Living Business Intelligence Organism
+          © 2026 SGD Business Analysis | iSiba AX V1.0 · light as a feather
         </p>
       </footer>
     </div>
