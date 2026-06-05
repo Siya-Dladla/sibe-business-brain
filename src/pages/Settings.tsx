@@ -27,10 +27,18 @@ const AX_ENGINES = [
   { id: "hermes", label: "Hermes API", placeholder: "hms_..." },
   { id: "mirofish", label: "MiroFish API", placeholder: "mf_..." },
   { id: "openclaw", label: "OpenClaw API", placeholder: "oc_..." },
+  { id: "higgsfield", label: "Higgsfield API", placeholder: "hf_..." },
+  { id: "custom_crm", label: "Custom CRM API Endpoint", placeholder: "https://your-crm.example.com/api" },
+] as const;
+
+const BACKEND_PROVIDERS = [
+  { id: "supabase", label: "Supabase", placeholder: "https://xxx.supabase.co", hint: "Lovable Cloud / Postgres + Auth" },
+  { id: "mongodb", label: "MongoDB", placeholder: "mongodb+srv://user:pass@cluster/db", hint: "MongoDB Atlas connection string" },
 ] as const;
 
 const AX_KEYS_STORAGE = "ax_engine_keys_v1";
 const AI_PROVIDER_STORAGE = "ai_provider_config_v1";
+const BACKEND_STORAGE = "backend_connection_v1";
 
 
 const Settings = () => {
