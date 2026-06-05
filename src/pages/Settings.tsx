@@ -169,6 +169,11 @@ const Settings = () => {
     }
   };
 
+  const saveBackend = () => {
+    localStorage.setItem(BACKEND_STORAGE, JSON.stringify({ provider: backendProvider, conn: backendConn }));
+    toast({ title: "Backend saved", description: `${backendProvider.toUpperCase()} connection stored on this device.` });
+  };
+
 
   const handleThemeChange = (newTheme: string) => {
     setTheme(newTheme as "dark" | "light");
