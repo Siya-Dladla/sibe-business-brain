@@ -76,6 +76,12 @@ const Settings = () => {
         if (p.provider) setAiProvider(p.provider);
         if (p.key) setAiProviderKey(p.key);
       }
+      const rawBe = localStorage.getItem(BACKEND_STORAGE);
+      if (rawBe) {
+        const b = JSON.parse(rawBe);
+        if (b.provider) setBackendProvider(b.provider);
+        if (b.conn) setBackendConn(b.conn);
+      }
     } catch {}
   }, []);
 
