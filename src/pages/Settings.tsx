@@ -27,10 +27,18 @@ const AX_ENGINES = [
   { id: "hermes", label: "Hermes API", placeholder: "hms_..." },
   { id: "mirofish", label: "MiroFish API", placeholder: "mf_..." },
   { id: "openclaw", label: "OpenClaw API", placeholder: "oc_..." },
+  { id: "higgsfield", label: "Higgsfield API", placeholder: "hf_..." },
+  { id: "custom_crm", label: "Custom CRM API Endpoint", placeholder: "https://your-crm.example.com/api" },
+] as const;
+
+const BACKEND_PROVIDERS = [
+  { id: "supabase", label: "Supabase", placeholder: "https://xxx.supabase.co", hint: "Lovable Cloud / Postgres + Auth" },
+  { id: "mongodb", label: "MongoDB", placeholder: "mongodb+srv://user:pass@cluster/db", hint: "MongoDB Atlas connection string" },
 ] as const;
 
 const AX_KEYS_STORAGE = "ax_engine_keys_v1";
 const AI_PROVIDER_STORAGE = "ai_provider_config_v1";
+const BACKEND_STORAGE = "backend_connection_v1";
 
 
 const Settings = () => {
@@ -42,12 +50,15 @@ const Settings = () => {
     email: "",
     full_name: ""
   });
-  const [platformPanel, setPlatformPanel] = useState<"overview" | "ax_keys" | "ai_engine">("overview");
+  const [platformPanel, setPlatformPanel] = useState<"overview" | "ax_keys" | "ai_engine" | "backend">("overview");
   const [aiProvider, setAiProvider] = useState<"claude" | "gemini" | "openai">("claude");
   const [aiProviderKey, setAiProviderKey] = useState("");
   const [showAiKey, setShowAiKey] = useState(false);
   const [axKeys, setAxKeys] = useState<Record<string, string>>({});
   const [reveal, setReveal] = useState<Record<string, boolean>>({});
+  const [backendProvider, setBackendProvider] = useState<"supabase" | "mongodb">("supabase");
+  const [backendConn, setBackendConn] = useState("");
+  const [showBackend, setShowBackend] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
@@ -64,6 +75,12 @@ const Settings = () => {
         const p = JSON.parse(rawAi);
         if (p.provider) setAiProvider(p.provider);
         if (p.key) setAiProviderKey(p.key);
+      }
+      const rawBe = localStorage.getItem(BACKEND_STORAGE);
+      if (rawBe) {
+        const b = JSON.parse(rawBe);
+        if (b.provider) setBackendProvider(b.provider);
+        if (b.conn) setBackendConn(b.conn);
       }
     } catch {}
   }, []);
@@ -150,6 +167,11 @@ const Settings = () => {
     } finally {
       setSavingAi(false);
     }
+  };
+
+  const saveBackend = () => {
+    localStorage.setItem(BACKEND_STORAGE, JSON.stringify({ provider: backendProvider, conn: backendConn }));
+    toast({ title: "Backend saved", description: `${backendProvider.toUpperCase()} connection stored on this device.` });
   };
 
 
@@ -357,134 +379,61 @@ const Settings = () => {
           <Card className="glass-card p-8 border-border/20">
             <div className="flex items-center gap-3 mb-6">
               <CreditCard className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Subscription Plans</h2>
+              <h2 className="text-2xl font-extralight tracking-wide text-foreground">Subscription</h2>
             </div>
 
             <div className="space-y-6">
-              {/* Professional Plan */}
-              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-border/30">
-                <div className="flex items-center justify-between mb-4">
+              <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/40 relative">
+                <div className="absolute -top-3 left-6 px-2 py-0.5 text-[10px] font-medium bg-primary text-primary-foreground rounded-full">
+                  SIBE AX
+                </div>
+                <div className="flex items-center justify-between mb-4 mt-1">
                   <div className="flex items-center gap-3">
                     <Zap className="w-6 h-6 text-primary" />
                     <div>
-                      <h3 className="text-xl font-light text-primary">Professional Plan</h3>
-                      <p className="text-sm text-muted-foreground">Self-service automation</p>
+                      <h3 className="text-xl font-light text-primary">Sibe AX</h3>
+                      <p className="text-sm text-muted-foreground">The brain on top of your business</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-light text-foreground">$49<span className="text-sm text-muted-foreground">/mo</span></p>
-                    <p className="text-xs text-muted-foreground">after 30-day trial</p>
+                    <p className="text-3xl font-light text-foreground">$499<span className="text-sm text-muted-foreground">/mo</span></p>
                   </div>
                 </div>
-                <div className="mb-4 p-3 bg-accent/10 border border-accent/30 rounded-lg">
-                  <p className="text-sm font-medium text-foreground">Start with $1 for 30 days</p>
-                  <p className="text-xs text-muted-foreground">Then $49/month after trial ends</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Unlimited Data Source Connections</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Third-Party Workflow Integrations</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>AI Agent Connections</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Operator Chat Assistant</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span>Community Developer Access</span>
-                  </div>
-                </div>
-                <Button
-                  onClick={() => {
-                    toast({
-                      title: "Trial Started",
-                      description: "Starting your $1 30-day trial. You'll be charged $49/month after the trial ends."
-                    });
-                  }}
-                  className="w-full mt-4 h-12 bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  Start $1 Trial
-                </Button>
-              </div>
-
-              {/* VIP Plan */}
-              <div className="p-6 rounded-lg bg-gradient-to-br from-yellow-500/20 via-amber-500/10 to-orange-500/20 border-2 border-yellow-500/50 relative overflow-hidden">
-                <div className="absolute top-3 right-3">
-                  <span className="px-3 py-1 text-xs font-semibold bg-yellow-500 text-black rounded-full">
-                    RECOMMENDED
-                  </span>
-                </div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <Crown className="w-7 h-7 text-yellow-500" />
-                    <div>
-                      <h3 className="text-xl font-light text-yellow-500">VIP Plan</h3>
-                      <p className="text-sm text-muted-foreground">Full-service managed solution</p>
+                <div className="space-y-2 mb-4">
+                  {[
+                    "Custom AI Agents",
+                    "CRM integration",
+                    "AI Prospecting & Lead Scoring",
+                    "Business Health Dashboard",
+                    "Forecasting & Insights Engine",
+                    "Custom App with AI voice assistant on the go",
+                  ].map((f) => (
+                    <div key={f} className="flex items-center gap-2 text-sm text-foreground">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <span>{f}</span>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-light text-foreground">$199<span className="text-sm text-muted-foreground">/mo</span></p>
-                    <p className="text-xs text-yellow-500/80">Done-for-you service</p>
-                  </div>
+                  ))}
+                  <p className="text-xs text-muted-foreground pl-6 pt-1">And more.</p>
                 </div>
-                <div className="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                  <p className="text-sm font-medium text-foreground flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-yellow-500" />
-                    SGD Business Analysis & Projects Included FREE
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Our team builds, configures, and deploys your entire ecosystem
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-yellow-500" />
-                    <span className="font-medium">Everything in Professional, plus:</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-yellow-500" />
-                    <span>Custom Store Setup & Configuration</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-yellow-500" />
-                    <span>AI Agent & Workflow Creation</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-yellow-500" />
-                    <span>Full Ecosystem Deployment</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-yellow-500" />
-                    <span>Dedicated Account Manager</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-yellow-500" />
-                    <span>Priority 24/7 Support</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Check className="w-4 h-4 text-yellow-500" />
-                    <span>Monthly Strategy Consultation</span>
+                <p className="text-xs text-muted-foreground font-light leading-relaxed mb-4">
+                  Sibe AX sits on top of your existing data and operations. It automates your operations,
+                  removes inefficiencies and errors, and <span className="text-foreground">SCALES EVERY DAY</span>.
+                </p>
+                <div className="mb-4">
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Perfect for</p>
+                  <div className="flex flex-wrap gap-2">
+                    {["Growing businesses", "Sales teams", "Agencies managing multiple clients", "Service businesses"].map((p) => (
+                      <span key={p} className="px-2 py-1 text-[11px] font-light border border-border/40 rounded-full text-muted-foreground">
+                        {p}
+                      </span>
+                    ))}
                   </div>
                 </div>
                 <Button
-                  onClick={() => {
-                    toast({
-                      title: "VIP Upgrade Request Sent",
-                      description: "Our team will contact you within 24 hours to set up your VIP account."
-                    });
-                  }}
-                  className="w-full mt-4 h-12 bg-yellow-500 text-black hover:bg-yellow-400 font-medium"
+                  onClick={() => toast({ title: "Sibe AX", description: "Subscription request sent. We'll be in touch." })}
+                  className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Upgrade to VIP
+                  Start with Sibe AX
                 </Button>
               </div>
 
@@ -493,6 +442,7 @@ const Settings = () => {
               </Button>
             </div>
           </Card>
+
 
           {/* Platform Information (with dropdown menu) */}
           <Card className="glass-card p-8 border-border/20">
@@ -509,6 +459,7 @@ const Settings = () => {
                   <SelectItem value="overview">Overview</SelectItem>
                   <SelectItem value="ax_keys">AX Engine Keys</SelectItem>
                   <SelectItem value="ai_engine">AI Engine</SelectItem>
+                  <SelectItem value="backend">Backend / Connection</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -607,6 +558,50 @@ const Settings = () => {
                 </div>
                 <Button onClick={saveAiProvider} disabled={savingAi} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90">
                   <Save className="w-4 h-4 mr-2" /> Save AI Engine
+                </Button>
+              </div>
+            )}
+
+            {platformPanel === "backend" && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground font-light">
+                  <KeyRound className="w-4 h-4 text-primary" />
+                  Connect a backend database for your AX agents to read & write.
+                </div>
+                <div className="space-y-2">
+                  <Label>Backend Provider</Label>
+                  <Select value={backendProvider} onValueChange={(v: any) => setBackendProvider(v)}>
+                    <SelectTrigger className="glass-button h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BACKEND_PROVIDERS.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.label} — {p.hint}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="backend-conn">
+                    {BACKEND_PROVIDERS.find(p => p.id === backendProvider)?.label} Connection String / URL
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="backend-conn"
+                      type={showBackend ? "text" : "password"}
+                      value={backendConn}
+                      onChange={(e) => setBackendConn(e.target.value)}
+                      placeholder={BACKEND_PROVIDERS.find(p => p.id === backendProvider)?.placeholder}
+                      className="glass-button h-12 font-mono pr-12"
+                    />
+                    <Button type="button" variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                      onClick={() => setShowBackend(!showBackend)}>
+                      {showBackend ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <Button onClick={saveBackend} className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90">
+                  <Save className="w-4 h-4 mr-2" /> Save Backend Connection
                 </Button>
               </div>
             )}
