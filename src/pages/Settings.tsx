@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Settings as SettingsIcon, User, LogOut, Save, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX, Eye, EyeOff, KeyRound, Cpu } from "lucide-react";
+import { Settings as SettingsIcon, User, LogOut, Save, CreditCard, Check, Palette, Sun, Moon, Crown, Zap, Shield, Volume2, VolumeX, Eye, EyeOff, KeyRound, Cpu, RefreshCw } from "lucide-react";
 import MobileMenu from "@/components/MobileMenu";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -193,7 +193,7 @@ const Settings = () => {
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
-          <p className="text-primary text-lg font-light">Configure your Sibe AI platform & integrations</p>
+          <p className="text-primary text-lg font-light">iSiba AX · light as a feather</p>
         </div>
 
         <div className="space-y-6">
@@ -468,7 +468,11 @@ const Settings = () => {
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between py-3 border-b border-border/30">
                   <span className="text-muted-foreground font-light">Platform Version</span>
-                  <span className="text-primary font-light">SIBE AX v7.0</span>
+                  <span className="text-primary font-light">iSiba AX V1.0</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Slogan</span>
+                  <span className="text-primary font-light">light as a feather</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-border/30">
                   <span className="text-muted-foreground font-light">AI Engine</span>
@@ -476,16 +480,40 @@ const Settings = () => {
                 </div>
                 <div className="flex justify-between py-3 border-b border-border/30">
                   <span className="text-muted-foreground font-light">Backend</span>
-                  <span className="text-primary font-light">Lovable Cloud</span>
+                  <span className="text-primary font-light capitalize">{backendProvider}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-border/30">
                   <span className="text-muted-foreground font-light">Theme</span>
                   <span className="text-primary font-light capitalize">{theme}</span>
                 </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Connected Engine Keys</span>
+                  <span className="text-primary font-light">
+                    {Object.values(axKeys).filter(Boolean).length} / {AX_ENGINES.length}
+                  </span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border/30">
+                  <span className="text-muted-foreground font-light">Last Platform Update</span>
+                  <span className="text-primary font-light">
+                    {lastUpdate ? new Date(lastUpdate).toLocaleString() : "Never"}
+                  </span>
+                </div>
                 <div className="flex justify-between py-3">
                   <span className="text-muted-foreground font-light">Status</span>
                   <span className="font-light text-green-500">● Active</span>
                 </div>
+
+                <Button
+                  onClick={runPlatformUpdate}
+                  disabled={updating}
+                  className="w-full h-12 mt-4 bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${updating ? "animate-spin" : ""}`} />
+                  {updating ? "Updating platform…" : "Update Platform (sync APIs & tokens)"}
+                </Button>
+                <p className="text-[11px] text-muted-foreground font-light text-center">
+                  Re-syncs all connected APIs, AI engines, AX engine keys and backend tokens.
+                </p>
               </div>
             )}
 
