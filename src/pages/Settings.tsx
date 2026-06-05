@@ -459,6 +459,7 @@ const Settings = () => {
                   <SelectItem value="overview">Overview</SelectItem>
                   <SelectItem value="ax_keys">AX Engine Keys</SelectItem>
                   <SelectItem value="ai_engine">AI Engine</SelectItem>
+                  <SelectItem value="backend">Backend / Connection</SelectItem>
                 </SelectContent>
               </Select>
             </div>
