@@ -59,6 +59,9 @@ const Settings = () => {
   const [backendProvider, setBackendProvider] = useState<"supabase" | "mongodb">("supabase");
   const [backendConn, setBackendConn] = useState("");
   const [showBackend, setShowBackend] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
+  const PLATFORM_UPDATE_STORAGE = "platform_last_update_v1";
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
@@ -82,6 +85,8 @@ const Settings = () => {
         if (b.provider) setBackendProvider(b.provider);
         if (b.conn) setBackendConn(b.conn);
       }
+      const lu = localStorage.getItem(PLATFORM_UPDATE_STORAGE);
+      if (lu) setLastUpdate(lu);
     } catch {}
   }, []);
 
@@ -172,6 +177,43 @@ const Settings = () => {
   const saveBackend = () => {
     localStorage.setItem(BACKEND_STORAGE, JSON.stringify({ provider: backendProvider, conn: backendConn }));
     toast({ title: "Backend saved", description: `${backendProvider.toUpperCase()} connection stored on this device.` });
+  };
+
+  const runPlatformUpdate = async () => {
+    setUpdating(true);
+    try {
+      // Persist latest local creds
+      localStorage.setItem(AX_KEYS_STORAGE, JSON.stringify(axKeys));
+      localStorage.setItem(AI_PROVIDER_STORAGE, JSON.stringify({ provider: aiProvider, key: aiProviderKey }));
+      localStorage.setItem(BACKEND_STORAGE, JSON.stringify({ provider: backendProvider, conn: backendConn }));
+
+      // Refresh auth session (rotates token)
+      await supabase.auth.refreshSession();
+
+      // Re-sync all connected APIs
+      const { data, error } = await supabase.functions.invoke("sync-api-data", { body: { syncAll: true } });
+      if (error) throw error;
+
+      const ts = new Date().toISOString();
+      localStorage.setItem(PLATFORM_UPDATE_STORAGE, ts);
+      setLastUpdate(ts);
+
+      toast({
+        title: "Platform updated",
+        description: data?.message || "All connected APIs and tokens refreshed.",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Update completed with warnings",
+        description: err?.message || "Local tokens refreshed; some remote syncs may have failed.",
+        variant: "destructive",
+      });
+      const ts = new Date().toISOString();
+      localStorage.setItem(PLATFORM_UPDATE_STORAGE, ts);
+      setLastUpdate(ts);
+    } finally {
+      setUpdating(false);
+    }
   };
 
 
