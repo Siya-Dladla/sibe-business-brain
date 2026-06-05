@@ -50,12 +50,15 @@ const Settings = () => {
     email: "",
     full_name: ""
   });
-  const [platformPanel, setPlatformPanel] = useState<"overview" | "ax_keys" | "ai_engine">("overview");
+  const [platformPanel, setPlatformPanel] = useState<"overview" | "ax_keys" | "ai_engine" | "backend">("overview");
   const [aiProvider, setAiProvider] = useState<"claude" | "gemini" | "openai">("claude");
   const [aiProviderKey, setAiProviderKey] = useState("");
   const [showAiKey, setShowAiKey] = useState(false);
   const [axKeys, setAxKeys] = useState<Record<string, string>>({});
   const [reveal, setReveal] = useState<Record<string, boolean>>({});
+  const [backendProvider, setBackendProvider] = useState<"supabase" | "mongodb">("supabase");
+  const [backendConn, setBackendConn] = useState("");
+  const [showBackend, setShowBackend] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
