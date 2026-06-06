@@ -428,62 +428,18 @@ const Settings = () => {
               <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/40 relative">
                 <div className="absolute -top-3 left-6 px-2 py-0.5 text-[10px] font-medium bg-primary text-primary-foreground rounded-full">
                   iSiba AX
-                </h2>
-              </div>
-              <div className="text-center mb-6">
-                <div className="inline-flex flex-col items-center gap-1">
-                  <h3 className="text-xl font-light text-primary">iSiba AX</h3>
-                  <p className="text-[10px] text-muted-foreground">independent Synthetic Intelligence Business Agents</p>
-                  <div className="mt-3">
-                    <span className="text-5xl font-extralight">$499</span>
-                    <span className="text-sm text-muted-foreground ml-1">/month</span>
-                  </div>
                 </div>
-              </div>
-              <ul className="space-y-3 mb-6 max-w-md mx-auto">
-                {[
-                  "Custom AI Agents",
-                  "CRM integration",
-                  "AI Prospecting & Lead Scoring",
-                  "Business Health Dashboard",
-                  "Forecasting & Insights Engine",
-                  "Custom App with AI voice assistant on the go",
-                ].map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm font-light">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-                <li className="flex items-start gap-3 text-sm font-light text-muted-foreground">
-                  <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <span>And more.</span>
-                </li>
-              </ul>
-              <p className="text-xs text-muted-foreground font-light mb-6 text-center max-w-md mx-auto">
-                  iSiba AX sits on top of your existing data and operations. It automates your operations,
-                  removes inefficiencies and errors, and <span className="text-foreground">scales every day</span>.
-              </p>
-              <Button
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12"
-                onClick={() => toast({ title: "iSiba AX", description: "Subscription request sent. We'll be in touch." })}
-              >
-                <Crown className="w-4 h-4 mr-2" />
-                Start with iSiba AX
-              </Button>
-                </div>
-                <div className="flex items-center justify-between mb-4 mt-1">
-                  <div className="flex items-center gap-3">
-                    <Zap className="w-6 h-6 text-primary" />
-                    <div>
-                      <h3 className="text-xl font-light text-primary">Sibe AX</h3>
-                      <p className="text-sm text-muted-foreground">The brain on top of your business</p>
+                <div className="text-center mb-6 mt-2">
+                  <div className="inline-flex flex-col items-center gap-1">
+                    <h3 className="text-xl font-light text-primary">iSiba AX</h3>
+                    <p className="text-[10px] text-muted-foreground">independent Synthetic Intelligence Business Agents</p>
+                    <div className="mt-3">
+                      <span className="text-5xl font-extralight">$499</span>
+                      <span className="text-sm text-muted-foreground ml-1">/month</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-light text-foreground">$499<span className="text-sm text-muted-foreground">/mo</span></p>
-                  </div>
                 </div>
-                <div className="space-y-2 mb-4">
+                <ul className="space-y-3 mb-6 max-w-md mx-auto">
                   {[
                     "Custom AI Agents",
                     "CRM integration",
@@ -492,20 +448,23 @@ const Settings = () => {
                     "Forecasting & Insights Engine",
                     "Custom App with AI voice assistant on the go",
                   ].map((f) => (
-                    <div key={f} className="flex items-center gap-2 text-sm text-foreground">
-                      <Check className="w-4 h-4 text-green-500" />
+                    <li key={f} className="flex items-start gap-3 text-sm font-light">
+                      <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                       <span>{f}</span>
-                    </div>
+                    </li>
                   ))}
-                  <p className="text-xs text-muted-foreground pl-6 pt-1">And more.</p>
-                </div>
-                <p className="text-xs text-muted-foreground font-light leading-relaxed mb-4">
-                  Sibe AX sits on top of your existing data and operations. It automates your operations,
-                  removes inefficiencies and errors, and <span className="text-foreground">SCALES EVERY DAY</span>.
+                  <li className="flex items-start gap-3 text-sm font-light text-muted-foreground">
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>And more.</span>
+                  </li>
+                </ul>
+                <p className="text-xs text-muted-foreground font-light mb-4 text-center max-w-md mx-auto">
+                  iSiba AX sits on top of your existing data and operations. It automates your operations,
+                  removes inefficiencies and errors, and <span className="text-foreground">scales every day</span>.
                 </p>
                 <div className="mb-4">
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Perfect for</p>
-                  <div className="flex flex-wrap gap-2">
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2 text-center">Perfect for</p>
+                  <div className="flex flex-wrap gap-2 justify-center">
                     {["Growing businesses", "Sales teams", "Agencies managing multiple clients", "Service businesses"].map((p) => (
                       <span key={p} className="px-2 py-1 text-[11px] font-light border border-border/40 rounded-full text-muted-foreground">
                         {p}
@@ -514,10 +473,11 @@ const Settings = () => {
                   </div>
                 </div>
                 <Button
-                  onClick={() => toast({ title: "Sibe AX", description: "Subscription request sent. We'll be in touch." })}
-                  className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12"
+                  onClick={() => toast({ title: "iSiba AX", description: "Subscription request sent. We'll be in touch." })}
                 >
-                  Start with Sibe AX
+                  <Crown className="w-4 h-4 mr-2" />
+                  Start with iSiba AX
                 </Button>
               </div>
 
@@ -526,6 +486,7 @@ const Settings = () => {
               </Button>
             </div>
           </Card>
+
 
 
           {/* Platform Information (with dropdown menu) */}
