@@ -7,11 +7,9 @@ import { KeyRound, Eye, EyeOff, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ENGINES = [
-  { id: "claude", label: "Claude API", placeholder: "sk-ant-...", hint: "Anthropic Claude — reasoning & long-context analysis" },
-  { id: "obsidian", label: "Obsidian API", placeholder: "obs_...", hint: "Knowledge vault sync & semantic memory" },
-  { id: "hermes", label: "Hermes API", placeholder: "hms_...", hint: "Multi-channel messaging & dispatch" },
-  { id: "mirofish", label: "MiroFish API", placeholder: "mf_...", hint: "Visual reasoning & canvas intelligence" },
-  { id: "openclaw", label: "OpenClaw API", placeholder: "oc_...", hint: "Agentic execution engine (default)" },
+  { id: "claude", label: "Claude Agent API", placeholder: "sk-ant-...", hint: "Anthropic Claude — reasoning agent" },
+  { id: "hermes", label: "Hermes Agent API", placeholder: "hms_...", hint: "Multi-channel messaging & dispatch agent" },
+  { id: "obsidian", label: "Obsidian Vault API", placeholder: "obs_...", hint: "Business memory & semantic knowledge vault" },
 ] as const;
 
 const STORAGE_KEY = "ax_engine_keys_v1";
