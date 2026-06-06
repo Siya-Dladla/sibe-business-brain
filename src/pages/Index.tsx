@@ -11,7 +11,7 @@ import { AX_NAV } from "@/components/MobileMenu";
 
 const Index = () => {
   const isMobile = useIsMobile();
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -59,7 +59,11 @@ const Index = () => {
       </header>
 
       <main className="flex-1 flex min-h-0 overflow-hidden touch-pan-y">
-        {user ? (
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+          </div>
+        ) : user ? (
           <AXCommandCenter />
         ) : (
           <Navigate to="/auth" replace />
