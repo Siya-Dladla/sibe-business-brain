@@ -901,7 +901,7 @@ const HomeChat = () => {
       {/* Watermark Logo */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
         <div className="text-[20vw] md:text-[15vw] font-extralight tracking-wider text-foreground/[0.02] select-none">
-          OpenClaw
+          iSiba AX
         </div>
       </div>
 
