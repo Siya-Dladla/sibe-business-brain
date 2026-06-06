@@ -22,11 +22,9 @@ const AI_PROVIDERS = [
 ] as const;
 
 const AX_ENGINES = [
-  { id: "claude", label: "Claude API", placeholder: "sk-ant-..." },
-  { id: "obsidian", label: "Obsidian API", placeholder: "obs_..." },
-  { id: "hermes", label: "Hermes API", placeholder: "hms_..." },
-  { id: "mirofish", label: "MiroFish API", placeholder: "mf_..." },
-  { id: "openclaw", label: "OpenClaw API", placeholder: "oc_..." },
+  { id: "claude", label: "Claude Agent API", placeholder: "sk-ant-..." },
+  { id: "hermes", label: "Hermes Agent API", placeholder: "hms_..." },
+  { id: "obsidian", label: "Obsidian Vault API", placeholder: "obs_..." },
   { id: "higgsfield", label: "Higgsfield API", placeholder: "hf_..." },
   { id: "custom_crm", label: "Custom CRM API Endpoint", placeholder: "https://your-crm.example.com/api" },
 ] as const;
