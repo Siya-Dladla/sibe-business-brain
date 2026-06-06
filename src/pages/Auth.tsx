@@ -29,7 +29,7 @@ const Auth = () => {
       }
     }) => {
       if (session) {
-        navigate("/dashboard");
+        navigate("/");
       }
     });
 
@@ -40,7 +40,7 @@ const Auth = () => {
       }
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === "SIGNED_IN") {
-        navigate("/dashboard");
+        navigate("/");
       }
     });
     return () => subscription.unsubscribe();
