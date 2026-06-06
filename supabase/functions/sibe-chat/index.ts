@@ -443,27 +443,8 @@ function parseCommand(message: string): { isCommand: boolean; commandType: strin
   return { isCommand: false, commandType: '', params: {} };
 }
 
-// Helper to get OpenClaw config or fallback to Lovable AI Gateway
-async function getAiConfig(supabase: any, userId: string | null, lovableApiKey: string) {
-  if (!userId) return { endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions', apiKey: lovableApiKey, isOpenClaw: false };
-  
-  const { data } = await supabase
-    .from('connected_agents')
-    .select('api_endpoint, api_key_encrypted')
-    .eq('user_id', userId)
-    .eq('platform', 'openclaw')
-    .eq('status', 'active')
-    .maybeSingle();
-  
-  if (data?.api_endpoint && data?.api_key_encrypted) {
-    // OpenClaw uses OpenAI-compatible API, append /chat/completions if needed
-    let endpoint = data.api_endpoint;
-    if (!endpoint.endsWith('/chat/completions')) {
-      endpoint = endpoint.replace(/\/$/, '') + '/chat/completions';
-    }
-    return { endpoint, apiKey: data.api_key_encrypted, isOpenClaw: true };
-  }
-  
+// Lovable AI Gateway config (Claude/Gemini-backed agent)
+async function getAiConfig(_supabase: any, _userId: string | null, lovableApiKey: string) {
   return { endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions', apiKey: lovableApiKey, isOpenClaw: false };
 }
 
