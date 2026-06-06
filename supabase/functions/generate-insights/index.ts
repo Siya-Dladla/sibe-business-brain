@@ -7,19 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function getAiConfig(supabase: any, userId: string, lovableApiKey: string) {
-  const { data } = await supabase
-    .from('connected_agents')
-    .select('api_endpoint, api_key_encrypted')
-    .eq('user_id', userId)
-    .eq('platform', 'openclaw')
-    .eq('status', 'active')
-    .maybeSingle();
-  if (data?.api_endpoint && data?.api_key_encrypted) {
-    let endpoint = data.api_endpoint;
-    if (!endpoint.endsWith('/chat/completions')) endpoint = endpoint.replace(/\/$/, '') + '/chat/completions';
-    return { endpoint, apiKey: data.api_key_encrypted, isOpenClaw: true };
-  }
+async function getAiConfig(_supabase: any, _userId: string, lovableApiKey: string) {
   return { endpoint: 'https://ai.gateway.lovable.dev/v1/chat/completions', apiKey: lovableApiKey, isOpenClaw: false };
 }
 

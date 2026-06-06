@@ -15,7 +15,7 @@ interface Message {
 const SibeChat = forwardRef((props, ref) => {
   const [messages, setMessages] = useState<Message[]>([{
     role: "assistant",
-    content: "Hello! I'm Sibe AI, your agentic AI business intelligence partner powered by OpenClaw. I've analyzed your business data and I'm ready to provide strategic insights. How can I help you today?",
+    content: "Hello! I'm Sibe AI, your agentic AI business intelligence partner powered by the iSiba AX Orchestrator. I've analyzed your business data and I'm ready to provide strategic insights. How can I help you today?",
     timestamp: new Date()
   }]);
   const [input, setInput] = useState("");
@@ -97,7 +97,7 @@ const SibeChat = forwardRef((props, ref) => {
           <h3 className="text-xl md:text-2xl font-extralight tracking-wide bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Ask Sibe
           </h3>
-          <p className="text-xs md:text-sm text-muted-foreground font-light">Powered by OpenClaw Agentic AI</p>
+          <p className="text-xs md:text-sm text-muted-foreground font-light">Powered by iSiba AX Orchestrator</p>
         </div>
       </div>
 
