@@ -41,7 +41,7 @@ const Observation = () => {
     <AXLayerShell icon={Eye} title="Observation Layer" subtitle="Always-on business signal ingestion" layerLabel="Layer 5 · Observation">
       <Card className="glass-card p-5 border-border/30 mb-6">
         <p className="text-sm font-light text-muted-foreground">
-          SIBE AX continuously ingests signals from CRM, email, messaging, finance, web, and IoT.
+          iSiba AX continuously ingests signals from CRM, email, messaging, finance, web, and IoT.
           Every signal becomes context for agent reasoning.
         </p>
       </Card>

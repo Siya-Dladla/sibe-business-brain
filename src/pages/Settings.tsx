@@ -566,7 +566,7 @@ const Settings = () => {
               <div className="space-y-5">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground font-light">
                   <KeyRound className="w-4 h-4 text-primary" />
-                  Plug your own API keys into the SIBE AX organism. Stored locally on this device.
+                  Plug your own API keys into the iSiba AX organism. Stored locally on this device.
                 </div>
                 {AX_ENGINES.map((e) => (
                   <div key={e.id} className="space-y-2">
