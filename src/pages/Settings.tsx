@@ -235,7 +235,7 @@ const Settings = () => {
       <div className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-10">
           <h1 className="text-5xl font-extralight mb-3 tracking-wide text-foreground">Settings</h1>
-          <p className="text-primary text-lg font-light">iSiba AX · light as a feather</p>
+          <p className="text-primary text-lg font-light">iSiba AX</p>
         </div>
 
         <div className="space-y-6">
@@ -513,8 +513,8 @@ const Settings = () => {
                   <span className="text-primary font-light">iSiba AX V1.0</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-border/30">
-                  <span className="text-muted-foreground font-light">Slogan</span>
-                  <span className="text-primary font-light">light as a feather</span>
+                  <span className="text-muted-foreground font-light">Name</span>
+                  <span className="text-primary font-light">independent Synthetic Intelligence Business Agents</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-border/30">
                   <span className="text-muted-foreground font-light">AI Engine</span>
