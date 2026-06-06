@@ -37,7 +37,7 @@ const Pricing = () => {
             The brain on top of your <span className="text-primary">business</span>
           </h1>
           <p className="text-sm md:text-base text-muted-foreground mt-4 max-w-xl mx-auto font-light">
-            SIBE AX sits on top of your existing data and operations. It automates your workflows,
+            iSiba AX sits on top of your existing data and operations. It automates your workflows,
             removes inefficiencies and errors, and <span className="text-foreground">scales every day</span>.
           </p>
         </div>
@@ -45,12 +45,12 @@ const Pricing = () => {
         <Card className="glass-card p-6 md:p-10 border-primary/60 ring-1 ring-primary/30 relative">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <Badge className="bg-primary text-primary-foreground text-[10px]">
-              <Sparkles className="w-3 h-3 mr-1" /> SIBE AX
+              <Sparkles className="w-3 h-3 mr-1" /> iSiba AX
             </Badge>
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-light">SIBE AX</h2>
+            <h2 className="text-2xl font-light">iSiba AX</h2>
             <div className="mt-4">
               <span className="text-5xl md:text-6xl font-extralight">$499</span>
               <span className="text-sm text-muted-foreground ml-1">/month</span>
@@ -71,7 +71,7 @@ const Pricing = () => {
           </ul>
 
           <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12">
-            Start with SIBE AX
+            Start with iSiba AX
           </Button>
         </Card>
 
