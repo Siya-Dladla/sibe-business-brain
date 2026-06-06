@@ -43,7 +43,7 @@ const App = () => (
               <Route path="/evolution" element={<Navigate to="/brain" replace />} />
               <Route path="/swarm" element={<Navigate to="/agents" replace />} />
               <Route path="/execution" element={<Navigate to="/agents" replace />} />
-              <Route path="/dashboard" element={<Navigate to="/reality" replace />} />
+              <Route path="/dashboard" element={<Navigate to="/" replace />} />
               <Route path="/analytics" element={<Navigate to="/brain" replace />} />
               <Route path="/intelligence" element={<Navigate to="/brain" replace />} />
               <Route path="/employees" element={<Navigate to="/agents" replace />} />

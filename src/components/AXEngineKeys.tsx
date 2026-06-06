@@ -40,7 +40,7 @@ export default function AXEngineKeys() {
         <h2 className="text-2xl font-extralight tracking-wide text-foreground">AX Engine Keys</h2>
       </div>
       <p className="text-sm text-muted-foreground font-light mb-6">
-        Plug your own API keys into the Sibe AX organism. Each engine extends a different cognitive layer.
+        Plug your own API keys into the iSiba AX organism. Each engine extends a different cognitive layer.
         Keys are stored locally on this device until you connect a backend secret.
       </p>
 

@@ -21,7 +21,7 @@ const Cognitive = () => {
     <AXLayerShell icon={Brain} title="Cognitive Layer" subtitle="Continuous reasoning engine" layerLabel="Layer 2 · Cognitive">
       <Card className="glass-card p-5 border-border/30 mb-6">
         <p className="text-sm font-light text-muted-foreground">
-          Sibe AX continuously reasons about your business state — detecting patterns, risks, and opportunities.
+          iSiba AX continuously reasons about your business state — detecting patterns, risks, and opportunities.
           Every human intent triggers a reasoning chain across specialized agents.
         </p>
       </Card>

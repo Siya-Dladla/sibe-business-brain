@@ -42,7 +42,7 @@ const Evolution = () => {
     <AXLayerShell icon={TrendingUp} title="Evolution Layer" subtitle="Self-improving business organism" layerLabel="Layer 8 · Evolution">
       <Card className="glass-card p-5 border-border/30 mb-6">
         <p className="text-sm font-light text-muted-foreground">
-          SIBE AX learns from every outcome. Workflows optimize. Agent decisions improve. Playbooks evolve.
+          iSiba AX learns from every outcome. Workflows optimize. Agent decisions improve. Playbooks evolve.
           The system grows more capable with every intent you dispatch.
         </p>
       </Card>

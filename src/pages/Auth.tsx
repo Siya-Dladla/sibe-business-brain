@@ -29,7 +29,7 @@ const Auth = () => {
       }
     }) => {
       if (session) {
-        navigate("/dashboard");
+        navigate("/");
       }
     });
 
@@ -40,7 +40,7 @@ const Auth = () => {
       }
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === "SIGNED_IN") {
-        navigate("/dashboard");
+        navigate("/");
       }
     });
     return () => subscription.unsubscribe();
@@ -68,7 +68,7 @@ const Auth = () => {
     e.preventDefault();
     if (!validateInputs()) return;
     setLoading(true);
-    const redirectUrl = `${window.location.origin}/dashboard`;
+    const redirectUrl = `${window.location.origin}/`;
     const {
       error
     } = await supabase.auth.signUp({
@@ -121,7 +121,7 @@ const Auth = () => {
             <div className="relative">
               <div className="w-32 h-32 rounded-full border border-primary/30 flex items-center justify-center bg-gradient-card backdrop-blur-sm shadow-2xl">
                 <div className="text-center">
-                  <h1 className="text-3xl font-extralight tracking-wider glow-text">Sibe</h1>
+                  <h1 className="text-3xl font-extralight tracking-wider glow-text">iSiba</h1>
                   <div className="h-px w-16 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent"></div>
                 </div>
               </div>
@@ -131,9 +131,11 @@ const Auth = () => {
           </div>
           <div>
             <CardTitle className="text-2xl font-extralight tracking-wide text-primary mb-2">
-              Agent Experience Operating System
+              iSiba AX
             </CardTitle>
-            
+            <CardDescription className="text-xs font-light text-muted-foreground px-4">
+              independent Synthetic Intelligence Business Agents
+            </CardDescription>
           </div>
         </CardHeader>
 

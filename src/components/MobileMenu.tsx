@@ -51,10 +51,9 @@ const MobileMenu = () => {
               <SibeLogo size="sm" />
               <div>
                 <h2 className="text-2xl font-extralight tracking-wider">iSiba AX</h2>
-                <p className="text-[10px] text-muted-foreground font-light">light as a feather</p>
+                <p className="text-[10px] text-muted-foreground font-light">independent Synthetic Intelligence Business Agents</p>
               </div>
             </div>
-            <p className="text-xs text-primary font-light mt-1">light as a feather</p>
           </div>
 
           <nav className="flex-1 py-4 native-bounce overflow-y-auto">

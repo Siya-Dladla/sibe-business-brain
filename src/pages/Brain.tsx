@@ -75,7 +75,7 @@ const Brain = () => {
     <AXLayerShell icon={BrainIcon} title="Brain" subtitle="Cognition · Observation · Memory · Evolution" layerLabel="Brain">
       <Card className="glass-card p-5 border-border/30 mb-6">
         <p className="text-sm font-light text-muted-foreground">
-          The unified mind of SIBE AX — observing signals, reasoning over intents, storing memory, and evolving with every outcome.
+          The unified mind of iSiba AX — observing signals, reasoning over intents, storing memory, and evolving with every outcome.
         </p>
       </Card>
 
