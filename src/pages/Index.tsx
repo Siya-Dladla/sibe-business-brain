@@ -11,7 +11,7 @@ import { AX_NAV } from "@/components/MobileMenu";
 
 const Index = () => {
   const isMobile = useIsMobile();
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
